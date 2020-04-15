@@ -5,10 +5,8 @@ import (
 	"testing"
 )
 
-// TODO: test ordering
-
-func TestTokenizer(t *testing.T) {
-	text := `Hi.    
+func TestScanner(t *testing.T) {
+	original := `Hi.    
 	node.js, first_last, my.name@domain.com
 	123.456, 789, .234, 1,000, a16z, 3G and $200.13.
 	wishy-washy and C++ and F# and .net
@@ -18,18 +16,33 @@ func TestTokenizer(t *testing.T) {
 	ב'
 	"אא"בב"abc
 	Then ウィキペディア and 象形.`
-	text += "crlf is \r\n"
+	original += "crlf is \r\n"
 
-	tokens := NewTokenizer(strings.NewReader(text))
+	scanner := NewScanner(strings.NewReader(original))
+
+	// First, sanity check
+	roundtrip := ""
+	for scanner.Scan() {
+		roundtrip += scanner.Text()
+	}
+	if err := scanner.Err(); err != nil {
+		t.Error(err)
+	}
+
+	if roundtrip != original {
+		t.Error("roundtrip should equal the original")
+	}
+
+	// Got re-scan
+	scanner = NewScanner(strings.NewReader(original))
 
 	got := map[string]bool{}
 
-	for tokens.Scan() {
-		token := tokens.Text()
+	for scanner.Scan() {
+		token := scanner.Text()
 		got[token] = true
 	}
-
-	if err := tokens.Err(); err != nil {
+	if err := scanner.Err(); err != nil {
 		t.Error(err)
 	}
 
