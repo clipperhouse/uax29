@@ -1,3 +1,5 @@
+// Package uax29 provides a scanner for Unicode text segmentation word boundaries: https://unicode.org/reports/tr29/#Word_Boundaries
+// It does not implement the eintire specification, but many of the most important rules.
 package uax29
 
 import (
@@ -11,13 +13,14 @@ import (
 //
 // Its uses several specs from Unicode Text Segmentation word boundaries https://unicode.org/reports/tr29/#Word_Boundaries. It's not a full implementation, but a decent approximation for many mainstream cases.
 //
-// Tokenize returns all tokens (including white space), so text can be reconstructed with fidelity.
+// It returns all tokens (including white space), so text can be reconstructed with fidelity.
 func NewScanner(r io.Reader) *Scanner {
 	return &Scanner{
 		incoming: bufio.NewReaderSize(r, 64*1024),
 	}
 }
 
+// Scanner is the structure for scanning an input Reader. Use NewScanner to instantiate.
 type Scanner struct {
 	incoming *bufio.Reader
 	buffer   []rune
