@@ -1,59 +1,53 @@
-package jargon
+package uax29
 
 import (
 	"bufio"
 	"io"
-	"strings"
 
-	"github.com/clipperhouse/jargon/is"
+	"github.com/clipperhouse/uax29/is"
 )
 
-// Tokenize tokenizes a reader into a stream of tokens. Iterate through the stream by calling Scan() or Next().
+// NewTokenizer tokenizes a reader into a stream of tokens. Iterate through the stream by calling Scan() or Next().
 //
 // Its uses several specs from Unicode Text Segmentation https://unicode.org/reports/tr29/. It's not a full implementation, but a decent approximation for many mainstream cases.
 //
 // Tokenize returns all tokens (including white space), so text can be reconstructed with fidelity.
-func Tokenize(r io.Reader) *TokenStream {
-	t := newTokenizer(r, false)
-	return NewTokenStream(t.next)
-}
-
-// TokenizeString tokenizes a string into a stream of tokens. Iterate through the stream by calling Scan() or Next().
-//
-// It returns all tokens (including white space), so text can be reconstructed with fidelity ("round tripped").
-func TokenizeString(s string) *TokenStream {
-	return Tokenize(strings.NewReader(s))
-}
-
-type tokenizer struct {
-	incoming *bufio.Reader
-	buffer   []rune
-}
-
-func newTokenizer(r io.Reader, guard bool) *tokenizer {
-	return &tokenizer{
+func NewTokenizer(r io.Reader) *Tokenizer {
+	return &Tokenizer{
 		incoming: bufio.NewReaderSize(r, 64*1024),
 	}
 }
 
-// next returns the next token. Call until it returns nil.
-func (t *tokenizer) next() (*Token, error) {
+type Tokenizer struct {
+	incoming *bufio.Reader
+	buffer   []rune
+
+	text string
+	err  error
+}
+
+// Scan returns the Scan token. Call until it returns nil.
+func (t *Tokenizer) Scan() bool {
 	for {
 		current, eof, err := t.readRune()
 		switch {
 		case err != nil:
-			return nil, err
+			t.err = err
+			return false
 		case eof:
 			// This is WB2
 			// https://unicode.org/reports/tr29/#WB2
-			return t.token(), nil
+
+			t.text = t.token()
+			return t.text != ""
 		}
 
 		// Some funcs below require lookahead; better to do I/O here than there
 		// (we don't care about eof for lookahead, irrelevant)
 		lookahead, _, err := t.peekRune()
 		if err != nil {
-			return nil, err
+			t.err = err
+			return false
 		}
 
 		switch {
@@ -91,14 +85,22 @@ func (t *tokenizer) next() (*Token, error) {
 		// https://unicode.org/reports/tr29/#WB999
 
 		if len(t.buffer) > 0 {
-			token := t.token()
+			t.text = t.token()
 			t.accept(current)
-			return token, nil
+			return true
 		}
 
 		t.accept(current)
 		continue
 	}
+}
+
+func (t *Tokenizer) Text() string {
+	return t.text
+}
+
+func (t *Tokenizer) Err() error {
+	return t.err
 }
 
 // Word boundary rules: https://unicode.org/reports/tr29/#Word_Boundaries
@@ -108,7 +110,7 @@ func (t *tokenizer) next() (*Token, error) {
 // In most cases, returning true means 'keep going'.
 
 // https://unicode.org/reports/tr29/#WB3
-func (t *tokenizer) wb3(current rune) (continues bool) {
+func (t *Tokenizer) wb3(current rune) (continues bool) {
 	if len(t.buffer) == 0 {
 		return is.Cr(current)
 	}
@@ -118,7 +120,7 @@ func (t *tokenizer) wb3(current rune) (continues bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB3a
-func (t *tokenizer) wb3a(current rune) (breaks bool) {
+func (t *Tokenizer) wb3a(current rune) (breaks bool) {
 	if len(t.buffer) == 0 {
 		return is.Cr(current) || is.Lf(current) || is.Newline(current)
 	}
@@ -128,12 +130,12 @@ func (t *tokenizer) wb3a(current rune) (breaks bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB3b
-func (t *tokenizer) wb3b(current rune) (breaks bool) {
+func (t *Tokenizer) wb3b(current rune) (breaks bool) {
 	return is.Cr(current) || is.Lf(current) || is.Newline(current)
 }
 
 // https://unicode.org/reports/tr29/#WB5
-func (t *tokenizer) wb3d(current rune) (continues bool) {
+func (t *Tokenizer) wb3d(current rune) (continues bool) {
 	if len(t.buffer) == 0 {
 		return is.WSegSpace(current)
 	}
@@ -143,7 +145,7 @@ func (t *tokenizer) wb3d(current rune) (continues bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB5
-func (t *tokenizer) wb5(current rune) (continues bool) {
+func (t *Tokenizer) wb5(current rune) (continues bool) {
 	if len(t.buffer) == 0 {
 		return is.AHLetter(current)
 	}
@@ -153,7 +155,7 @@ func (t *tokenizer) wb5(current rune) (continues bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB6
-func (t *tokenizer) wb6(current, lookahead rune) (continues bool) {
+func (t *Tokenizer) wb6(current, lookahead rune) (continues bool) {
 	if len(t.buffer) == 0 {
 		return is.AHLetter(current)
 	}
@@ -163,7 +165,7 @@ func (t *tokenizer) wb6(current, lookahead rune) (continues bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB7
-func (t *tokenizer) wb7(current rune) (continues bool) {
+func (t *Tokenizer) wb7(current rune) (continues bool) {
 	if len(t.buffer) < 2 {
 		return false
 	}
@@ -175,7 +177,7 @@ func (t *tokenizer) wb7(current rune) (continues bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB7a
-func (t *tokenizer) wb7a(current rune) (continues bool) {
+func (t *Tokenizer) wb7a(current rune) (continues bool) {
 	if len(t.buffer) == 0 {
 		return is.HebrewLetter(current)
 	}
@@ -185,7 +187,7 @@ func (t *tokenizer) wb7a(current rune) (continues bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB7b
-func (t *tokenizer) wb7b(current, lookahead rune) (continues bool) {
+func (t *Tokenizer) wb7b(current, lookahead rune) (continues bool) {
 	if len(t.buffer) == 0 {
 		return is.HebrewLetter(current)
 	}
@@ -195,7 +197,7 @@ func (t *tokenizer) wb7b(current, lookahead rune) (continues bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB7c
-func (t *tokenizer) wb7c(current rune) (continues bool) {
+func (t *Tokenizer) wb7c(current rune) (continues bool) {
 	if len(t.buffer) < 2 {
 		return false
 	}
@@ -207,7 +209,7 @@ func (t *tokenizer) wb7c(current rune) (continues bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB8
-func (t *tokenizer) wb8(current rune) (continues bool) {
+func (t *Tokenizer) wb8(current rune) (continues bool) {
 	// If it's a new token and Numeric
 	if len(t.buffer) == 0 {
 		return is.Numeric(current)
@@ -218,7 +220,7 @@ func (t *tokenizer) wb8(current rune) (continues bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB9
-func (t *tokenizer) wb9(current rune) (continues bool) {
+func (t *Tokenizer) wb9(current rune) (continues bool) {
 	if len(t.buffer) == 0 {
 		return is.AHLetter(current)
 	}
@@ -228,7 +230,7 @@ func (t *tokenizer) wb9(current rune) (continues bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB9
-func (t *tokenizer) wb10(current rune) (continues bool) {
+func (t *Tokenizer) wb10(current rune) (continues bool) {
 	if len(t.buffer) == 0 {
 		return is.Numeric(current)
 	}
@@ -238,7 +240,7 @@ func (t *tokenizer) wb10(current rune) (continues bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB11
-func (t *tokenizer) wb11(current rune) (continues bool) {
+func (t *Tokenizer) wb11(current rune) (continues bool) {
 	if len(t.buffer) < 2 {
 		return false
 	}
@@ -250,7 +252,7 @@ func (t *tokenizer) wb11(current rune) (continues bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB12
-func (t *tokenizer) wb12(current, lookahead rune) (continues bool) {
+func (t *Tokenizer) wb12(current, lookahead rune) (continues bool) {
 	if len(t.buffer) == 0 {
 		return is.Numeric(current)
 	}
@@ -260,7 +262,7 @@ func (t *tokenizer) wb12(current, lookahead rune) (continues bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB13
-func (t *tokenizer) wb13(current rune) (continues bool) {
+func (t *Tokenizer) wb13(current rune) (continues bool) {
 	// If it's a new token and Katakana
 	if len(t.buffer) == 0 {
 		return is.Katakana(current)
@@ -271,7 +273,7 @@ func (t *tokenizer) wb13(current rune) (continues bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB13a
-func (t *tokenizer) wb13a(current rune) (continues bool) {
+func (t *Tokenizer) wb13a(current rune) (continues bool) {
 	if len(t.buffer) == 0 {
 		return is.AHLetter(current) || is.Numeric(current) || is.Katakana(current) || is.ExtendNumLet(current)
 	}
@@ -281,7 +283,7 @@ func (t *tokenizer) wb13a(current rune) (continues bool) {
 }
 
 // https://unicode.org/reports/tr29/#WB13b
-func (t *tokenizer) wb13b(current rune) (continues bool) {
+func (t *Tokenizer) wb13b(current rune) (continues bool) {
 	if len(t.buffer) == 0 {
 		return is.ExtendNumLet(current)
 	}
@@ -290,24 +292,23 @@ func (t *tokenizer) wb13b(current rune) (continues bool) {
 	return is.ExtendNumLet(previous) && (is.AHLetter(current) || is.Numeric(current) || is.Katakana(current))
 }
 
-func (t *tokenizer) token() *Token {
+func (t *Tokenizer) token() string {
 	if len(t.buffer) == 0 {
-		return nil
+		return ""
 	}
 
 	s := string(t.buffer)
 	t.buffer = t.buffer[:0]
 
-	token := NewToken(s, false)
-	return token
+	return s
 }
 
-func (t *tokenizer) accept(r rune) {
+func (t *Tokenizer) accept(r rune) {
 	t.buffer = append(t.buffer, r)
 }
 
 // readRune gets the next rune, advancing the reader
-func (t *tokenizer) readRune() (r rune, eof bool, err error) {
+func (t *Tokenizer) readRune() (r rune, eof bool, err error) {
 	r, _, err = t.incoming.ReadRune()
 
 	if err != nil {
@@ -320,7 +321,7 @@ func (t *tokenizer) readRune() (r rune, eof bool, err error) {
 	return r, false, nil
 }
 
-func (t *tokenizer) unreadRune() error {
+func (t *Tokenizer) unreadRune() error {
 	err := t.incoming.UnreadRune()
 
 	if err != nil {
@@ -331,7 +332,7 @@ func (t *tokenizer) unreadRune() error {
 }
 
 // peekRune peeks the next rune, without advancing the reader
-func (t *tokenizer) peekRune() (r rune, eof bool, err error) {
+func (t *Tokenizer) peekRune() (r rune, eof bool, err error) {
 	r, _, err = t.incoming.ReadRune()
 
 	if err != nil {

@@ -1,17 +1,11 @@
-package jargon
+package uax29
 
 import (
-	"io"
 	"strings"
 	"testing"
 )
 
 // TODO: test ordering
-
-func tokenize(r io.Reader) *TokenStream {
-	t := newTokenizer(r, true) // add guard for testing
-	return NewTokenStream(t.next)
-}
 
 func TestTokenizer(t *testing.T) {
 	text := `Hi.    
@@ -26,13 +20,13 @@ func TestTokenizer(t *testing.T) {
 	Then ウィキペディア and 象形.`
 	text += "crlf is \r\n"
 
-	tokens := tokenize(strings.NewReader(text))
+	tokens := NewTokenizer(strings.NewReader(text))
 
 	got := map[string]bool{}
 
 	for tokens.Scan() {
-		token := tokens.Token()
-		got[token.String()] = true
+		token := tokens.Text()
+		got[token] = true
 	}
 
 	if err := tokens.Err(); err != nil {
