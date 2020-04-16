@@ -2,7 +2,11 @@
 // https://unicode.org/reports/tr29/
 package is
 
-import "unicode"
+import (
+	"unicode"
+
+	"golang.org/x/text/unicode/rangetable"
+)
 
 // Alphabetic is defined here: https://unicode.org/reports/tr44/#Alphabetic
 func Alphabetic(r rune) bool {
@@ -61,37 +65,35 @@ func AHLetter(r rune) bool {
 	return ALetter(r) || HebrewLetter(r)
 }
 
+var midLetter = rangetable.New(
+	//':',	// TODO Swedish
+	'·',
+	'·',
+	'՟',
+	'״',
+	'‧',
+	'︓',
+	'﹕',
+	'：',
+)
+
 // MidLetter is defined here: https://unicode.org/reports/tr29/#MidLetter
 func MidLetter(r rune) bool {
-	switch r {
-	case
-		//':',	// TODO Swedish
-		'·',
-		'·',
-		'՟',
-		'״',
-		'‧',
-		'︓',
-		'﹕',
-		'：':
-		return true
-	}
-	return false
+	return unicode.Is(midLetter, r)
 }
+
+var midNumLet = rangetable.New(
+	'.',
+	'’',
+	'․',
+	'﹒',
+	'＇',
+	'．',
+)
 
 // MidNumLet is defined here: https://unicode.org/reports/tr29/#MidNumLet
 func MidNumLet(r rune) bool {
-	switch r {
-	case
-		'.',
-		'’',
-		'․',
-		'﹒',
-		'＇',
-		'．':
-		return true
-	}
-	return false
+	return unicode.Is(midNumLet, r)
 }
 
 // MidNumLetQ is defined here: https://unicode.org/reports/tr29/#MidNumLet
@@ -99,47 +101,44 @@ func MidNumLetQ(r rune) bool {
 	return MidNumLet(r) || r == '\''
 }
 
+var infixNumeric = rangetable.New(
+	0x002C,
+	0x002E,
+	0x003A,
+	0x003B,
+	0x037E,
+	0x0589,
+	0x060C,
+	0x060D,
+	0x07F8,
+	0x2044,
+	0xFE10,
+	0xFE13,
+	0xFE14,
+)
+
 // InfixNumeric is defined here: https://unicode.org/reports/tr14/
 func InfixNumeric(r rune) bool {
-	switch r {
-	case
-		0x002C,
-		0x002E,
-		0x003A,
-		0x003B,
-		0x037E,
-		0x0589,
-		0x060C,
-		0x060D,
-		0x07F8,
-		0x2044,
-		0xFE10,
-		0xFE13,
-		0xFE14:
-		return true
-	}
-
-	return false
+	return unicode.Is(infixNumeric, r)
 }
+
+var notMidNum = rangetable.New(
+	0x003A,
+	0xFE13,
+	0x002E,
+)
+
+var addMidNum = rangetable.New(
+	0x066C,
+	0xFE50,
+	0xFE54,
+	0xFF0C,
+	0xFF1B,
+)
 
 // MidNum is defined here: https://unicode.org/reports/tr29/#MidNum
 func MidNum(r rune) bool {
-	switch r {
-	case
-		0x003A,
-		0xFE13,
-		0x002E:
-		return false
-	case
-		0x066C,
-		0xFE50,
-		0xFE54,
-		0xFF0C,
-		0xFF1B:
-		return true
-	default:
-		return InfixNumeric(r)
-	}
+	return !unicode.Is(notMidNum, r) && (InfixNumeric(r) || unicode.Is(addMidNum, r))
 }
 
 // Numeric is defined here: https://unicode.org/reports/tr29/#Numeric
@@ -164,24 +163,22 @@ func Lf(r rune) bool {
 	return r == '\n'
 }
 
+var addKatakana = rangetable.New(
+	0x3031,
+	0x3032,
+	0x3033,
+	0x3034,
+	0x3035,
+	0x309B,
+	0x309C,
+	0x30A0,
+	0x30FC,
+	0xFF70,
+)
+
 // Katakana is defined here: https://unicode.org/reports/tr29/#Katakana
 func Katakana(r rune) bool {
-	switch r {
-	case
-		0x3031,
-		0x3032,
-		0x3033,
-		0x3034,
-		0x3035,
-		0x309B,
-		0x309C,
-		0x30A0,
-		0x30FC,
-		0xFF70:
-		return true
-	default:
-		return unicode.Is(unicode.Katakana, r)
-	}
+	return unicode.Is(unicode.Katakana, r) || unicode.Is(addKatakana, r)
 }
 
 // HebrewLetter is defined here: https://unicode.org/reports/tr29/#Hebrew_Letter
@@ -189,19 +186,17 @@ func HebrewLetter(r rune) bool {
 	return unicode.Is(unicode.Hebrew, r) && unicode.IsLetter(r)
 }
 
+var newLine = rangetable.New(
+	0x000B,
+	0x000C,
+	0x0085,
+	0x2028,
+	0x2029,
+)
+
 // Newline is defined here: https://unicode.org/reports/tr29/#WB3a
 func Newline(r rune) bool {
-	switch r {
-	case
-		0x000B,
-		0x000C,
-		0x0085,
-		0x2028,
-		0x2029:
-		return true
-	}
-
-	return false
+	return unicode.Is(newLine, r)
 }
 
 // SingleQuote is defined here: https://unicode.org/reports/tr29/#Single_Quote
