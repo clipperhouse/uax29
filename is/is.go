@@ -8,18 +8,14 @@ import (
 	"golang.org/x/text/unicode/rangetable"
 )
 
+var alphabetic = rangetable.Merge(rangetable.New('_'), unicode.Letter, unicode.Nl, unicode.Other_Alphabetic)
+
 // Alphabetic is defined here: https://unicode.org/reports/tr44/#Alphabetic
 func Alphabetic(r rune) bool {
-	switch {
-	case
-		r == '_',
-		unicode.IsLetter(r),
-		unicode.Is(unicode.Nl, r),
-		unicode.Is(unicode.Other_Alphabetic, r):
-		return true
-	}
-	return false
+	return unicode.Is(alphabetic, r)
 }
+
+var hiraganaKatakanaIdeographic = rangetable.Merge(unicode.Hiragana, unicode.Katakana, unicode.Ideographic)
 
 // ALetter is defined here: https://unicode.org/reports/tr29/#ALetter
 func ALetter(r rune) bool {
@@ -28,20 +24,18 @@ func ALetter(r rune) bool {
 	switch {
 	case
 		HebrewLetter(r),
-		unicode.Is(unicode.Hiragana, r),
-		unicode.Is(unicode.Katakana, r),
-		unicode.Is(unicode.Ideographic, r):
+		unicode.Is(hiraganaKatakanaIdeographic, r):
 		return false
 	}
 
-	if unicode.Is(ALetterTable, r) {
+	if unicode.Is(addALetter, r) {
 		return true
 	}
 
 	return Alphabetic(r)
 }
 
-var ALetterTable = &unicode.RangeTable{
+var addALetter = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x02C2, 0x02C5, 1},
 		{0x02D2, 0x02D7, 1},
