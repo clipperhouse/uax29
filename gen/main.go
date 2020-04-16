@@ -61,6 +61,13 @@ func main() {
 		rangeTablesByCategory[category] = rangetable.New(runes...)
 	}
 
+	// Merged "macro" tables defined here: https://unicode.org/reports/tr29/#WB_Rule_Macros
+	ALetter := rangeTablesByCategory["ALetter"]
+	Hebrew_Letter := rangeTablesByCategory["Hebrew_Letter"]
+	MidNumLet := rangeTablesByCategory["MidNumLet"]
+	rangeTablesByCategory["AHLetter"] = rangetable.Merge(ALetter, Hebrew_Letter)
+	rangeTablesByCategory["MidNumLetQ"] = rangetable.Merge(MidNumLet, rangetable.New('\''))
+
 	dst, err := os.Create("tables.go")
 	if err != nil {
 		panic(err)
