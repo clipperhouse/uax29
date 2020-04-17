@@ -83,7 +83,9 @@ func (sc *Scanner) Scan() bool {
 			sc.WB10(current),
 			sc.WB11(current),
 			sc.WB12(current, lookahead),
-			sc.WB13(current):
+			sc.WB13(current),
+			sc.WB15(current),
+			sc.WB16(current):
 			// true indicates continue
 			sc.accept(current)
 			continue
@@ -261,6 +263,36 @@ func (sc *Scanner) WB13a(current rune) (continues bool) {
 func (sc *Scanner) WB13b(current rune) (continues bool) {
 	previous := sc.buffer[len(sc.buffer)-1]
 	return is(ExtendNumLet, previous) && (is(AHLetter, current) || is(Numeric, current) || is(Katakana, current))
+}
+
+// WB15 implements https://unicode.org/reports/tr29/#WB15
+func (sc *Scanner) WB15(current rune) (continues bool) {
+	// Buffer comprised entirely of an odd number of RI
+	count := 0
+	for i := len(sc.buffer) - 1; i >= 0; i-- {
+		r := sc.buffer[i]
+		if !is(Regional_Indicator, r) {
+			return false
+		}
+		count++
+	}
+	odd := count > 0 && count%2 == 1
+	return odd
+}
+
+// WB16 implements https://unicode.org/reports/tr29/#WB16
+func (sc *Scanner) WB16(current rune) (continues bool) {
+	// Last n runes represent an odd number of RI
+	count := 0
+	for i := len(sc.buffer) - 1; i >= 0; i-- {
+		r := sc.buffer[i]
+		if !is(Regional_Indicator, r) {
+			break
+		}
+		count++
+	}
+	odd := count > 0 && count%2 == 1
+	return odd
 }
 
 func (sc *Scanner) token() string {

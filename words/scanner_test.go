@@ -14,6 +14,7 @@ func TestScanner(t *testing.T) {
 	ש״ח
 	א"ב
 	ב'
+	🇦🇺🇦🇶
 	"אא"בב"abc
 	Then ウィキペディア and 象形.`
 	original += "crlf is \r\n"
@@ -134,6 +135,9 @@ func TestScanner(t *testing.T) {
 
 		{"\r\n", true},
 		{"\r", false},
+
+		{"🇦🇺", true},
+		{"🇦🇶", true},
 	}
 
 	for _, expected := range expecteds {
