@@ -6,6 +6,8 @@ import (
 	"bufio"
 	"io"
 	"unicode"
+
+	"github.com/clipperhouse/uax29/emoji"
 )
 
 // NewScanner tokenizes a reader into a stream of tokens. Iterate through the stream by calling Scan() or Next().
@@ -139,6 +141,16 @@ func (sc *Scanner) wb3a(current rune) (breaks bool) {
 // https://unicode.org/reports/tr29/#WB3b
 func (sc *Scanner) wb3b(current rune) (breaks bool) {
 	return is(CR, current) || is(LF, current) || is(Newline, current)
+}
+
+// https://unicode.org/reports/tr29/#WB3c
+func (sc *Scanner) wb3c(current rune) (continues bool) {
+	if len(sc.buffer) == 0 {
+		return is(ZWJ, current)
+	}
+
+	previous := sc.buffer[len(sc.buffer)-1]
+	return is(ZWJ, previous) && is(emoji.Extended_Pictographic, current)
 }
 
 // https://unicode.org/reports/tr29/#WB5
