@@ -18,7 +18,6 @@ import (
 func NewScanner(r io.Reader) *Scanner {
 	return &Scanner{
 		incoming: bufio.NewReaderSize(r, 64*1024),
-		sot:      true,
 	}
 }
 
@@ -29,9 +28,6 @@ type Scanner struct {
 
 	text string
 	err  error
-
-	// sot indicates "start of text": https://unicode.org/reports/tr29/#WB1
-	sot bool
 }
 
 // Scan advances to the next token, returning true if successful. Returns false on error or EOF.
@@ -46,7 +42,6 @@ func (sc *Scanner) Scan() bool {
 		switch {
 		case sc.WB1(eof):
 			// true indicates continue
-			sc.sot = false
 			sc.accept(current)
 			continue
 		case sc.WB2(eof):
