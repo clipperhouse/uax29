@@ -60,10 +60,10 @@ func TestScanner(t *testing.T) {
 		{"node", false},
 		{"js", false},
 
-		{"first_last", true},
-		{"first", false},
-		{"_", false},
-		{"last", false},
+		{"first_last", false},
+		{"first", true},
+		{"_", true},
+		{"last", true},
 
 		{"my.name", true},
 		{"my.name@", false},
