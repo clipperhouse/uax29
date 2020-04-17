@@ -1,18 +1,18 @@
-package uax29_test
+package words_test
 
 import (
 	"fmt"
 	"log"
 	"strings"
 
-	"github.com/clipperhouse/uax29"
+	"github.com/clipperhouse/uax29/words"
 )
 
 func ExampleScanner_Scan() {
 	text := "This is an example."
 	reader := strings.NewReader(text)
 
-	scanner := uax29.NewScanner(reader)
+	scanner := words.NewScanner(reader)
 
 	// Scan returns true until error or EOF
 	for scanner.Scan() {

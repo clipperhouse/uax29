@@ -1,4 +1,4 @@
-package uax29
+package words
 
 import (
 	"strings"

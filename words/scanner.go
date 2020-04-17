@@ -1,13 +1,11 @@
-// Package uax29 provides a scanner for Unicode text segmentation word boundaries: https://unicode.org/reports/tr29/#Word_Boundaries
-// It does not implement the eintire specification, but many of the most important rules.
-package uax29
+// Package words provides a scanner for Unicode text segmentation word boundaries: https://unicode.org/reports/tr29/#Word_Boundaries
+// It does not implement the entire specification, but many of the most important rules.
+package words
 
 import (
 	"bufio"
 	"io"
 	"unicode"
-
-	"github.com/clipperhouse/uax29/wordbreak"
 )
 
 // NewScanner tokenizes a reader into a stream of tokens. Iterate through the stream by calling Scan() or Next().
@@ -100,10 +98,12 @@ func (sc *Scanner) Scan() bool {
 	}
 }
 
+// Text returns the current token, given a successful call to Scan
 func (sc *Scanner) Text() string {
 	return sc.text
 }
 
+// Err returns the current error, given an unsuccessful call to Scan
 func (sc *Scanner) Err() error {
 	return sc.err
 }
@@ -119,56 +119,56 @@ var is = unicode.Is
 // https://unicode.org/reports/tr29/#WB3
 func (sc *Scanner) wb3(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
-		return is(wordbreak.CR, current)
+		return is(CR, current)
 	}
 
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(wordbreak.CR, previous) && is(wordbreak.LF, current)
+	return is(CR, previous) && is(LF, current)
 }
 
 // https://unicode.org/reports/tr29/#WB3a
 func (sc *Scanner) wb3a(current rune) (breaks bool) {
 	if len(sc.buffer) == 0 {
-		return is(wordbreak.CR, current) || is(wordbreak.LF, current) || is(wordbreak.Newline, current)
+		return is(CR, current) || is(LF, current) || is(Newline, current)
 	}
 
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(wordbreak.CR, previous) || is(wordbreak.LF, previous) || is(wordbreak.Newline, previous)
+	return is(CR, previous) || is(LF, previous) || is(Newline, previous)
 }
 
 // https://unicode.org/reports/tr29/#WB3b
-func (t *Scanner) wb3b(current rune) (breaks bool) {
-	return is(wordbreak.CR, current) || is(wordbreak.LF, current) || is(wordbreak.Newline, current)
+func (sc *Scanner) wb3b(current rune) (breaks bool) {
+	return is(CR, current) || is(LF, current) || is(Newline, current)
 }
 
 // https://unicode.org/reports/tr29/#WB5
 func (sc *Scanner) wb3d(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
-		return is(wordbreak.WSegSpace, current)
+		return is(WSegSpace, current)
 	}
 
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(wordbreak.WSegSpace, previous) && is(wordbreak.WSegSpace, current)
+	return is(WSegSpace, previous) && is(WSegSpace, current)
 }
 
 // https://unicode.org/reports/tr29/#WB5
 func (sc *Scanner) wb5(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
-		return is(wordbreak.AHLetter, current)
+		return is(AHLetter, current)
 	}
 
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(wordbreak.AHLetter, previous) && is(wordbreak.AHLetter, current)
+	return is(AHLetter, previous) && is(AHLetter, current)
 }
 
 // https://unicode.org/reports/tr29/#WB6
 func (sc *Scanner) wb6(current, lookahead rune) (continues bool) {
 	if len(sc.buffer) == 0 {
-		return is(wordbreak.AHLetter, current)
+		return is(AHLetter, current)
 	}
 
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(wordbreak.AHLetter, previous) && (is(wordbreak.MidLetter, current) || is(wordbreak.MidNumLetQ, current)) && is(wordbreak.AHLetter, lookahead)
+	return is(AHLetter, previous) && (is(MidLetter, current) || is(MidNumLetQ, current)) && is(AHLetter, lookahead)
 }
 
 // https://unicode.org/reports/tr29/#WB7
@@ -180,27 +180,27 @@ func (sc *Scanner) wb7(current rune) (continues bool) {
 	previous := sc.buffer[len(sc.buffer)-1]
 	preprevious := sc.buffer[len(sc.buffer)-2]
 
-	return is(wordbreak.AHLetter, preprevious) && (is(wordbreak.MidLetter, previous) || is(wordbreak.MidNumLetQ, previous)) && is(wordbreak.AHLetter, current)
+	return is(AHLetter, preprevious) && (is(MidLetter, previous) || is(MidNumLetQ, previous)) && is(AHLetter, current)
 }
 
 // https://unicode.org/reports/tr29/#WB7a
 func (sc *Scanner) wb7a(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
-		return is(wordbreak.Hebrew_Letter, current)
+		return is(Hebrew_Letter, current)
 	}
 
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(wordbreak.Hebrew_Letter, previous) && is(wordbreak.Single_Quote, current)
+	return is(Hebrew_Letter, previous) && is(Single_Quote, current)
 }
 
 // https://unicode.org/reports/tr29/#WB7b
 func (sc *Scanner) wb7b(current, lookahead rune) (continues bool) {
 	if len(sc.buffer) == 0 {
-		return is(wordbreak.Hebrew_Letter, current)
+		return is(Hebrew_Letter, current)
 	}
 
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(wordbreak.AHLetter, previous) && is(wordbreak.Double_Quote, current) && is(wordbreak.Hebrew_Letter, lookahead)
+	return is(AHLetter, previous) && is(Double_Quote, current) && is(Hebrew_Letter, lookahead)
 }
 
 // https://unicode.org/reports/tr29/#WB7c
@@ -212,38 +212,38 @@ func (sc *Scanner) wb7c(current rune) (continues bool) {
 	previous := sc.buffer[len(sc.buffer)-1]
 	preprevious := sc.buffer[len(sc.buffer)-2]
 
-	return is(wordbreak.Hebrew_Letter, preprevious) && is(wordbreak.Double_Quote, previous) && is(wordbreak.Hebrew_Letter, current)
+	return is(Hebrew_Letter, preprevious) && is(Double_Quote, previous) && is(Hebrew_Letter, current)
 }
 
 // https://unicode.org/reports/tr29/#WB8
 func (sc *Scanner) wb8(current rune) (continues bool) {
 	// If it's a new token and Numeric
 	if len(sc.buffer) == 0 {
-		return is(wordbreak.Numeric, current)
+		return is(Numeric, current)
 	}
 
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(wordbreak.Numeric, previous) && is(wordbreak.Numeric, current)
+	return is(Numeric, previous) && is(Numeric, current)
 }
 
 // https://unicode.org/reports/tr29/#WB9
 func (sc *Scanner) wb9(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
-		return is(wordbreak.AHLetter, current)
+		return is(AHLetter, current)
 	}
 
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(wordbreak.AHLetter, previous) && is(wordbreak.Numeric, current)
+	return is(AHLetter, previous) && is(Numeric, current)
 }
 
 // https://unicode.org/reports/tr29/#WB9
 func (sc *Scanner) wb10(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
-		return is(wordbreak.Numeric, current)
+		return is(Numeric, current)
 	}
 
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(wordbreak.Numeric, previous) && is(wordbreak.AHLetter, current)
+	return is(Numeric, previous) && is(AHLetter, current)
 }
 
 // https://unicode.org/reports/tr29/#WB11
@@ -255,48 +255,48 @@ func (sc *Scanner) wb11(current rune) (continues bool) {
 	previous := sc.buffer[len(sc.buffer)-1]
 	preprevious := sc.buffer[len(sc.buffer)-2]
 
-	return is(wordbreak.Numeric, preprevious) && (is(wordbreak.MidNum, previous) || is(wordbreak.MidNumLetQ, previous)) && is(wordbreak.Numeric, current)
+	return is(Numeric, preprevious) && (is(MidNum, previous) || is(MidNumLetQ, previous)) && is(Numeric, current)
 }
 
 // https://unicode.org/reports/tr29/#WB12
 func (sc *Scanner) wb12(current, lookahead rune) (continues bool) {
 	if len(sc.buffer) == 0 {
-		return is(wordbreak.Numeric, current)
+		return is(Numeric, current)
 	}
 
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(wordbreak.Numeric, previous) && (is(wordbreak.MidNum, current) || is(wordbreak.MidNumLetQ, current)) && is(wordbreak.Numeric, lookahead)
+	return is(Numeric, previous) && (is(MidNum, current) || is(MidNumLetQ, current)) && is(Numeric, lookahead)
 }
 
 // https://unicode.org/reports/tr29/#WB13
 func (sc *Scanner) wb13(current rune) (continues bool) {
 	// If it's a new token and Katakana
 	if len(sc.buffer) == 0 {
-		return is(wordbreak.Katakana, current)
+		return is(Katakana, current)
 	}
 
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(wordbreak.Katakana, previous) && is(wordbreak.Katakana, current)
+	return is(Katakana, previous) && is(Katakana, current)
 }
 
 // https://unicode.org/reports/tr29/#WB13a
 func (sc *Scanner) wb13a(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
-		return is(wordbreak.AHLetter, current) || is(wordbreak.Numeric, current) || is(wordbreak.Katakana, current) || is(wordbreak.ExtendNumLet, current)
+		return is(AHLetter, current) || is(Numeric, current) || is(Katakana, current) || is(ExtendNumLet, current)
 	}
 
 	previous := sc.buffer[len(sc.buffer)-1]
-	return (is(wordbreak.AHLetter, previous) || is(wordbreak.Numeric, previous) || is(wordbreak.Katakana, previous) || is(wordbreak.ExtendNumLet, previous)) && is(wordbreak.ExtendNumLet, current)
+	return (is(AHLetter, previous) || is(Numeric, previous) || is(Katakana, previous) || is(ExtendNumLet, previous)) && is(ExtendNumLet, current)
 }
 
 // https://unicode.org/reports/tr29/#WB13b
 func (sc *Scanner) wb13b(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
-		return is(wordbreak.ExtendNumLet, current)
+		return is(ExtendNumLet, current)
 	}
 
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(wordbreak.ExtendNumLet, previous) && (is(wordbreak.AHLetter, current) || is(wordbreak.Numeric, current) || is(wordbreak.Katakana, current))
+	return is(ExtendNumLet, previous) && (is(AHLetter, current) || is(Numeric, current) || is(Katakana, current))
 }
 
 func (sc *Scanner) token() string {
