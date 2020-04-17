@@ -18,6 +18,7 @@ import (
 func NewScanner(r io.Reader) *Scanner {
 	return &Scanner{
 		incoming: bufio.NewReaderSize(r, 64*1024),
+		sot:      true,
 	}
 }
 
@@ -28,21 +29,18 @@ type Scanner struct {
 
 	text string
 	err  error
+
+	// sot indicates "start of text": https://unicode.org/reports/tr29/#WB1
+	sot bool
 }
 
 // Scan advances to the next token, returning true if successful. Returns false on error or EOF.
 func (sc *Scanner) Scan() bool {
 	for {
 		current, eof, err := sc.readRune()
-		switch {
-		case err != nil:
+		if err != nil {
 			sc.err = err
 			return false
-		case eof:
-			// This is WB2: https://unicode.org/reports/tr29/#WB2
-			sc.text = sc.token()
-			sc.err = nil
-			return sc.text != ""
 		}
 
 		// Some funcs below require lookahead; better to do I/O here than there
@@ -54,6 +52,16 @@ func (sc *Scanner) Scan() bool {
 		}
 
 		switch {
+		case sc.WB1(eof):
+			// true indicates continue
+			sc.sot = false
+			sc.accept(current)
+			continue
+		case sc.WB2(eof):
+			// true indicates break
+			sc.text = sc.token()
+			sc.err = nil
+			return sc.text != ""
 		case
 			sc.WB3(current):
 			// true indicates continue
@@ -116,6 +124,18 @@ func (sc *Scanner) Err() error {
 // In most cases, returning true means 'keep going'.
 
 var is = unicode.Is
+
+// WB1 implements https://unicode.org/reports/tr29/#WB1
+func (sc *Scanner) WB1(eof bool) (continues bool) {
+	// A bit silly, but reads consistently in Scan above
+	return sc.sot && !eof
+}
+
+// WB2 implements https://unicode.org/reports/tr29/#WB2
+func (sc *Scanner) WB2(eof bool) (breaks bool) {
+	// A bit silly, but reads consistently in Scan above
+	return eof
+}
 
 // WB3 implements https://unicode.org/reports/tr29/#WB3
 func (sc *Scanner) WB3(current rune) (continues bool) {
