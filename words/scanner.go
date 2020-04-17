@@ -292,16 +292,6 @@ func (sc *Scanner) readRune() (r rune, eof bool, err error) {
 	return r, false, nil
 }
 
-func (sc *Scanner) unreadRune() error {
-	err := sc.incoming.UnreadRune()
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // peekRune peeks the next rune, without advancing the reader
 func (sc *Scanner) peekRune() (r rune, eof bool, err error) {
 	r, _, err = sc.incoming.ReadRune()
