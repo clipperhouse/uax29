@@ -39,8 +39,7 @@ func (sc *Scanner) Scan() bool {
 			sc.err = err
 			return false
 		case eof:
-			// This is WB2
-			// https://unicode.org/reports/tr29/#WB2
+			// This is WB2: https://unicode.org/reports/tr29/#WB2
 			sc.text = sc.token()
 			sc.err = nil
 			return sc.text != ""
@@ -56,29 +55,29 @@ func (sc *Scanner) Scan() bool {
 
 		switch {
 		case
-			sc.wb3(current):
+			sc.WB3(current):
 			// true indicates continue
 			sc.accept(current)
 			continue
 		case
-			sc.wb3a(current),
-			sc.wb3b(current):
+			sc.WB3a(current),
+			sc.WB3b(current):
 			// true indicates break
 			goto breaking
 		case
-			sc.wb3d(current),
-			sc.wb5(current),
-			sc.wb6(current, lookahead),
-			sc.wb7(current),
-			sc.wb7a(current),
-			sc.wb7b(current, lookahead),
-			sc.wb7c(current),
-			sc.wb8(current),
-			sc.wb9(current),
-			sc.wb10(current),
-			sc.wb11(current),
-			sc.wb12(current, lookahead),
-			sc.wb13(current):
+			sc.WB3d(current),
+			sc.WB5(current),
+			sc.WB6(current, lookahead),
+			sc.WB7(current),
+			sc.WB7a(current),
+			sc.WB7b(current, lookahead),
+			sc.WB7c(current),
+			sc.WB8(current),
+			sc.WB9(current),
+			sc.WB10(current),
+			sc.WB11(current),
+			sc.WB12(current, lookahead),
+			sc.WB13(current):
 			// true indicates continue
 			sc.accept(current)
 			continue
@@ -86,7 +85,7 @@ func (sc *Scanner) Scan() bool {
 
 	breaking:
 		// If we fall through all the above rules, it's a word break
-		// https://unicode.org/reports/tr29/#WB999
+		// WB999 implements https://unicode.org/reports/tr29/#WB999
 
 		if len(sc.buffer) > 0 {
 			sc.text = sc.token()
@@ -118,8 +117,8 @@ func (sc *Scanner) Err() error {
 
 var is = unicode.Is
 
-// https://unicode.org/reports/tr29/#WB3
-func (sc *Scanner) wb3(current rune) (continues bool) {
+// WB3 implements https://unicode.org/reports/tr29/#WB3
+func (sc *Scanner) WB3(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
 		return is(CR, current)
 	}
@@ -128,8 +127,8 @@ func (sc *Scanner) wb3(current rune) (continues bool) {
 	return is(CR, previous) && is(LF, current)
 }
 
-// https://unicode.org/reports/tr29/#WB3a
-func (sc *Scanner) wb3a(current rune) (breaks bool) {
+// WB3a implements https://unicode.org/reports/tr29/#WB3a
+func (sc *Scanner) WB3a(current rune) (breaks bool) {
 	if len(sc.buffer) == 0 {
 		return is(CR, current) || is(LF, current) || is(Newline, current)
 	}
@@ -138,13 +137,13 @@ func (sc *Scanner) wb3a(current rune) (breaks bool) {
 	return is(CR, previous) || is(LF, previous) || is(Newline, previous)
 }
 
-// https://unicode.org/reports/tr29/#WB3b
-func (sc *Scanner) wb3b(current rune) (breaks bool) {
+// WB3b implements https://unicode.org/reports/tr29/#WB3b
+func (sc *Scanner) WB3b(current rune) (breaks bool) {
 	return is(CR, current) || is(LF, current) || is(Newline, current)
 }
 
-// https://unicode.org/reports/tr29/#WB3c
-func (sc *Scanner) wb3c(current rune) (continues bool) {
+// WB3c implements https://unicode.org/reports/tr29/#WB3c
+func (sc *Scanner) WB3c(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
 		return is(ZWJ, current)
 	}
@@ -153,8 +152,8 @@ func (sc *Scanner) wb3c(current rune) (continues bool) {
 	return is(ZWJ, previous) && is(emoji.Extended_Pictographic, current)
 }
 
-// https://unicode.org/reports/tr29/#WB5
-func (sc *Scanner) wb3d(current rune) (continues bool) {
+// WB3d implements https://unicode.org/reports/tr29/#WB3d
+func (sc *Scanner) WB3d(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
 		return is(WSegSpace, current)
 	}
@@ -163,8 +162,8 @@ func (sc *Scanner) wb3d(current rune) (continues bool) {
 	return is(WSegSpace, previous) && is(WSegSpace, current)
 }
 
-// https://unicode.org/reports/tr29/#WB5
-func (sc *Scanner) wb5(current rune) (continues bool) {
+// WB5 implements https://unicode.org/reports/tr29/#WB5
+func (sc *Scanner) WB5(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
 		return is(AHLetter, current)
 	}
@@ -173,8 +172,8 @@ func (sc *Scanner) wb5(current rune) (continues bool) {
 	return is(AHLetter, previous) && is(AHLetter, current)
 }
 
-// https://unicode.org/reports/tr29/#WB6
-func (sc *Scanner) wb6(current, lookahead rune) (continues bool) {
+// WB6 implements https://unicode.org/reports/tr29/#WB6
+func (sc *Scanner) WB6(current, lookahead rune) (continues bool) {
 	if len(sc.buffer) == 0 {
 		return is(AHLetter, current)
 	}
@@ -183,8 +182,8 @@ func (sc *Scanner) wb6(current, lookahead rune) (continues bool) {
 	return is(AHLetter, previous) && (is(MidLetter, current) || is(MidNumLetQ, current)) && is(AHLetter, lookahead)
 }
 
-// https://unicode.org/reports/tr29/#WB7
-func (sc *Scanner) wb7(current rune) (continues bool) {
+// WB7 implements https://unicode.org/reports/tr29/#WB7
+func (sc *Scanner) WB7(current rune) (continues bool) {
 	if len(sc.buffer) < 2 {
 		return false
 	}
@@ -195,8 +194,8 @@ func (sc *Scanner) wb7(current rune) (continues bool) {
 	return is(AHLetter, preprevious) && (is(MidLetter, previous) || is(MidNumLetQ, previous)) && is(AHLetter, current)
 }
 
-// https://unicode.org/reports/tr29/#WB7a
-func (sc *Scanner) wb7a(current rune) (continues bool) {
+// WB7a implements https://unicode.org/reports/tr29/#WB7a
+func (sc *Scanner) WB7a(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
 		return is(Hebrew_Letter, current)
 	}
@@ -205,8 +204,8 @@ func (sc *Scanner) wb7a(current rune) (continues bool) {
 	return is(Hebrew_Letter, previous) && is(Single_Quote, current)
 }
 
-// https://unicode.org/reports/tr29/#WB7b
-func (sc *Scanner) wb7b(current, lookahead rune) (continues bool) {
+// WB7b implements https://unicode.org/reports/tr29/#WB7b
+func (sc *Scanner) WB7b(current, lookahead rune) (continues bool) {
 	if len(sc.buffer) == 0 {
 		return is(Hebrew_Letter, current)
 	}
@@ -215,8 +214,8 @@ func (sc *Scanner) wb7b(current, lookahead rune) (continues bool) {
 	return is(AHLetter, previous) && is(Double_Quote, current) && is(Hebrew_Letter, lookahead)
 }
 
-// https://unicode.org/reports/tr29/#WB7c
-func (sc *Scanner) wb7c(current rune) (continues bool) {
+// WB7c implements https://unicode.org/reports/tr29/#WB7c
+func (sc *Scanner) WB7c(current rune) (continues bool) {
 	if len(sc.buffer) < 2 {
 		return false
 	}
@@ -227,8 +226,8 @@ func (sc *Scanner) wb7c(current rune) (continues bool) {
 	return is(Hebrew_Letter, preprevious) && is(Double_Quote, previous) && is(Hebrew_Letter, current)
 }
 
-// https://unicode.org/reports/tr29/#WB8
-func (sc *Scanner) wb8(current rune) (continues bool) {
+// WB8 implements https://unicode.org/reports/tr29/#WB8
+func (sc *Scanner) WB8(current rune) (continues bool) {
 	// If it's a new token and Numeric
 	if len(sc.buffer) == 0 {
 		return is(Numeric, current)
@@ -238,8 +237,8 @@ func (sc *Scanner) wb8(current rune) (continues bool) {
 	return is(Numeric, previous) && is(Numeric, current)
 }
 
-// https://unicode.org/reports/tr29/#WB9
-func (sc *Scanner) wb9(current rune) (continues bool) {
+// WB9 implements https://unicode.org/reports/tr29/#WB9
+func (sc *Scanner) WB9(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
 		return is(AHLetter, current)
 	}
@@ -248,8 +247,8 @@ func (sc *Scanner) wb9(current rune) (continues bool) {
 	return is(AHLetter, previous) && is(Numeric, current)
 }
 
-// https://unicode.org/reports/tr29/#WB9
-func (sc *Scanner) wb10(current rune) (continues bool) {
+// WB10 implements https://unicode.org/reports/tr29/#WB10
+func (sc *Scanner) WB10(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
 		return is(Numeric, current)
 	}
@@ -258,8 +257,8 @@ func (sc *Scanner) wb10(current rune) (continues bool) {
 	return is(Numeric, previous) && is(AHLetter, current)
 }
 
-// https://unicode.org/reports/tr29/#WB11
-func (sc *Scanner) wb11(current rune) (continues bool) {
+// WB11 implements https://unicode.org/reports/tr29/#WB11
+func (sc *Scanner) WB11(current rune) (continues bool) {
 	if len(sc.buffer) < 2 {
 		return false
 	}
@@ -270,8 +269,8 @@ func (sc *Scanner) wb11(current rune) (continues bool) {
 	return is(Numeric, preprevious) && (is(MidNum, previous) || is(MidNumLetQ, previous)) && is(Numeric, current)
 }
 
-// https://unicode.org/reports/tr29/#WB12
-func (sc *Scanner) wb12(current, lookahead rune) (continues bool) {
+// WB12 implements https://unicode.org/reports/tr29/#WB12
+func (sc *Scanner) WB12(current, lookahead rune) (continues bool) {
 	if len(sc.buffer) == 0 {
 		return is(Numeric, current)
 	}
@@ -280,8 +279,8 @@ func (sc *Scanner) wb12(current, lookahead rune) (continues bool) {
 	return is(Numeric, previous) && (is(MidNum, current) || is(MidNumLetQ, current)) && is(Numeric, lookahead)
 }
 
-// https://unicode.org/reports/tr29/#WB13
-func (sc *Scanner) wb13(current rune) (continues bool) {
+// WB13 implements https://unicode.org/reports/tr29/#WB13
+func (sc *Scanner) WB13(current rune) (continues bool) {
 	// If it's a new token and Katakana
 	if len(sc.buffer) == 0 {
 		return is(Katakana, current)
@@ -291,8 +290,8 @@ func (sc *Scanner) wb13(current rune) (continues bool) {
 	return is(Katakana, previous) && is(Katakana, current)
 }
 
-// https://unicode.org/reports/tr29/#WB13a
-func (sc *Scanner) wb13a(current rune) (continues bool) {
+// WB13a implements https://unicode.org/reports/tr29/#WB13a
+func (sc *Scanner) WB13a(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
 		return is(AHLetter, current) || is(Numeric, current) || is(Katakana, current) || is(ExtendNumLet, current)
 	}
@@ -301,8 +300,8 @@ func (sc *Scanner) wb13a(current rune) (continues bool) {
 	return (is(AHLetter, previous) || is(Numeric, previous) || is(Katakana, previous) || is(ExtendNumLet, previous)) && is(ExtendNumLet, current)
 }
 
-// https://unicode.org/reports/tr29/#WB13b
-func (sc *Scanner) wb13b(current rune) (continues bool) {
+// WB13b implements https://unicode.org/reports/tr29/#WB13b
+func (sc *Scanner) WB13b(current rune) (continues bool) {
 	if len(sc.buffer) == 0 {
 		return is(ExtendNumLet, current)
 	}
