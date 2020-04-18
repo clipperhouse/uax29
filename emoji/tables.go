@@ -150,7 +150,6 @@ var Emoji_Modifier = &unicode.RangeTable{
 	R32: []unicode.Range32{
 		{0x1f3fb, 0x1f3ff, 0x1},
 	},
-	LatinOffset: 0,
 }
 
 var Emoji_Modifier_Base = &unicode.RangeTable{
@@ -190,7 +189,6 @@ var Emoji_Modifier_Base = &unicode.RangeTable{
 		{0x1f9ce, 0x1f9cf, 0x1},
 		{0x1f9d1, 0x1f9dd, 0x1},
 	},
-	LatinOffset: 0,
 }
 
 var Emoji_Presentation = &unicode.RangeTable{
@@ -267,7 +265,6 @@ var Emoji_Presentation = &unicode.RangeTable{
 		{0x1fa80, 0x1fa82, 0x1},
 		{0x1fa90, 0x1fa95, 0x1},
 	},
-	LatinOffset: 0,
 }
 
 var Extended_Pictographic = &unicode.RangeTable{

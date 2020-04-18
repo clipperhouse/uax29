@@ -1036,7 +1036,7 @@ var CR = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xd, 0xd, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
+
 	LatinOffset: 1,
 }
 
@@ -1044,7 +1044,7 @@ var Double_Quote = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x22, 0x22, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
+
 	LatinOffset: 1,
 }
 
@@ -1327,7 +1327,6 @@ var Extend = &unicode.RangeTable{
 		{0xe0020, 0xe007f, 0x1},
 		{0xe0100, 0xe01ef, 0x1},
 	},
-	LatinOffset: 0,
 }
 
 var ExtendNumLet = &unicode.RangeTable{
@@ -1339,8 +1338,6 @@ var ExtendNumLet = &unicode.RangeTable{
 		{0xfe4e, 0xfe4f, 0x1},
 		{0xff3f, 0xff3f, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
-	LatinOffset: 0,
 }
 
 var Format = &unicode.RangeTable{
@@ -1364,7 +1361,6 @@ var Format = &unicode.RangeTable{
 		{0x1d173, 0x1d17a, 0x1},
 		{0xe0001, 0xe0001, 0x1},
 	},
-	LatinOffset: 0,
 }
 
 var Hebrew_Letter = &unicode.RangeTable{
@@ -1380,8 +1376,6 @@ var Hebrew_Letter = &unicode.RangeTable{
 		{0xfb44, 0xfb46, 0x2},
 		{0xfb47, 0xfb4f, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
-	LatinOffset: 0,
 }
 
 var Katakana = &unicode.RangeTable{
@@ -1399,14 +1393,13 @@ var Katakana = &unicode.RangeTable{
 		{0x1b000, 0x1b164, 0x164},
 		{0x1b165, 0x1b167, 0x1},
 	},
-	LatinOffset: 0,
 }
 
 var LF = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xa, 0xa, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
+
 	LatinOffset: 1,
 }
 
@@ -1417,7 +1410,7 @@ var MidLetter = &unicode.RangeTable{
 		{0x2027, 0xfe13, 0xddec},
 		{0xfe55, 0xff1a, 0xc5},
 	},
-	R32:         []unicode.Range32(nil),
+
 	LatinOffset: 1,
 }
 
@@ -1432,7 +1425,7 @@ var MidNum = &unicode.RangeTable{
 		{0xfe54, 0xff0c, 0xb8},
 		{0xff1b, 0xff1b, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
+
 	LatinOffset: 1,
 }
 
@@ -1444,7 +1437,7 @@ var MidNumLet = &unicode.RangeTable{
 		{0xfe52, 0xff07, 0xb5},
 		{0xff0e, 0xff0e, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
+
 	LatinOffset: 1,
 }
 
@@ -1457,7 +1450,7 @@ var MidNumLetQ = &unicode.RangeTable{
 		{0xfe52, 0xff07, 0xb5},
 		{0xff0e, 0xff0e, 0x1},
 	},
-	R32: []unicode.Range32(nil), LatinOffset: 2}
+	LatinOffset: 2}
 
 var Newline = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -1465,7 +1458,7 @@ var Newline = &unicode.RangeTable{
 		{0x85, 0x2028, 0x1fa3},
 		{0x2029, 0x2029, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
+
 	LatinOffset: 1,
 }
 
@@ -1542,14 +1535,13 @@ var Regional_Indicator = &unicode.RangeTable{
 	R32: []unicode.Range32{
 		{0x1f1e6, 0x1f1ff, 0x1},
 	},
-	LatinOffset: 0,
 }
 
 var Single_Quote = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x27, 0x27, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
+
 	LatinOffset: 1,
 }
 
@@ -1560,14 +1552,10 @@ var WSegSpace = &unicode.RangeTable{
 		{0x2008, 0x200a, 0x1},
 		{0x205f, 0x3000, 0xfa1},
 	},
-	R32:         []unicode.Range32(nil),
-	LatinOffset: 0,
 }
 
 var ZWJ = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x200d, 0x200d, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
-	LatinOffset: 0,
 }

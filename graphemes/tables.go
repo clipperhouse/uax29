@@ -8,7 +8,7 @@ var CR = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xd, 0xd, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
+
 	LatinOffset: 1,
 }
 
@@ -337,7 +337,6 @@ var Extend = &unicode.RangeTable{
 		{0xe0020, 0xe007f, 0x1},
 		{0xe0100, 0xe01ef, 0x1},
 	},
-	LatinOffset: 0,
 }
 
 var L = &unicode.RangeTable{
@@ -345,15 +344,13 @@ var L = &unicode.RangeTable{
 		{0x1100, 0x115f, 0x1},
 		{0xa960, 0xa97c, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
-	LatinOffset: 0,
 }
 
 var LF = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xa, 0xa, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
+
 	LatinOffset: 1,
 }
 
@@ -361,8 +358,6 @@ var LV = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xac00, 0xd788, 0x1c},
 	},
-	R32:         []unicode.Range32(nil),
-	LatinOffset: 0,
 }
 
 var LVT = &unicode.RangeTable{
@@ -767,8 +762,6 @@ var LVT = &unicode.RangeTable{
 		{0xd76d, 0xd787, 0x1},
 		{0xd789, 0xd7a3, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
-	LatinOffset: 0,
 }
 
 var Prepend = &unicode.RangeTable{
@@ -784,7 +777,6 @@ var Prepend = &unicode.RangeTable{
 		{0x11a85, 0x11a89, 0x1},
 		{0x11d46, 0x11d46, 0x1},
 	},
-	LatinOffset: 0,
 }
 
 var Regional_Indicator = &unicode.RangeTable{
@@ -792,7 +784,6 @@ var Regional_Indicator = &unicode.RangeTable{
 	R32: []unicode.Range32{
 		{0x1f1e6, 0x1f1ff, 0x1},
 	},
-	LatinOffset: 0,
 }
 
 var SpacingMark = &unicode.RangeTable{
@@ -929,7 +920,6 @@ var SpacingMark = &unicode.RangeTable{
 		{0x16f52, 0x16f87, 0x1},
 		{0x1d166, 0x1d16d, 0x7},
 	},
-	LatinOffset: 0,
 }
 
 var T = &unicode.RangeTable{
@@ -937,8 +927,6 @@ var T = &unicode.RangeTable{
 		{0x11a8, 0x11ff, 0x1},
 		{0xd7cb, 0xd7fb, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
-	LatinOffset: 0,
 }
 
 var V = &unicode.RangeTable{
@@ -946,14 +934,10 @@ var V = &unicode.RangeTable{
 		{0x1160, 0x11a7, 0x1},
 		{0xd7b0, 0xd7c6, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
-	LatinOffset: 0,
 }
 
 var ZWJ = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x200d, 0x200d, 0x1},
 	},
-	R32:         []unicode.Range32(nil),
-	LatinOffset: 0,
 }
