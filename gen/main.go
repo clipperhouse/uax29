@@ -72,22 +72,23 @@ func generate(prop prop) error {
 		runesByCategory[category] = append(runesByCategory[category], runes...)
 	}
 
-	rangeTablesByCategory := map[string]*unicode.RangeTable{}
+	rangeTables := map[string]*unicode.RangeTable{}
 	for category, runes := range runesByCategory {
-		rangeTablesByCategory[category] = rangetable.New(runes...)
+		rangeTables[category] = rangetable.New(runes...)
 	}
 
 	if prop.packagename == "words" {
-		// Merged "macro" tables defined here: https://unicode.org/reports/tr29/#WB_Rule_Macros
-		ALetter := rangeTablesByCategory["ALetter"]
-		Hebrew_Letter := rangeTablesByCategory["Hebrew_Letter"]
-		MidNumLet := rangeTablesByCategory["MidNumLet"]
+		// Special case for underscore; it's not in the spec but we allow it mid-word
+		// It's commonly used in handles and usernames, we choose to interpret as a single token
+		// Some programming languages allow it for formatting numbers
+		rangeTables["MidNumLet"] = rangetable.Merge(rangeTables["MidNumLet"], rangetable.New('_'))
 
-		rangeTablesByCategory["AHLetter"] = rangetable.Merge(ALetter, Hebrew_Letter)
-		rangeTablesByCategory["MidNumLetQ"] = rangetable.Merge(MidNumLet, rangetable.New('\''))
+		// Merged "macro" tables defined here: https://unicode.org/reports/tr29/#WB_Rule_Macros
+		rangeTables["AHLetter"] = rangetable.Merge(rangeTables["ALetter"], rangeTables["Hebrew_Letter"])
+		rangeTables["MidNumLetQ"] = rangetable.Merge(rangeTables["MidNumLet"], rangetable.New('\''))
 	}
 
-	err = write(prop, rangeTablesByCategory)
+	err = write(prop, rangeTables)
 	if err != nil {
 		return err
 	}
