@@ -32,17 +32,17 @@ If I am reading my benchmarks correctly, `uax29/words` processes around 2MM toke
 
 ### Conformance
 
+We are [working](https://github.com/clipperhouse/uax29/blob/master/words/scanner_test.go#L154) to comply with the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29). As of this writing, the `words` package passes 1600 of 1823 tests.
+
 The [spec](https://unicode.org/reports/tr29/#Word_Boundaries) has many nods to practicality and judgment for the implementer. One place where we vary from the strict spec is to consider underscore `_` a valid mid-word/mid-number character, helpful for things like user_names.
-
-(Counterargument: separate tokens should be preserved for search applications.)
-
-We have not implemented the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Maybe you’d like to help!
 
 ### Status
 
-- Most of the [word boundary rules](https://unicode.org/reports/tr29/#Word_Boundaries) have been implemented. We code-gen the Unicode categories relevant to UAX 29 by running `go generate` at the repository root.
+- Most of the [word boundary rules](https://unicode.org/reports/tr29/#Word_Boundaries) have been implemented.
 
-- Tests are very basic. We’d like to get the [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29) implemented. The folks at bleve [offer an example](https://github.com/blevesearch/segment/blob/master/tables_test.go).
+- We code-gen the Unicode categories relevant to UAX 29 by running `go generate` at the repository root.
+
+- We’re working on the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29). As of this writing, the `words` package passes 1600 of 1823 tests.
 
 - Support for [grapheme rules](https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries) and perhaps [sentence rules](https://unicode.org/reports/tr29/#Sentence_Boundaries) might be useful.
 
