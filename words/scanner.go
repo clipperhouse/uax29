@@ -223,7 +223,7 @@ func (sc *Scanner) wb6(current, lookahead rune) (continues bool) {
 		return false
 	}
 
-	if !is(AHLetter, lookahead) {
+	if !(is(AHLetter, lookahead) || is(ExtendFormatZWJ, current)) {
 		return false
 	}
 
@@ -236,10 +236,17 @@ func (sc *Scanner) wb7(current rune) (continues bool) {
 		return false
 	}
 
-	previous := sc.buffer[len(sc.buffer)-1]
-	preprevious := sc.buffer[len(sc.buffer)-2]
+	if !(is(AHLetter, current) || is(ExtendFormatZWJ, current)) {
+		return false
+	}
 
-	return is(AHLetter, preprevious) && (is(MidLetter, previous) || is(MidNumLetQ, previous)) && is(AHLetter, current)
+	if !sc.seekPrevious(MidLetter, MidNumLetQ) {
+		return false
+	}
+
+	// This is not quite right, needs to seek
+	preprevious := sc.buffer[len(sc.buffer)-2]
+	return is(AHLetter, preprevious)
 }
 
 // wb7a implements https://unicode.org/reports/tr29/#WB7a
