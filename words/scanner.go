@@ -72,6 +72,7 @@ func (sc *Scanner) Scan() bool {
 			goto breaking
 		case
 			sc.WB3d(current),
+			sc.WB4(current),
 			sc.WB5(current),
 			sc.WB6(current, lookahead),
 			sc.WB7(current),
@@ -161,6 +162,19 @@ func (sc *Scanner) WB3c(current rune) (continues bool) {
 func (sc *Scanner) WB3d(current rune) (continues bool) {
 	previous := sc.buffer[len(sc.buffer)-1]
 	return is(WSegSpace, previous) && is(WSegSpace, current)
+}
+
+// WB4 implements https://unicode.org/reports/tr29/#WB4
+func (sc *Scanner) WB4(current rune) (continues bool) {
+	switch {
+	case
+		is(Extend, current),
+		is(Format, current),
+		is(ZWJ, current):
+		return true
+	}
+
+	return false
 }
 
 // WB5 implements https://unicode.org/reports/tr29/#WB5
