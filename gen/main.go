@@ -102,6 +102,13 @@ func generate(prop prop) error {
 		// Merged "macro" tables defined here: https://unicode.org/reports/tr29/#WB_Rule_Macros
 		rangeTables["AHLetter"] = rangetable.Merge(rangeTables["ALetter"], rangeTables["Hebrew_Letter"])
 		rangeTables["MidNumLetQ"] = rangetable.Merge(rangeTables["MidNumLet"], rangetable.New('\''))
+
+		// Ignore categories, merge for convenience and maybe perf. See WB4 method.
+		rangeTables["ExtendFormatZWJ"] = rangetable.Merge(
+			rangeTables["Extend"],
+			rangeTables["Format"],
+			rangeTables["ZWJ"],
+		)
 	}
 
 	err = write(prop, rangeTables)

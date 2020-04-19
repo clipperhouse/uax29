@@ -166,15 +166,7 @@ func (sc *Scanner) WB3d(current rune) (continues bool) {
 
 // WB4 implements https://unicode.org/reports/tr29/#WB4
 func (sc *Scanner) WB4(current rune) (continues bool) {
-	switch {
-	case
-		is(Extend, current),
-		is(Format, current),
-		is(ZWJ, current):
-		return true
-	}
-
-	return false
+	return is(ExtendFormatZWJ, current)
 }
 
 // WB5 implements https://unicode.org/reports/tr29/#WB5
