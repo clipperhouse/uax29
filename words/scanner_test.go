@@ -164,7 +164,7 @@ func TestUnicodeSegments(t *testing.T) {
 		}
 		if !reflect.DeepEqual(rv, test.Output) {
 			failed++
-			//			t.Errorf("expected:\n%#v\ngot:\n%#v\nfor: '%s' comment: %s", test.Output, rv, test.Input, test.Comment)
+			// t.Fatalf("expected:\n%#v\ngot:\n%#v\nfor: '%s' comment: %s", test.Output, rv, test.Input, test.Comment)
 		} else {
 			passed++
 		}
