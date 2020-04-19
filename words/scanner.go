@@ -342,6 +342,9 @@ func (sc *Scanner) wb15(current rune) (continues bool) {
 	count := 0
 	for i := len(sc.buffer) - 1; i >= 0; i-- {
 		r := sc.buffer[i]
+		if is(ExtendFormatZWJ, r) {
+			continue
+		}
 		if !is(Regional_Indicator, r) {
 			return false
 		}
@@ -361,6 +364,9 @@ func (sc *Scanner) wb16(current rune) (continues bool) {
 	count := 0
 	for i := len(sc.buffer) - 1; i >= 0; i-- {
 		r := sc.buffer[i]
+		if is(ExtendFormatZWJ, r) {
+			continue
+		}
 		if !is(Regional_Indicator, r) {
 			break
 		}
