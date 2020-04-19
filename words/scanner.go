@@ -334,7 +334,11 @@ func (sc *Scanner) wb13b(current rune) (continues bool) {
 
 // wb15 implements https://unicode.org/reports/tr29/#WB15
 func (sc *Scanner) wb15(current rune) (continues bool) {
-	// Buffer comprised entirely of an odd number of RI
+	if !is(Regional_Indicator, current) {
+		return false
+	}
+
+	// Buffer comprised entirely of an odd number of RI, ignoring ExtendFormatZWJ
 	count := 0
 	for i := len(sc.buffer) - 1; i >= 0; i-- {
 		r := sc.buffer[i]
@@ -349,7 +353,11 @@ func (sc *Scanner) wb15(current rune) (continues bool) {
 
 // wb16 implements https://unicode.org/reports/tr29/#WB16
 func (sc *Scanner) wb16(current rune) (continues bool) {
-	// Last n runes represent an odd number of RI
+	if !is(Regional_Indicator, current) {
+		return false
+	}
+
+	// Last n runes represent an odd number of RI, ignoring ExtendFormatZWJ
 	count := 0
 	for i := len(sc.buffer) - 1; i >= 0; i-- {
 		r := sc.buffer[i]
