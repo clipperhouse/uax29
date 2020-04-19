@@ -85,6 +85,8 @@ func (sc *Scanner) Scan() bool {
 			sc.wb11(current),
 			sc.wb12(current, lookahead),
 			sc.wb13(current),
+			sc.wb13a(current),
+			sc.wb13b(current),
 			sc.wb15(current),
 			sc.wb16(current):
 			// true indicates continue
