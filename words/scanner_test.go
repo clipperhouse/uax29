@@ -1,8 +1,12 @@
 package words
 
 import (
+	"bytes"
+	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/clipperhouse/segment"
 )
 
 func TestScanner(t *testing.T) {
@@ -145,4 +149,25 @@ func TestScanner(t *testing.T) {
 			t.Errorf("expected %q to be %t", expected.value, expected.found)
 		}
 	}
+}
+
+func TestUnicodeSegments(t *testing.T) {
+	var passed, failed int
+	for _, test := range segment.UnicodeWordTests {
+		rv := make([][]byte, 0)
+		scanner := NewScanner(bytes.NewReader(test.Input))
+		for scanner.Scan() {
+			rv = append(rv, []byte(scanner.Text()))
+		}
+		if err := scanner.Err(); err != nil {
+			t.Fatal(err)
+		}
+		if !reflect.DeepEqual(rv, test.Output) {
+			failed++
+			//			t.Errorf("expected:\n%#v\ngot:\n%#v\nfor: '%s' comment: %s", test.Output, rv, test.Input, test.Comment)
+		} else {
+			passed++
+		}
+	}
+	t.Logf("passed %d, failed %d", passed, failed)
 }
