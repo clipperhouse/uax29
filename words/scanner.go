@@ -66,7 +66,7 @@ func (sc *Scanner) Scan() bool {
 			sc.accept(current)
 			continue
 		case
-			sc.wb3a(current),
+			sc.wb3a(),
 			sc.wb3b(current):
 			// true indicates break
 			goto breaking
@@ -148,7 +148,7 @@ func (sc *Scanner) wb3(current rune) (continues bool) {
 }
 
 // wb3a implements https://unicode.org/reports/tr29/#WB3a
-func (sc *Scanner) wb3a(current rune) (breaks bool) {
+func (sc *Scanner) wb3a() (breaks bool) {
 	previous := sc.buffer[len(sc.buffer)-1]
 	return is(CR, previous) || is(LF, previous) || is(Newline, previous)
 }
