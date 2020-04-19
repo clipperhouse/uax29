@@ -140,8 +140,11 @@ func (sc *Scanner) wb2(eof bool) (breaks bool) {
 
 // wb3 implements https://unicode.org/reports/tr29/#WB3
 func (sc *Scanner) wb3(current rune) (continues bool) {
+	if !is(LF, current) {
+		return false
+	}
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(CR, previous) && is(LF, current)
+	return is(CR, previous)
 }
 
 // wb3a implements https://unicode.org/reports/tr29/#WB3a
@@ -157,14 +160,20 @@ func (sc *Scanner) wb3b(current rune) (breaks bool) {
 
 // wb3c implements https://unicode.org/reports/tr29/#WB3c
 func (sc *Scanner) wb3c(current rune) (continues bool) {
+	if !is(emoji.Extended_Pictographic, current) {
+		return false
+	}
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(ZWJ, previous) && is(emoji.Extended_Pictographic, current)
+	return is(ZWJ, previous)
 }
 
 // wb3d implements https://unicode.org/reports/tr29/#WB3d
 func (sc *Scanner) wb3d(current rune) (continues bool) {
+	if !is(WSegSpace, current) {
+		return false
+	}
 	previous := sc.buffer[len(sc.buffer)-1]
-	return is(WSegSpace, previous) && is(WSegSpace, current)
+	return is(WSegSpace, previous)
 }
 
 // wb4 implements https://unicode.org/reports/tr29/#WB4
