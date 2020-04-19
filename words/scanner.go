@@ -71,6 +71,7 @@ func (sc *Scanner) Scan() bool {
 			// true indicates break
 			goto breaking
 		case
+			sc.wb3c(current),
 			sc.wb3d(current),
 			sc.wb4(current),
 			sc.wb5(current),
