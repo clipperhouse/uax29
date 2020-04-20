@@ -185,8 +185,8 @@ func (sc *Scanner) wb4(current rune) (continues bool) {
 // - skipping (ignoring) ExtendFormatZWJ
 // - testing that the last rune is in any of the range tables
 // Logic is here: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by WB4)
-func (sc *Scanner) seekPrevious(rts ...*unicode.RangeTable) bool {
-	// Start at the end of the buffer and move backards
+func (sc *Scanner) seekPreviousIndex(rts ...*unicode.RangeTable) int {
+	// Start at the end of the buffer and move backwards
 	for i := len(sc.buffer) - 1; i >= 0; i-- {
 		r := sc.buffer[i]
 
@@ -198,7 +198,7 @@ func (sc *Scanner) seekPrevious(rts ...*unicode.RangeTable) bool {
 		// See if any of the range tables apply
 		for _, rt := range rts {
 			if is(rt, r) {
-				return true
+				return i
 			}
 		}
 
@@ -206,7 +206,15 @@ func (sc *Scanner) seekPrevious(rts ...*unicode.RangeTable) bool {
 		break
 	}
 
-	return false
+	return -1
+}
+
+// seekPrevious works backward from the end of the buffer
+// - skipping (ignoring) ExtendFormatZWJ
+// - testing that the last rune is in any of the range tables
+// Logic is here: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by WB4)
+func (sc *Scanner) seekPrevious(rts ...*unicode.RangeTable) bool {
+	return sc.seekPreviousIndex(rts...) >= 0
 }
 
 // wb5 implements https://unicode.org/reports/tr29/#WB5
