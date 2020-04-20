@@ -273,14 +273,21 @@ func (sc *Scanner) wb7b(current, lookahead rune) (continues bool) {
 
 // wb7c implements https://unicode.org/reports/tr29/#WB7c
 func (sc *Scanner) wb7c(current rune) (continues bool) {
+	if !is(Hebrew_Letter, current) {
+		return false
+	}
+
 	if len(sc.buffer) < 2 {
 		return false
 	}
 
 	previous := sc.buffer[len(sc.buffer)-1]
-	preprevious := sc.buffer[len(sc.buffer)-2]
+	if !is(Double_Quote, previous) {
+		return false
+	}
 
-	return is(Hebrew_Letter, preprevious) && is(Double_Quote, previous) && is(Hebrew_Letter, current)
+	preprevious := sc.buffer[len(sc.buffer)-2]
+	return is(Hebrew_Letter, preprevious)
 }
 
 // wb8 implements https://unicode.org/reports/tr29/#WB8
