@@ -223,7 +223,7 @@ func (sc *Scanner) wb6(current, lookahead rune) (continues bool) {
 		return false
 	}
 
-	if !(is(AHLetter, lookahead) || is(ExtendFormatZWJ, current)) {
+	if !is(AHLetter, lookahead) {
 		return false
 	}
 
