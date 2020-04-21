@@ -186,6 +186,30 @@ func (sc *Scanner) wb4() (continues bool) {
 	return is(ExtendFormatZWJ, current)
 }
 
+func (sc *Scanner) seekForward(pos int, rts ...*unicode.RangeTable) bool {
+	// Start at the end of the buffer and move backwards
+	for i := pos + 1; i < len(sc.buffer); i++ {
+		r := sc.buffer[i]
+
+		// Ignore ExtendFormatZWJ
+		if is(ExtendFormatZWJ, r) {
+			continue
+		}
+
+		// See if any of the range tables apply
+		for _, rt := range rts {
+			if is(rt, r) {
+				return true
+			}
+		}
+
+		// If we get this far, it's false
+		break
+	}
+
+	return false
+}
+
 // seekPrevious works backward from the end of the buffer
 // - skipping (ignoring) ExtendFormatZWJ
 // - testing that the last rune is in any of the range tables
@@ -239,12 +263,7 @@ func (sc *Scanner) wb6() (continues bool) {
 		return false
 	}
 
-	if len(sc.buffer) < sc.pos+2 {
-		// There's no lookahead
-		return false
-	}
-	lookahead := sc.buffer[sc.pos+1]
-	if !is(AHLetter, lookahead) {
+	if !sc.seekForward(sc.pos, AHLetter) {
 		return false
 	}
 
@@ -283,12 +302,7 @@ func (sc *Scanner) wb7b() (continues bool) {
 		return false
 	}
 
-	if len(sc.buffer) < sc.pos+2 {
-		// There's no lookahead
-		return false
-	}
-	lookahead := sc.buffer[sc.pos+1]
-	if !is(Hebrew_Letter, lookahead) {
+	if !sc.seekForward(sc.pos, Hebrew_Letter) {
 		return false
 	}
 
@@ -363,12 +377,7 @@ func (sc *Scanner) wb12() (continues bool) {
 		return false
 	}
 
-	if len(sc.buffer) < sc.pos+2 {
-		// There's no lookahead
-		return false
-	}
-	lookahead := sc.buffer[sc.pos+1]
-	if !is(Numeric, lookahead) {
+	if !sc.seekForward(sc.pos, Numeric) {
 		return false
 	}
 
