@@ -138,10 +138,10 @@ func (sc *Scanner) wb2() (breaks bool) {
 // wb3 implements https://unicode.org/reports/tr29/#WB3
 func (sc *Scanner) wb3() (continues bool) {
 	current := sc.buffer[sc.pos]
-
 	if !is(LF, current) {
 		return false
 	}
+
 	previous := sc.buffer[sc.pos-1]
 	return is(CR, previous)
 }
@@ -225,10 +225,10 @@ func (sc *Scanner) seekPrevious(pos int, rts ...*unicode.RangeTable) bool {
 // wb5 implements https://unicode.org/reports/tr29/#WB5
 func (sc *Scanner) wb5() (continues bool) {
 	current := sc.buffer[sc.pos]
-
 	if !is(AHLetter, current) {
 		return false
 	}
+
 	return sc.seekPrevious(sc.pos, AHLetter)
 }
 
@@ -269,7 +269,6 @@ func (sc *Scanner) wb7() (continues bool) {
 // wb7a implements https://unicode.org/reports/tr29/#WB7a
 func (sc *Scanner) wb7a() (continues bool) {
 	current := sc.buffer[sc.pos]
-
 	if !is(Single_Quote, current) {
 		return false
 	}
@@ -315,30 +314,30 @@ func (sc *Scanner) wb7c() (continues bool) {
 // wb8 implements https://unicode.org/reports/tr29/#WB8
 func (sc *Scanner) wb8() (continues bool) {
 	current := sc.buffer[sc.pos]
-
 	if !is(Numeric, current) {
 		return false
 	}
+
 	return sc.seekPrevious(sc.pos, Numeric)
 }
 
 // wb9 implements https://unicode.org/reports/tr29/#WB9
 func (sc *Scanner) wb9() (continues bool) {
 	current := sc.buffer[sc.pos]
-
 	if !is(Numeric, current) {
 		return false
 	}
+
 	return sc.seekPrevious(sc.pos, AHLetter)
 }
 
 // wb10 implements https://unicode.org/reports/tr29/#WB10
 func (sc *Scanner) wb10() (continues bool) {
 	current := sc.buffer[sc.pos]
-
 	if !is(AHLetter, current) {
 		return false
 	}
+
 	return sc.seekPrevious(sc.pos, Numeric)
 }
 
@@ -379,37 +378,36 @@ func (sc *Scanner) wb12() (continues bool) {
 // wb13 implements https://unicode.org/reports/tr29/#WB13
 func (sc *Scanner) wb13() (continues bool) {
 	current := sc.buffer[sc.pos]
-
 	if !is(Katakana, current) {
 		return false
 	}
+
 	return sc.seekPrevious(sc.pos, Katakana)
 }
 
 // wb13a implements https://unicode.org/reports/tr29/#WB13a
 func (sc *Scanner) wb13a() (continues bool) {
 	current := sc.buffer[sc.pos]
-
 	if !is(ExtendNumLet, current) {
 		return false
 	}
+
 	return sc.seekPrevious(sc.pos, AHLetter, Numeric, Katakana, ExtendNumLet)
 }
 
 // wb13b implements https://unicode.org/reports/tr29/#WB13b
 func (sc *Scanner) wb13b() (continues bool) {
 	current := sc.buffer[sc.pos]
-
 	if !(is(AHLetter, current) || is(Numeric, current) || is(Katakana, current)) {
 		return false
 	}
+
 	return sc.seekPrevious(sc.pos, ExtendNumLet)
 }
 
 // wb15 implements https://unicode.org/reports/tr29/#WB15
 func (sc *Scanner) wb15() (continues bool) {
 	current := sc.buffer[sc.pos]
-
 	if !is(Regional_Indicator, current) {
 		return false
 	}
@@ -436,7 +434,6 @@ func (sc *Scanner) wb15() (continues bool) {
 // wb16 implements https://unicode.org/reports/tr29/#WB16
 func (sc *Scanner) wb16() (continues bool) {
 	current := sc.buffer[sc.pos]
-
 	if !is(Regional_Indicator, current) {
 		return false
 	}
