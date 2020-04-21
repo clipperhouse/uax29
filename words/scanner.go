@@ -284,21 +284,20 @@ func (sc *Scanner) wb7b(current, lookahead rune) (continues bool) {
 
 // wb7c implements https://unicode.org/reports/tr29/#WB7c
 func (sc *Scanner) wb7c(current rune) (continues bool) {
-	if !is(Hebrew_Letter, current) {
-		return false
-	}
-
 	if sc.pos < 2 {
 		return false
 	}
 
-	previous := sc.buffer[sc.pos-1]
-	if !is(Double_Quote, previous) {
+	if !is(Hebrew_Letter, current) {
 		return false
 	}
 
-	preprevious := sc.buffer[sc.pos-2]
-	return is(Hebrew_Letter, preprevious)
+	previous := sc.seekPreviousIndex(sc.pos, Double_Quote)
+	if previous < 0 {
+		return false
+	}
+
+	return sc.seekPrevious(previous, Hebrew_Letter)
 }
 
 // wb8 implements https://unicode.org/reports/tr29/#WB8
