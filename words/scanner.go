@@ -195,13 +195,13 @@ func (sc *Scanner) wb4() (accept bool) {
 }
 
 // seekForward looks ahead until it hits a rune satisfying one of the range tables,
-// ignoring ExtendFormatZWJ
+// ignoring Extend|Format|ZWJ
 // See: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by WB4)
 func (sc *Scanner) seekForward(rts ...*unicode.RangeTable) bool {
 	for i := sc.pos + 1; i < len(sc.buffer); i++ {
 		r := sc.buffer[i]
 
-		// Ignore ExtendFormatZWJ
+		// Ignore Extend|Format|ZWJ
 		if is(_mergedExtendFormatZWJ, r) {
 			continue
 		}
@@ -213,22 +213,22 @@ func (sc *Scanner) seekForward(rts ...*unicode.RangeTable) bool {
 			}
 		}
 
-		// If we get this far, it's false
+		// If we get this far, it's not there
 		break
 	}
 
 	return false
 }
 
-// seekPreviousIndex works backward ahead until it hits a rune satisfying one of the range tables,
-// ignoring ExtendFormatZWJ, returning the index of the rune in the buffer
+// seekPreviousIndex works backward until it hits a rune satisfying one of the range tables,
+// ignoring Extend|Format|ZWJ, and returns the index of the rune in the buffer
 // See: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by WB4)
 func (sc *Scanner) seekPreviousIndex(pos int, rts ...*unicode.RangeTable) int {
 	// Start at the end of the buffer and move backwards
 	for i := pos - 1; i >= 0; i-- {
 		r := sc.buffer[i]
 
-		// Ignore ExtendFormatZWJ
+		// Ignore Extend|Format|ZWJ
 		if is(_mergedExtendFormatZWJ, r) {
 			continue
 		}
@@ -240,7 +240,7 @@ func (sc *Scanner) seekPreviousIndex(pos int, rts ...*unicode.RangeTable) int {
 			}
 		}
 
-		// If we get this far, it's false
+		// If we get this far, it's not there
 		break
 	}
 
