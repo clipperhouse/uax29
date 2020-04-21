@@ -4,6 +4,7 @@ package words
 
 import (
 	"bufio"
+	"bytes"
 	"io"
 	"unicode"
 
@@ -24,14 +25,17 @@ func NewScanner(r io.Reader) *Scanner {
 // Scanner is the structure for scanning an input Reader. Use NewScanner to instantiate.
 type Scanner struct {
 	incoming *bufio.Reader
-	buffer   []rune
 
+	// a buffer of runes to evaluate
+	buffer []rune
 	// a cursor for runes in the buffer
-	// the current rune is buffer[pos], the token is buffer[:pos]
 	pos int
 
-	text string
-	err  error
+	bb bytes.Buffer
+
+	// outputs
+	bytes []byte
+	err   error
 }
 
 // Scan advances to the next token, returning true if successful. Returns false on error or EOF.
@@ -100,9 +104,14 @@ func (sc *Scanner) Scan() bool {
 	}
 }
 
+// Bytes returns the current token as a byte slice, given a successful call to Scan
+func (sc *Scanner) Bytes() []byte {
+	return sc.bytes
+}
+
 // Text returns the current token, given a successful call to Scan
 func (sc *Scanner) Text() string {
-	return sc.text
+	return string(sc.bytes)
 }
 
 // Err returns the current error, given an unsuccessful call to Scan
@@ -460,19 +469,22 @@ func (sc *Scanner) wb16() (accept bool) {
 // wb999 implements https://unicode.org/reports/tr29/#WB999
 // i.e. word break
 func (sc *Scanner) wb999() bool {
-	sc.text = string(sc.buffer[:sc.pos])
+	// Get the bytes & reset
+	sc.bytes = sc.bb.Bytes()
+	sc.bb.Reset()
 
-	// Optimization to avoid growing array
+	// Drop the emitted runes (optimization to avoid growing array)
 	copy(sc.buffer, sc.buffer[sc.pos:])
 	sc.buffer = sc.buffer[:len(sc.buffer)-sc.pos]
 
 	sc.pos = 0
 
-	return len(sc.text) > 0
+	return len(sc.bytes) > 0
 }
 
 // accept forwards the buffer cursor (pos) by 1
 func (sc *Scanner) accept() {
+	sc.bb.WriteRune(sc.buffer[sc.pos])
 	sc.pos++
 }
 
