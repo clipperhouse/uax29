@@ -5,7 +5,22 @@ package graphemes
 
 import "unicode"
 
-var CR = _CR
+var (
+	// See https://unicode.org/reports/tr29/
+	CR                 = _CR
+	Control            = _Control
+	Extend             = _Extend
+	L                  = _L
+	LF                 = _LF
+	LV                 = _LV
+	LVT                = _LVT
+	Prepend            = _Prepend
+	Regional_Indicator = _Regional_Indicator
+	SpacingMark        = _SpacingMark
+	T                  = _T
+	V                  = _V
+	ZWJ                = _ZWJ
+)
 
 var _CR = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -13,8 +28,6 @@ var _CR = &unicode.RangeTable{
 	},
 	LatinOffset: 1,
 }
-
-var Control = _Control
 
 var _Control = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -40,8 +53,6 @@ var _Control = &unicode.RangeTable{
 	},
 	LatinOffset: 4,
 }
-
-var Extend = _Extend
 
 var _Extend = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -347,16 +358,12 @@ var _Extend = &unicode.RangeTable{
 	},
 }
 
-var L = _L
-
 var _L = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x1100, 0x115f, 1},
 		{0xa960, 0xa97c, 1},
 	},
 }
-
-var LF = _LF
 
 var _LF = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -365,15 +372,11 @@ var _LF = &unicode.RangeTable{
 	LatinOffset: 1,
 }
 
-var LV = _LV
-
 var _LV = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xac00, 0xd788, 28},
 	},
 }
-
-var LVT = _LVT
 
 var _LVT = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -779,8 +782,6 @@ var _LVT = &unicode.RangeTable{
 	},
 }
 
-var Prepend = _Prepend
-
 var _Prepend = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x600, 0x605, 1},
@@ -796,15 +797,11 @@ var _Prepend = &unicode.RangeTable{
 	},
 }
 
-var Regional_Indicator = _Regional_Indicator
-
 var _Regional_Indicator = &unicode.RangeTable{
 	R32: []unicode.Range32{
 		{0x1f1e6, 0x1f1ff, 1},
 	},
 }
-
-var SpacingMark = _SpacingMark
 
 var _SpacingMark = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -942,8 +939,6 @@ var _SpacingMark = &unicode.RangeTable{
 	},
 }
 
-var T = _T
-
 var _T = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x11a8, 0x11ff, 1},
@@ -951,16 +946,12 @@ var _T = &unicode.RangeTable{
 	},
 }
 
-var V = _V
-
 var _V = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x1160, 0x11a7, 1},
 		{0xd7b0, 0xd7c6, 1},
 	},
 }
-
-var ZWJ = _ZWJ
 
 var _ZWJ = &unicode.RangeTable{
 	R16: []unicode.Range16{

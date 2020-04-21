@@ -5,7 +5,15 @@ package emoji
 
 import "unicode"
 
-var Emoji = _Emoji
+var (
+	// See https://unicode.org/reports/tr29/
+	Emoji                 = _Emoji
+	Emoji_Component       = _Emoji_Component
+	Emoji_Modifier        = _Emoji_Modifier
+	Emoji_Modifier_Base   = _Emoji_Modifier_Base
+	Emoji_Presentation    = _Emoji_Presentation
+	Extended_Pictographic = _Extended_Pictographic
+)
 
 var _Emoji = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -136,8 +144,6 @@ var _Emoji = &unicode.RangeTable{
 	LatinOffset: 3,
 }
 
-var Emoji_Component = _Emoji_Component
-
 var _Emoji_Component = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x23, 0x2a, 7},
@@ -154,15 +160,11 @@ var _Emoji_Component = &unicode.RangeTable{
 	LatinOffset: 2,
 }
 
-var Emoji_Modifier = _Emoji_Modifier
-
 var _Emoji_Modifier = &unicode.RangeTable{
 	R32: []unicode.Range32{
 		{0x1f3fb, 0x1f3ff, 1},
 	},
 }
-
-var Emoji_Modifier_Base = _Emoji_Modifier_Base
 
 var _Emoji_Modifier_Base = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -202,8 +204,6 @@ var _Emoji_Modifier_Base = &unicode.RangeTable{
 		{0x1f9d1, 0x1f9dd, 1},
 	},
 }
-
-var Emoji_Presentation = _Emoji_Presentation
 
 var _Emoji_Presentation = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -280,8 +280,6 @@ var _Emoji_Presentation = &unicode.RangeTable{
 		{0x1fad0, 0x1fad6, 1},
 	},
 }
-
-var Extended_Pictographic = _Extended_Pictographic
 
 var _Extended_Pictographic = &unicode.RangeTable{
 	R16: []unicode.Range16{

@@ -5,7 +5,30 @@ package words
 
 import "unicode"
 
-var AHLetter = _AHLetter
+var (
+	// See https://unicode.org/reports/tr29/
+	AHLetter           = _AHLetter
+	ALetter            = _ALetter
+	CR                 = _CR
+	Double_Quote       = _Double_Quote
+	Extend             = _Extend
+	ExtendFormatZWJ    = _ExtendFormatZWJ
+	ExtendNumLet       = _ExtendNumLet
+	Format             = _Format
+	Hebrew_Letter      = _Hebrew_Letter
+	Katakana           = _Katakana
+	LF                 = _LF
+	MidLetter          = _MidLetter
+	MidNum             = _MidNum
+	MidNumLet          = _MidNumLet
+	MidNumLetQ         = _MidNumLetQ
+	Newline            = _Newline
+	Numeric            = _Numeric
+	Regional_Indicator = _Regional_Indicator
+	Single_Quote       = _Single_Quote
+	WSegSpace          = _WSegSpace
+	ZWJ                = _ZWJ
+)
 
 var _AHLetter = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -527,8 +550,6 @@ var _AHLetter = &unicode.RangeTable{
 	LatinOffset: 6,
 }
 
-var ALetter = _ALetter
-
 var _ALetter = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x41, 0x5a, 1},
@@ -1041,8 +1062,6 @@ var _ALetter = &unicode.RangeTable{
 	LatinOffset: 6,
 }
 
-var CR = _CR
-
 var _CR = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xd, 0xd, 1},
@@ -1050,16 +1069,12 @@ var _CR = &unicode.RangeTable{
 	LatinOffset: 1,
 }
 
-var Double_Quote = _Double_Quote
-
 var _Double_Quote = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x22, 0x22, 1},
 	},
 	LatinOffset: 1,
 }
-
-var Extend = _Extend
 
 var _Extend = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -1341,8 +1356,6 @@ var _Extend = &unicode.RangeTable{
 		{0xe0100, 0xe01ef, 1},
 	},
 }
-
-var ExtendFormatZWJ = _ExtendFormatZWJ
 
 var _ExtendFormatZWJ = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -1637,8 +1650,6 @@ var _ExtendFormatZWJ = &unicode.RangeTable{
 	LatinOffset: 1,
 }
 
-var ExtendNumLet = _ExtendNumLet
-
 var _ExtendNumLet = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x5f, 0x202f, 8144},
@@ -1649,8 +1660,6 @@ var _ExtendNumLet = &unicode.RangeTable{
 		{0xff3f, 0xff3f, 1},
 	},
 }
-
-var Format = _Format
 
 var _Format = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -1675,8 +1684,6 @@ var _Format = &unicode.RangeTable{
 	},
 }
 
-var Hebrew_Letter = _Hebrew_Letter
-
 var _Hebrew_Letter = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x5d0, 0x5ea, 1},
@@ -1691,8 +1698,6 @@ var _Hebrew_Letter = &unicode.RangeTable{
 		{0xfb47, 0xfb4f, 1},
 	},
 }
-
-var Katakana = _Katakana
 
 var _Katakana = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -1711,16 +1716,12 @@ var _Katakana = &unicode.RangeTable{
 	},
 }
 
-var LF = _LF
-
 var _LF = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xa, 0xa, 1},
 	},
 	LatinOffset: 1,
 }
-
-var MidLetter = _MidLetter
 
 var _MidLetter = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -1731,8 +1732,6 @@ var _MidLetter = &unicode.RangeTable{
 	},
 	LatinOffset: 1,
 }
-
-var MidNum = _MidNum
 
 var _MidNum = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -1748,8 +1747,6 @@ var _MidNum = &unicode.RangeTable{
 	LatinOffset: 1,
 }
 
-var MidNumLet = _MidNumLet
-
 var _MidNumLet = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x2e, 0x5f, 49},
@@ -1760,8 +1757,6 @@ var _MidNumLet = &unicode.RangeTable{
 	},
 	LatinOffset: 1,
 }
-
-var MidNumLetQ = _MidNumLetQ
 
 var _MidNumLetQ = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -1775,8 +1770,6 @@ var _MidNumLetQ = &unicode.RangeTable{
 	LatinOffset: 2,
 }
 
-var Newline = _Newline
-
 var _Newline = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xb, 0xc, 1},
@@ -1785,8 +1778,6 @@ var _Newline = &unicode.RangeTable{
 	},
 	LatinOffset: 1,
 }
-
-var Numeric = _Numeric
 
 var _Numeric = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -1856,15 +1847,11 @@ var _Numeric = &unicode.RangeTable{
 	LatinOffset: 1,
 }
 
-var Regional_Indicator = _Regional_Indicator
-
 var _Regional_Indicator = &unicode.RangeTable{
 	R32: []unicode.Range32{
 		{0x1f1e6, 0x1f1ff, 1},
 	},
 }
-
-var Single_Quote = _Single_Quote
 
 var _Single_Quote = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -1872,8 +1859,6 @@ var _Single_Quote = &unicode.RangeTable{
 	},
 	LatinOffset: 1,
 }
-
-var WSegSpace = _WSegSpace
 
 var _WSegSpace = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -1883,8 +1868,6 @@ var _WSegSpace = &unicode.RangeTable{
 		{0x205f, 0x3000, 4001},
 	},
 }
-
-var ZWJ = _ZWJ
 
 var _ZWJ = &unicode.RangeTable{
 	R16: []unicode.Range16{

@@ -166,9 +166,15 @@ func write(prop prop, rts map[string]*unicode.RangeTable) error {
 	}
 	sort.Strings(categories)
 
+	fmt.Fprintf(&buf, "var (\n")
+	fmt.Fprintf(&buf, "\t// See https://unicode.org/reports/tr29/\n")
+	for _, category := range categories {
+		fmt.Fprintf(&buf, "%s = _%s\n", category, category)
+	}
+	fmt.Fprintf(&buf, ")\n\n")
+
 	for _, category := range categories {
 		rt := rts[category]
-		fmt.Fprintf(&buf, "var %s = _%s\n\n", category, category)
 		fmt.Fprintf(&buf, "var _%s = ", category)
 		print(&buf, rt)
 	}

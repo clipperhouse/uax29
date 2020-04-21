@@ -5,7 +5,23 @@ package sentences
 
 import "unicode"
 
-var ATerm = _ATerm
+var (
+	// See https://unicode.org/reports/tr29/
+	ATerm     = _ATerm
+	CR        = _CR
+	Close     = _Close
+	Extend    = _Extend
+	Format    = _Format
+	LF        = _LF
+	Lower     = _Lower
+	Numeric   = _Numeric
+	OLetter   = _OLetter
+	SContinue = _SContinue
+	STerm     = _STerm
+	Sep       = _Sep
+	Sp        = _Sp
+	Upper     = _Upper
+)
 
 var _ATerm = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -14,16 +30,12 @@ var _ATerm = &unicode.RangeTable{
 	},
 }
 
-var CR = _CR
-
 var _CR = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xd, 0xd, 1},
 	},
 	LatinOffset: 1,
 }
-
-var Close = _Close
 
 var _Close = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -71,8 +83,6 @@ var _Close = &unicode.RangeTable{
 	},
 	LatinOffset: 5,
 }
-
-var Extend = _Extend
 
 var _Extend = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -354,8 +364,6 @@ var _Extend = &unicode.RangeTable{
 	},
 }
 
-var Format = _Format
-
 var _Format = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xad, 0x600, 1363},
@@ -379,16 +387,12 @@ var _Format = &unicode.RangeTable{
 	},
 }
 
-var LF = _LF
-
 var _LF = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xa, 0xa, 1},
 	},
 	LatinOffset: 1,
 }
-
-var Lower = _Lower
 
 var _Lower = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -558,8 +562,6 @@ var _Lower = &unicode.RangeTable{
 	LatinOffset: 5,
 }
 
-var Numeric = _Numeric
-
 var _Numeric = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x30, 0x39, 1},
@@ -627,8 +629,6 @@ var _Numeric = &unicode.RangeTable{
 	},
 	LatinOffset: 1,
 }
-
-var OLetter = _OLetter
 
 var _OLetter = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -1115,8 +1115,6 @@ var _OLetter = &unicode.RangeTable{
 	},
 }
 
-var SContinue = _SContinue
-
 var _SContinue = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x2c, 0x2d, 1},
@@ -1135,8 +1133,6 @@ var _SContinue = &unicode.RangeTable{
 	},
 	LatinOffset: 1,
 }
-
-var STerm = _STerm
 
 var _STerm = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -1204,16 +1200,12 @@ var _STerm = &unicode.RangeTable{
 	LatinOffset: 1,
 }
 
-var Sep = _Sep
-
 var _Sep = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x85, 0x2028, 8099},
 		{0x2029, 0x2029, 1},
 	},
 }
-
-var Sp = _Sp
 
 var _Sp = &unicode.RangeTable{
 	R16: []unicode.Range16{
@@ -1226,8 +1218,6 @@ var _Sp = &unicode.RangeTable{
 	},
 	LatinOffset: 2,
 }
-
-var Upper = _Upper
 
 var _Upper = &unicode.RangeTable{
 	R16: []unicode.Range16{
