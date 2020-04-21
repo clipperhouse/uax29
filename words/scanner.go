@@ -26,6 +26,10 @@ type Scanner struct {
 	incoming *bufio.Reader
 	buffer   []rune
 
+	// a cursor for _accepted_ runes in the buffer
+	// the current accepted token is buffer[:pos] and lookahead is buffer[pos:]
+	pos int
+
 	text string
 	err  error
 }
@@ -33,37 +37,42 @@ type Scanner struct {
 // Scan advances to the next token, returning true if successful. Returns false on error or EOF.
 func (sc *Scanner) Scan() bool {
 	for {
-		current, eof, err := sc.readRune()
-		if err != nil {
-			sc.err = err
-			return false
+		for len(sc.buffer) < sc.pos+2 {
+			current, eof, err := sc.readRune()
+			if err != nil {
+				sc.err = err
+				return false
+			}
+			if eof {
+				break
+			}
+			sc.buffer = append(sc.buffer, current)
 		}
 
 		switch {
-		case sc.wb1(eof):
+		case sc.wb1():
 			// true indicates continue
-			sc.accept(current)
+			sc.accept()
 			continue
-		case sc.wb2(eof):
+		case sc.wb2():
 			// true indicates break
 			sc.text = sc.token()
 			sc.err = nil
 			return sc.text != ""
 		}
 
-		// Some funcs below require lookahead; better to do I/O here than there
-		// (we don't care about eof for lookahead, irrelevant)
-		lookahead, _, err := sc.peekRune()
-		if err != nil {
-			sc.err = err
-			return false
+		current := sc.buffer[sc.pos]
+
+		var lookahead rune
+		if len(sc.buffer) > sc.pos+1 {
+			lookahead = sc.buffer[sc.pos+1]
 		}
 
 		switch {
 		case
 			sc.wb3(current):
 			// true indicates continue
-			sc.accept(current)
+			sc.accept()
 			continue
 		case
 			sc.wb3a(),
@@ -91,7 +100,7 @@ func (sc *Scanner) Scan() bool {
 			sc.wb15(current),
 			sc.wb16(current):
 			// true indicates continue
-			sc.accept(current)
+			sc.accept()
 			continue
 		}
 
@@ -99,15 +108,9 @@ func (sc *Scanner) Scan() bool {
 		// If we fall through all the above rules, it's a word break
 		// wb999 implements https://unicode.org/reports/tr29/#WB999
 
-		if len(sc.buffer) > 0 {
-			sc.text = sc.token()
-			sc.err = nil
-			sc.accept(current)
-			return true
-		}
-
-		sc.accept(current)
-		continue
+		sc.text = sc.token()
+		sc.err = nil
+		return true
 	}
 }
 
@@ -127,15 +130,16 @@ func (sc *Scanner) Err() error {
 var is = unicode.Is
 
 // wb1 implements https://unicode.org/reports/tr29/#WB1
-func (sc *Scanner) wb1(eof bool) (continues bool) {
-	sot := len(sc.buffer) == 0 // "start of text"
+func (sc *Scanner) wb1() (continues bool) {
+	sot := sc.pos == 0 // "start of text"
+	eof := len(sc.buffer) == sc.pos
 	return sot && !eof
 }
 
 // wb2 implements https://unicode.org/reports/tr29/#WB2
-func (sc *Scanner) wb2(eof bool) (breaks bool) {
-	// A bit silly, but reads consistently in Scan above
-	return eof
+func (sc *Scanner) wb2() (breaks bool) {
+	// eof
+	return len(sc.buffer) == sc.pos
 }
 
 // wb3 implements https://unicode.org/reports/tr29/#WB3
@@ -143,13 +147,13 @@ func (sc *Scanner) wb3(current rune) (continues bool) {
 	if !is(LF, current) {
 		return false
 	}
-	previous := sc.buffer[len(sc.buffer)-1]
+	previous := sc.buffer[sc.pos-1]
 	return is(CR, previous)
 }
 
 // wb3a implements https://unicode.org/reports/tr29/#WB3a
 func (sc *Scanner) wb3a() (breaks bool) {
-	previous := sc.buffer[len(sc.buffer)-1]
+	previous := sc.buffer[sc.pos-1]
 	return is(CR, previous) || is(LF, previous) || is(Newline, previous)
 }
 
@@ -163,7 +167,7 @@ func (sc *Scanner) wb3c(current rune) (continues bool) {
 	if !is(emoji.Extended_Pictographic, current) {
 		return false
 	}
-	previous := sc.buffer[len(sc.buffer)-1]
+	previous := sc.buffer[sc.pos-1]
 	return is(ZWJ, previous)
 }
 
@@ -172,7 +176,7 @@ func (sc *Scanner) wb3d(current rune) (continues bool) {
 	if !is(WSegSpace, current) {
 		return false
 	}
-	previous := sc.buffer[len(sc.buffer)-1]
+	previous := sc.buffer[sc.pos-1]
 	return is(WSegSpace, previous)
 }
 
@@ -185,10 +189,10 @@ func (sc *Scanner) wb4(current rune) (continues bool) {
 // - skipping (ignoring) ExtendFormatZWJ
 // - testing that the last rune is in any of the range tables
 // Logic is here: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by WB4)
-func seekPreviousIndex(buffer []rune, rts ...*unicode.RangeTable) int {
+func (sc *Scanner) seekPreviousIndex(pos int, rts ...*unicode.RangeTable) int {
 	// Start at the end of the buffer and move backwards
-	for i := len(buffer) - 1; i >= 0; i-- {
-		r := buffer[i]
+	for i := pos - 1; i >= 0; i-- {
+		r := sc.buffer[i]
 
 		// Ignore ExtendFormatZWJ
 		if is(ExtendFormatZWJ, r) {
@@ -213,8 +217,8 @@ func seekPreviousIndex(buffer []rune, rts ...*unicode.RangeTable) int {
 // - skipping (ignoring) ExtendFormatZWJ
 // - testing that the last rune is in any of the range tables
 // Logic is here: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by WB4)
-func seekPrevious(buffer []rune, rts ...*unicode.RangeTable) bool {
-	return seekPreviousIndex(buffer, rts...) >= 0
+func (sc *Scanner) seekPrevious(pos int, rts ...*unicode.RangeTable) bool {
+	return sc.seekPreviousIndex(pos, rts...) >= 0
 }
 
 // wb5 implements https://unicode.org/reports/tr29/#WB5
@@ -222,7 +226,7 @@ func (sc *Scanner) wb5(current rune) (continues bool) {
 	if !is(AHLetter, current) {
 		return false
 	}
-	return seekPrevious(sc.buffer, AHLetter)
+	return sc.seekPrevious(sc.pos, AHLetter)
 }
 
 // wb6 implements https://unicode.org/reports/tr29/#WB6
@@ -235,12 +239,12 @@ func (sc *Scanner) wb6(current, lookahead rune) (continues bool) {
 		return false
 	}
 
-	return seekPrevious(sc.buffer, AHLetter)
+	return sc.seekPrevious(sc.pos, AHLetter)
 }
 
 // wb7 implements https://unicode.org/reports/tr29/#WB7
 func (sc *Scanner) wb7(current rune) (continues bool) {
-	if len(sc.buffer) < 2 {
+	if sc.pos < 2 {
 		return false
 	}
 
@@ -248,13 +252,13 @@ func (sc *Scanner) wb7(current rune) (continues bool) {
 		return false
 	}
 
-	index := seekPreviousIndex(sc.buffer, MidLetter, MidNumLetQ)
+	index := sc.seekPreviousIndex(sc.pos, MidLetter, MidNumLetQ)
 	if index < 0 {
 		return false
 	}
 
 	// Look previous to above
-	return seekPrevious(sc.buffer[:index], AHLetter)
+	return sc.seekPrevious(index, AHLetter)
 }
 
 // wb7a implements https://unicode.org/reports/tr29/#WB7a
@@ -263,7 +267,7 @@ func (sc *Scanner) wb7a(current rune) (continues bool) {
 		return false
 	}
 
-	return seekPrevious(sc.buffer, Hebrew_Letter)
+	return sc.seekPrevious(sc.pos, Hebrew_Letter)
 }
 
 // wb7b implements https://unicode.org/reports/tr29/#WB7b
@@ -276,7 +280,7 @@ func (sc *Scanner) wb7b(current, lookahead rune) (continues bool) {
 		return false
 	}
 
-	return seekPrevious(sc.buffer, Hebrew_Letter)
+	return sc.seekPrevious(sc.pos, Hebrew_Letter)
 }
 
 // wb7c implements https://unicode.org/reports/tr29/#WB7c
@@ -285,16 +289,16 @@ func (sc *Scanner) wb7c(current rune) (continues bool) {
 		return false
 	}
 
-	if len(sc.buffer) < 2 {
+	if sc.pos < 2 {
 		return false
 	}
 
-	previous := sc.buffer[len(sc.buffer)-1]
+	previous := sc.buffer[sc.pos-1]
 	if !is(Double_Quote, previous) {
 		return false
 	}
 
-	preprevious := sc.buffer[len(sc.buffer)-2]
+	preprevious := sc.buffer[sc.pos-2]
 	return is(Hebrew_Letter, preprevious)
 }
 
@@ -303,7 +307,7 @@ func (sc *Scanner) wb8(current rune) (continues bool) {
 	if !is(Numeric, current) {
 		return false
 	}
-	return seekPrevious(sc.buffer, Numeric)
+	return sc.seekPrevious(sc.pos, Numeric)
 }
 
 // wb9 implements https://unicode.org/reports/tr29/#WB9
@@ -311,7 +315,7 @@ func (sc *Scanner) wb9(current rune) (continues bool) {
 	if !is(Numeric, current) {
 		return false
 	}
-	return seekPrevious(sc.buffer, AHLetter)
+	return sc.seekPrevious(sc.pos, AHLetter)
 }
 
 // wb10 implements https://unicode.org/reports/tr29/#WB10
@@ -319,24 +323,24 @@ func (sc *Scanner) wb10(current rune) (continues bool) {
 	if !is(AHLetter, current) {
 		return false
 	}
-	return seekPrevious(sc.buffer, Numeric)
+	return sc.seekPrevious(sc.pos, Numeric)
 }
 
 // wb11 implements https://unicode.org/reports/tr29/#WB11
 func (sc *Scanner) wb11(current rune) (continues bool) {
-	if len(sc.buffer) < 2 {
+	if sc.pos < 2 {
 		return false
 	}
 
-	previous := sc.buffer[len(sc.buffer)-1]
-	preprevious := sc.buffer[len(sc.buffer)-2]
+	previous := sc.buffer[sc.pos-1]
+	preprevious := sc.buffer[sc.pos-2]
 
 	return is(Numeric, preprevious) && (is(MidNum, previous) || is(MidNumLetQ, previous)) && is(Numeric, current)
 }
 
 // wb12 implements https://unicode.org/reports/tr29/#WB12
 func (sc *Scanner) wb12(current, lookahead rune) (continues bool) {
-	previous := sc.buffer[len(sc.buffer)-1]
+	previous := sc.buffer[sc.pos-1]
 	return is(Numeric, previous) && (is(MidNum, current) || is(MidNumLetQ, current)) && is(Numeric, lookahead)
 }
 
@@ -345,7 +349,7 @@ func (sc *Scanner) wb13(current rune) (continues bool) {
 	if !is(Katakana, current) {
 		return false
 	}
-	return seekPrevious(sc.buffer, Katakana)
+	return sc.seekPrevious(sc.pos, Katakana)
 }
 
 // wb13a implements https://unicode.org/reports/tr29/#WB13a
@@ -353,7 +357,7 @@ func (sc *Scanner) wb13a(current rune) (continues bool) {
 	if !is(ExtendNumLet, current) {
 		return false
 	}
-	return seekPrevious(sc.buffer, AHLetter, Numeric, Katakana, ExtendNumLet)
+	return sc.seekPrevious(sc.pos, AHLetter, Numeric, Katakana, ExtendNumLet)
 }
 
 // wb13b implements https://unicode.org/reports/tr29/#WB13b
@@ -361,7 +365,7 @@ func (sc *Scanner) wb13b(current rune) (continues bool) {
 	if !(is(AHLetter, current) || is(Numeric, current) || is(Katakana, current)) {
 		return false
 	}
-	return seekPrevious(sc.buffer, ExtendNumLet)
+	return sc.seekPrevious(sc.pos, ExtendNumLet)
 }
 
 // wb15 implements https://unicode.org/reports/tr29/#WB15
@@ -372,7 +376,7 @@ func (sc *Scanner) wb15(current rune) (continues bool) {
 
 	// Buffer comprised entirely of an odd number of RI, ignoring ExtendFormatZWJ
 	count := 0
-	for i := len(sc.buffer) - 1; i >= 0; i-- {
+	for i := sc.pos - 1; i >= 0; i-- {
 		r := sc.buffer[i]
 		if is(ExtendFormatZWJ, r) {
 			continue
@@ -394,7 +398,7 @@ func (sc *Scanner) wb16(current rune) (continues bool) {
 
 	// Last n runes represent an odd number of RI, ignoring ExtendFormatZWJ
 	count := 0
-	for i := len(sc.buffer) - 1; i >= 0; i-- {
+	for i := sc.pos - 1; i >= 0; i-- {
 		r := sc.buffer[i]
 		if is(ExtendFormatZWJ, r) {
 			continue
@@ -409,18 +413,15 @@ func (sc *Scanner) wb16(current rune) (continues bool) {
 }
 
 func (sc *Scanner) token() string {
-	if len(sc.buffer) == 0 {
-		return ""
-	}
-
-	s := string(sc.buffer)
-	sc.buffer = sc.buffer[:0]
+	s := string(sc.buffer[:sc.pos])
+	sc.buffer = sc.buffer[sc.pos:]
+	sc.pos = 0
 
 	return s
 }
 
-func (sc *Scanner) accept(r rune) {
-	sc.buffer = append(sc.buffer, r)
+func (sc *Scanner) accept() {
+	sc.pos++
 }
 
 // readRune gets the next rune, advancing the reader
