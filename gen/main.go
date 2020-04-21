@@ -99,15 +99,28 @@ func generate(prop prop) error {
 		// Some programming languages allow it for formatting numbers
 		rangeTables["MidNumLet"] = rangetable.Merge(rangeTables["MidNumLet"], rangetable.New('_'))
 
-		// Merged "macro" tables defined here: https://unicode.org/reports/tr29/#WB_Rule_Macros
+		// "Macro" tables defined here: https://unicode.org/reports/tr29/#WB_Rule_Macros
 		rangeTables["AHLetter"] = rangetable.Merge(rangeTables["ALetter"], rangeTables["Hebrew_Letter"])
 		rangeTables["MidNumLetQ"] = rangetable.Merge(rangeTables["MidNumLet"], rangetable.New('\''))
 
-		// Ignore categories, merge for convenience and maybe perf. See WB4 method.
-		rangeTables["ExtendFormatZWJ"] = rangetable.Merge(
+		// an optimization for wb4 and subsequent
+		rangeTables["mergedExtendFormatZWJ"] = rangetable.Merge(
 			rangeTables["Extend"],
 			rangeTables["Format"],
 			rangeTables["ZWJ"],
+		)
+
+		// an optimization for wb13b
+		rangeTables["mergedAHLetterNumericKatakana"] = rangetable.Merge(
+			rangeTables["AHLetter"],
+			rangeTables["Numeric"],
+			rangeTables["Katakana"],
+		)
+
+		// an optimization for wb13a
+		rangeTables["mergedAHLetterNumericKatakanaExtendNumLet"] = rangetable.Merge(
+			rangeTables["mergedAHLetterNumericKatakana"],
+			rangeTables["ExtendNumLet"],
 		)
 	}
 
@@ -169,12 +182,19 @@ func write(prop prop, rts map[string]*unicode.RangeTable) error {
 	fmt.Fprintf(&buf, "var (\n")
 	fmt.Fprintf(&buf, "\t// See https://unicode.org/reports/tr29/\n")
 	for _, category := range categories {
+		if strings.HasPrefix(category, "merged") {
+			// Skip the merged cateogries
+			continue
+		}
 		fmt.Fprintf(&buf, "%s = _%s\n", category, category)
 	}
 	fmt.Fprintf(&buf, ")\n\n")
 
 	for _, category := range categories {
 		rt := rts[category]
+		if strings.HasPrefix(category, "merged") {
+			fmt.Fprintln(&buf, "// a 'denormalized' range table for perf and readability")
+		}
 		fmt.Fprintf(&buf, "var _%s = ", category)
 		print(&buf, rt)
 	}

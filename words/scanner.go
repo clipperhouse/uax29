@@ -191,7 +191,7 @@ func (sc *Scanner) wb3d() (accept bool) {
 // wb4 implements https://unicode.org/reports/tr29/#WB4
 func (sc *Scanner) wb4() (accept bool) {
 	current := sc.buffer[sc.pos]
-	return is(ExtendFormatZWJ, current)
+	return is(_mergedExtendFormatZWJ, current)
 }
 
 // seekForward looks ahead until it hits a rune satisfying one of the range tables,
@@ -202,7 +202,7 @@ func (sc *Scanner) seekForward(rts ...*unicode.RangeTable) bool {
 		r := sc.buffer[i]
 
 		// Ignore ExtendFormatZWJ
-		if is(ExtendFormatZWJ, r) {
+		if is(_mergedExtendFormatZWJ, r) {
 			continue
 		}
 
@@ -229,7 +229,7 @@ func (sc *Scanner) seekPreviousIndex(pos int, rts ...*unicode.RangeTable) int {
 		r := sc.buffer[i]
 
 		// Ignore ExtendFormatZWJ
-		if is(ExtendFormatZWJ, r) {
+		if is(_mergedExtendFormatZWJ, r) {
 			continue
 		}
 
@@ -281,7 +281,7 @@ func (sc *Scanner) wb6() (accept bool) {
 // wb7 implements https://unicode.org/reports/tr29/#WB7
 func (sc *Scanner) wb7() (accept bool) {
 	current := sc.buffer[sc.pos]
-	if !(is(AHLetter, current) || is(ExtendFormatZWJ, current)) {
+	if !(is(AHLetter, current) || is(_mergedExtendFormatZWJ, current)) {
 		return false
 	}
 
@@ -409,13 +409,13 @@ func (sc *Scanner) wb13a() (accept bool) {
 		return false
 	}
 
-	return sc.seekPrevious(sc.pos, AHLetter, Numeric, Katakana, ExtendNumLet)
+	return sc.seekPrevious(sc.pos, _mergedAHLetterNumericKatakanaExtendNumLet)
 }
 
 // wb13b implements https://unicode.org/reports/tr29/#WB13b
 func (sc *Scanner) wb13b() (accept bool) {
 	current := sc.buffer[sc.pos]
-	if !(is(AHLetter, current) || is(Numeric, current) || is(Katakana, current)) {
+	if !(is(_mergedAHLetterNumericKatakana, current)) {
 		return false
 	}
 
@@ -433,7 +433,7 @@ func (sc *Scanner) wb15() (accept bool) {
 	count := 0
 	for i := sc.pos - 1; i >= 0; i-- {
 		r := sc.buffer[i]
-		if is(ExtendFormatZWJ, r) {
+		if is(_mergedExtendFormatZWJ, r) {
 			continue
 		}
 		if !is(Regional_Indicator, r) {
@@ -459,7 +459,7 @@ func (sc *Scanner) wb16() (accept bool) {
 	count := 0
 	for i := sc.pos - 1; i >= 0; i-- {
 		r := sc.buffer[i]
-		if is(ExtendFormatZWJ, r) {
+		if is(_mergedExtendFormatZWJ, r) {
 			continue
 		}
 		if !is(Regional_Indicator, r) {
