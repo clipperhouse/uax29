@@ -27,7 +27,7 @@ type Scanner struct {
 	buffer   []rune
 
 	// a cursor for runes in the buffer
-	// the current token is buffer[pos]
+	// the current rune is buffer[pos], the token is buffer[:pos]
 	pos int
 
 	text string
@@ -39,7 +39,7 @@ func (sc *Scanner) Scan() bool {
 	for {
 		// Fill the buffer with enough runes for lookahead
 		for len(sc.buffer) < sc.pos+4 {
-			current, eof, err := sc.readRune()
+			r, eof, err := sc.readRune()
 			if err != nil {
 				sc.err = err
 				return false
@@ -47,7 +47,7 @@ func (sc *Scanner) Scan() bool {
 			if eof {
 				break
 			}
-			sc.buffer = append(sc.buffer, current)
+			sc.buffer = append(sc.buffer, r)
 		}
 
 		switch {
@@ -182,8 +182,8 @@ func (sc *Scanner) wb4() (accept bool) {
 // seekForward looks ahead until it hits a rune satisfying one of the range tables,
 // ignoring ExtendFormatZWJ
 // See: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by WB4)
-func (sc *Scanner) seekForward(pos int, rts ...*unicode.RangeTable) bool {
-	for i := pos + 1; i < len(sc.buffer); i++ {
+func (sc *Scanner) seekForward(rts ...*unicode.RangeTable) bool {
+	for i := sc.pos + 1; i < len(sc.buffer); i++ {
 		r := sc.buffer[i]
 
 		// Ignore ExtendFormatZWJ
@@ -256,7 +256,7 @@ func (sc *Scanner) wb6() (accept bool) {
 		return false
 	}
 
-	if !sc.seekForward(sc.pos, AHLetter) {
+	if !sc.seekForward(AHLetter) {
 		return false
 	}
 
@@ -295,7 +295,7 @@ func (sc *Scanner) wb7b() (accept bool) {
 		return false
 	}
 
-	if !sc.seekForward(sc.pos, Hebrew_Letter) {
+	if !sc.seekForward(Hebrew_Letter) {
 		return false
 	}
 
@@ -370,7 +370,7 @@ func (sc *Scanner) wb12() (accept bool) {
 		return false
 	}
 
-	if !sc.seekForward(sc.pos, Numeric) {
+	if !sc.seekForward(Numeric) {
 		return false
 	}
 
