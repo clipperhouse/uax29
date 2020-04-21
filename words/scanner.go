@@ -37,7 +37,7 @@ type Scanner struct {
 // Scan advances to the next token, returning true if successful. Returns false on error or EOF.
 func (sc *Scanner) Scan() bool {
 	for {
-		for len(sc.buffer) < sc.pos+2 {
+		for len(sc.buffer) < sc.pos+4 {
 			current, eof, err := sc.readRune()
 			if err != nil {
 				sc.err = err
