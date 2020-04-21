@@ -252,13 +252,12 @@ func (sc *Scanner) wb7(current rune) (continues bool) {
 		return false
 	}
 
-	index := sc.seekPreviousIndex(sc.pos, MidLetter, MidNumLetQ)
-	if index < 0 {
+	previous := sc.seekPreviousIndex(sc.pos, MidLetter, MidNumLetQ)
+	if previous < 0 {
 		return false
 	}
 
-	// Look previous to above
-	return sc.seekPrevious(index, AHLetter)
+	return sc.seekPrevious(previous, AHLetter)
 }
 
 // wb7a implements https://unicode.org/reports/tr29/#WB7a
@@ -332,16 +331,29 @@ func (sc *Scanner) wb11(current rune) (continues bool) {
 		return false
 	}
 
-	previous := sc.buffer[sc.pos-1]
-	preprevious := sc.buffer[sc.pos-2]
+	if !is(Numeric, current) {
+		return false
+	}
 
-	return is(Numeric, preprevious) && (is(MidNum, previous) || is(MidNumLetQ, previous)) && is(Numeric, current)
+	previous := sc.seekPreviousIndex(sc.pos, MidNum, MidNumLetQ)
+	if previous < 0 {
+		return false
+	}
+
+	return sc.seekPrevious(previous, Numeric)
 }
 
 // wb12 implements https://unicode.org/reports/tr29/#WB12
 func (sc *Scanner) wb12(current, lookahead rune) (continues bool) {
-	previous := sc.buffer[sc.pos-1]
-	return is(Numeric, previous) && (is(MidNum, current) || is(MidNumLetQ, current)) && is(Numeric, lookahead)
+	if !is(Numeric, lookahead) {
+		return false
+	}
+
+	if !(is(MidNum, current) || is(MidNumLetQ, current)) {
+		return false
+	}
+
+	return sc.seekPrevious(sc.pos, Numeric)
 }
 
 // wb13 implements https://unicode.org/reports/tr29/#WB13
