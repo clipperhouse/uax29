@@ -157,13 +157,13 @@ func (sc *Scanner) wb3() (accept bool) {
 // wb3a implements https://unicode.org/reports/tr29/#WB3a
 func (sc *Scanner) wb3a() (breaking bool) {
 	previous := sc.buffer[sc.pos-1]
-	return is(CR, previous) || is(LF, previous) || is(Newline, previous)
+	return is(_mergedCRLFNewline, previous)
 }
 
 // wb3b implements https://unicode.org/reports/tr29/#WB3b
 func (sc *Scanner) wb3b() (breaking bool) {
 	current := sc.buffer[sc.pos]
-	return is(CR, current) || is(LF, current) || is(Newline, current)
+	return is(_mergedCRLFNewline, current)
 }
 
 // wb3c implements https://unicode.org/reports/tr29/#WB3c

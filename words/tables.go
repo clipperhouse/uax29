@@ -2745,6 +2745,16 @@ var _mergedAHLetterNumericKatakanaExtendNumLet = &unicode.RangeTable{
 }
 
 // a 'denormalized' range table for perf and readability
+var _mergedCRLFNewline = &unicode.RangeTable{
+	R16: []unicode.Range16{
+		{0xa, 0xd, 1},
+		{0x85, 0x2028, 8099},
+		{0x2029, 0x2029, 1},
+	},
+	LatinOffset: 1,
+}
+
+// a 'denormalized' range table for perf and readability
 var _mergedExtendFormatZWJ = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xad, 0xad, 1},
