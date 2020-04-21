@@ -397,6 +397,9 @@ func (sc *Scanner) wb15(current rune) (continues bool) {
 		}
 		count++
 	}
+
+	// If we fall through, we've seen the whole buffer,
+	// so it's all Regional_Indicator | ExtendFormatZWJ
 	odd := count > 0 && count%2 == 1
 	return odd
 }
@@ -415,12 +418,13 @@ func (sc *Scanner) wb16(current rune) (continues bool) {
 			continue
 		}
 		if !is(Regional_Indicator, r) {
-			break
+			odd := count > 0 && count%2 == 1
+			return odd
 		}
 		count++
 	}
-	odd := count > 0 && count%2 == 1
-	return odd
+
+	return false
 }
 
 func (sc *Scanner) token() string {
