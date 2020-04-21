@@ -461,7 +461,11 @@ func (sc *Scanner) wb16() (accept bool) {
 // i.e. word break
 func (sc *Scanner) wb999() bool {
 	sc.text = string(sc.buffer[:sc.pos])
-	sc.buffer = sc.buffer[sc.pos:]
+
+	// Optimization to avoid growing array
+	copy(sc.buffer, sc.buffer[sc.pos:])
+	sc.buffer = sc.buffer[:len(sc.buffer)-sc.pos]
+
 	sc.pos = 0
 
 	return len(sc.text) > 0
