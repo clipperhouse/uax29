@@ -1,5 +1,4 @@
 // Package words provides a scanner for Unicode text segmentation word boundaries: https://unicode.org/reports/tr29/#Word_Boundaries
-// It does not implement the entire specification, but many of the most important rules.
 package words
 
 import (
@@ -11,11 +10,18 @@ import (
 	"github.com/clipperhouse/uax29/emoji"
 )
 
-// NewScanner tokenizes a reader into a stream of tokens. Iterate through the stream by calling Scan() or Next().
+// NewScanner tokenizes a reader into a stream of tokens according to Unicode Text Segmentation word boundaries https://unicode.org/reports/tr29/#Word_Boundaries
+// Iterate through the stream by calling Scan() until false.
+//	text := "This is an example."
+//	reader := strings.NewReader(text)
 //
-// Its uses several specs from Unicode Text Segmentation word boundaries https://unicode.org/reports/tr29/#Word_Boundaries. It's not a full implementation, but a decent approximation for many mainstream cases.
-//
-// It returns all tokens (including white space), so text can be reconstructed with fidelity.
+//	scanner := words.NewScanner(reader)
+//	for scanner.Scan() {
+//		fmt.Printf("%q\n", scanner.Text())
+//	}
+//	if err := scanner.Err(); err != nil {
+//		log.Fatal(err)
+//	}
 func NewScanner(r io.Reader) *Scanner {
 	return &Scanner{
 		incoming: bufio.NewReaderSize(r, 64*1024),
@@ -104,17 +110,17 @@ func (sc *Scanner) Scan() bool {
 	}
 }
 
-// Bytes returns the current token as a byte slice, given a successful call to Scan
+// Bytes returns the current token as a byte slice, after a successful call to Scan
 func (sc *Scanner) Bytes() []byte {
 	return sc.bytes
 }
 
-// Text returns the current token, given a successful call to Scan
+// Text returns the current token, after a successful call to Scan
 func (sc *Scanner) Text() string {
 	return string(sc.bytes)
 }
 
-// Err returns the current error, given an unsuccessful call to Scan
+// Err returns the current error, after an unsuccessful call to Scan
 func (sc *Scanner) Err() error {
 	return sc.err
 }
