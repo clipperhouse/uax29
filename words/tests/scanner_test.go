@@ -1,4 +1,4 @@
-package words
+package tests
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/clipperhouse/segment"
+	"github.com/clipperhouse/uax29/words"
 )
 
 func TestScanner(t *testing.T) {
@@ -23,7 +24,7 @@ func TestScanner(t *testing.T) {
 	Then ウィキペディア and 象形.`
 	original += "crlf is \r\n"
 
-	scanner := NewScanner(strings.NewReader(original))
+	scanner := words.NewScanner(strings.NewReader(original))
 
 	// First, sanity check
 	roundtrip := ""
@@ -39,7 +40,7 @@ func TestScanner(t *testing.T) {
 	}
 
 	// Got re-scan
-	scanner = NewScanner(strings.NewReader(original))
+	scanner = words.NewScanner(strings.NewReader(original))
 
 	got := map[string]bool{}
 
@@ -155,7 +156,7 @@ func TestUnicodeSegments(t *testing.T) {
 	var passed, failed int
 	for _, test := range segment.UnicodeWordTests {
 		rv := make([][]byte, 0)
-		scanner := NewScanner(bytes.NewReader(test.Input))
+		scanner := words.NewScanner(bytes.NewReader(test.Input))
 		for scanner.Scan() {
 			rv = append(rv, []byte(scanner.Text()))
 		}
@@ -164,7 +165,7 @@ func TestUnicodeSegments(t *testing.T) {
 		}
 		if !reflect.DeepEqual(rv, test.Output) {
 			failed++
-			// t.Fatalf("expected:\n%#v\ngot:\n%#v\nfor: '%s' comment: %s", test.Output, rv, test.Input, test.Comment)
+			t.Fatalf("expected:\n%#v\ngot:\n%#v\nfor: '%s' comment: %s", test.Output, rv, test.Input, test.Comment)
 		} else {
 			passed++
 		}
