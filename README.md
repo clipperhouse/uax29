@@ -30,9 +30,7 @@ If I am reading my benchmarks correctly, `uax29/words` processes around 2MM toke
 
 ### Conformance
 
-We are [working](https://github.com/clipperhouse/uax29/issues/1) to comply with the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29). As of this writing, the `words` package passes 1775 of 1823 tests. 
-
-That’s around 97%, not bad. The remaining cases have to do with “extend” and “format” characters. [More...](https://github.com/clipperhouse/uax29/issues/1)
+The official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29) passes.
 
 The [spec](https://unicode.org/reports/tr29/#Word_Boundaries) has many nods to practicality and judgment for the implementer. One place where we vary from the strict spec is to consider underscore `_` a valid mid-word/mid-number character, helpful for things like user_names.
 
@@ -42,7 +40,7 @@ The [spec](https://unicode.org/reports/tr29/#Word_Boundaries) has many nods to p
 
 - We code-gen the Unicode categories relevant to UAX 29 by running `go generate` at the repository root.
 
-- We’re working on the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29). [More...](https://github.com/clipperhouse/uax29/issues/1)
+- The official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29) passes.
 
 - Support for [grapheme rules](https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries) and perhaps [sentence rules](https://unicode.org/reports/tr29/#Sentence_Boundaries) might be useful.
 
