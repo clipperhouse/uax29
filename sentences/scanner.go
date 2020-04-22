@@ -6,8 +6,6 @@ import (
 	"bytes"
 	"io"
 	"unicode"
-
-	"golang.org/x/text/unicode/rangetable"
 )
 
 // NewScanner tokenizes a reader into a stream of tokens according to Unicode Text Segmentation word boundaries https://unicode.org/reports/tr29/#Word_Boundaries
@@ -150,15 +148,11 @@ func (sc *Scanner) sb3() (accept bool) {
 	return is(CR, previous)
 }
 
-var _mergedParaSep = rangetable.Merge(Sep, CR, LF)
-
 // sb4 implements https://unicode.org/reports/tr29/#SB4
 func (sc *Scanner) sb4() (breaking bool) {
 	previous := sc.buffer[sc.pos-1]
 	return is(_mergedParaSep, previous)
 }
-
-var _mergedExtendFormat = rangetable.Merge(Extend, Format)
 
 // sb5 implements https://unicode.org/reports/tr29/#SB5
 func (sc *Scanner) sb5() (accept bool) {
@@ -236,8 +230,6 @@ func (sc *Scanner) sb6() (accept bool) {
 	return sc.seekPrevious(sc.pos, ATerm)
 }
 
-var _mergedUpperLower = rangetable.Merge(Upper, Lower)
-
 // sb7 implements https://unicode.org/reports/tr29/#SB7
 func (sc *Scanner) sb7() (accept bool) {
 	current := sc.buffer[sc.pos]
@@ -252,9 +244,6 @@ func (sc *Scanner) sb7() (accept bool) {
 
 	return sc.seekPrevious(previous, _mergedUpperLower)
 }
-
-var _mergedOLetterUpperLowerParaSepSATerm = rangetable.Merge(OLetter, Upper, Lower, _mergedParaSep, _mergedSATerm)
-var _mergedSATerm = rangetable.Merge(STerm, ATerm)
 
 // sb8 implements https://unicode.org/reports/tr29/#SB8
 func (sc *Scanner) sb8() (accept bool) {
@@ -296,8 +285,6 @@ func (sc *Scanner) sb8() (accept bool) {
 	return sc.seekPrevious(pos, ATerm)
 }
 
-var _mergedSContinueSATerm = rangetable.Merge(SContinue, _mergedSATerm)
-
 // sb8a implements https://unicode.org/reports/tr29/#SB8a
 func (sc *Scanner) sb8a() (accept bool) {
 	current := sc.buffer[sc.pos]
@@ -328,8 +315,6 @@ func (sc *Scanner) sb8a() (accept bool) {
 	return sc.seekPrevious(pos, _mergedSATerm)
 }
 
-var _mergedCloseSpParaSep = rangetable.Merge(Close, Sp, _mergedParaSep)
-
 // sb9 implements https://unicode.org/reports/tr29/#SB9
 func (sc *Scanner) sb9() (accept bool) {
 	current := sc.buffer[sc.pos]
@@ -350,8 +335,6 @@ func (sc *Scanner) sb9() (accept bool) {
 
 	return sc.seekPrevious(pos, _mergedSATerm)
 }
-
-var _mergedSpParaSep = rangetable.Merge(Sp, _mergedParaSep)
 
 // sb10 implements https://unicode.org/reports/tr29/#SB10
 func (sc *Scanner) sb10() (accept bool) {

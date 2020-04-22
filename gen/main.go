@@ -149,6 +149,55 @@ func generate(prop prop) error {
 		)
 	}
 
+	if prop.packagename == "sentences" {
+		rangeTables["mergedSATerm"] = rangetable.Merge(
+			rangeTables["STerm"],
+			rangeTables["ATerm"],
+		)
+
+		rangeTables["mergedParaSep"] = rangetable.Merge(
+			rangeTables["Sep"],
+			rangeTables["CR"],
+			rangeTables["LF"],
+		)
+
+		rangeTables["mergedOLetterUpperLowerParaSepSATerm"] = rangetable.Merge(
+			rangeTables["OLetter"],
+			rangeTables["Upper"],
+			rangeTables["Lower"],
+			rangeTables["mergedParaSep"],
+			rangeTables["mergedSATerm"],
+		)
+
+		rangeTables["mergedExtendFormat"] = rangetable.Merge(
+			rangeTables["Extend"],
+			rangeTables["Format"],
+		)
+
+		rangeTables["mergedUpperLower"] = rangetable.Merge(
+			rangeTables["Upper"],
+			rangeTables["Lower"],
+		)
+
+		rangeTables["mergedSContinueSATerm"] = rangetable.Merge(
+			rangeTables["SContinue"],
+			rangeTables["mergedSATerm"],
+		)
+
+		rangeTables["mergedCloseSpParaSep"] = rangetable.Merge(
+			rangeTables["Close"],
+			rangeTables["Sp"],
+			rangeTables["mergedParaSep"],
+		)
+
+		// var _mergedSpParaSep = rangetable.Merge(Sp, _mergedParaSep)
+
+		rangeTables["mergedSpParaSep"] = rangetable.Merge(
+			rangeTables["Sp"],
+			rangeTables["mergedParaSep"],
+		)
+	}
+
 	err = write(prop, rangeTables)
 	if err != nil {
 		return err
