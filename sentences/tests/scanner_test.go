@@ -4,11 +4,48 @@ import (
 	"bytes"
 	"io/ioutil"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/clipperhouse/segment"
 	"github.com/clipperhouse/uax29/sentences"
 )
+
+func TestSentences(t *testing.T) {
+	original := "This is a test. “Is it?”, he wondered."
+
+	// First, test roundtrip
+	scanner := sentences.NewScanner(strings.NewReader(original))
+	roundtrip := ""
+	for scanner.Scan() {
+		roundtrip += scanner.Text()
+	}
+	if err := scanner.Err(); err != nil {
+		t.Error(err)
+	}
+	if roundtrip != original {
+		t.Error("expected roundtrip to equal original")
+	}
+
+	var got []string
+	scanner = sentences.NewScanner(strings.NewReader(original))
+	for scanner.Scan() {
+		got = append(got, scanner.Text())
+		t.Log(scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		t.Error(err)
+	}
+
+	expected := []string{
+		"This is a test. ",
+		"“Is it?”, he wondered.",
+	}
+
+	if !reflect.DeepEqual(got, expected) {
+		t.Errorf("expected %q, got %q", expected, got)
+	}
+}
 
 func TestUnicodeSegments(t *testing.T) {
 	var passed, failed int
