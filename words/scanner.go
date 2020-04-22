@@ -267,7 +267,7 @@ func (sc *Scanner) wb5() (accept bool) {
 // wb6 implements https://unicode.org/reports/tr29/#WB6
 func (sc *Scanner) wb6() (accept bool) {
 	current := sc.buffer[sc.pos]
-	if !(is(MidLetter, current) || is(MidNumLetQ, current)) {
+	if !(is(_mergedMidLetterMidNumLetQ, current)) {
 		return false
 	}
 
@@ -281,11 +281,11 @@ func (sc *Scanner) wb6() (accept bool) {
 // wb7 implements https://unicode.org/reports/tr29/#WB7
 func (sc *Scanner) wb7() (accept bool) {
 	current := sc.buffer[sc.pos]
-	if !(is(AHLetter, current) || is(_mergedExtendFormatZWJ, current)) {
+	if !(is(_mergedAHLetterExtendFormatZWJ, current)) {
 		return false
 	}
 
-	previous := sc.seekPreviousIndex(sc.pos, MidLetter, MidNumLetQ)
+	previous := sc.seekPreviousIndex(sc.pos, _mergedMidLetterMidNumLetQ)
 	if previous < 0 {
 		return false
 	}
@@ -370,7 +370,7 @@ func (sc *Scanner) wb11() (accept bool) {
 		return false
 	}
 
-	previous := sc.seekPreviousIndex(sc.pos, MidNum, MidNumLetQ)
+	previous := sc.seekPreviousIndex(sc.pos, _mergedMidNumMidNumLetQ)
 	if previous < 0 {
 		return false
 	}
@@ -381,7 +381,7 @@ func (sc *Scanner) wb11() (accept bool) {
 // wb12 implements https://unicode.org/reports/tr29/#WB12
 func (sc *Scanner) wb12() (accept bool) {
 	current := sc.buffer[sc.pos]
-	if !(is(MidNum, current) || is(MidNumLetQ, current)) {
+	if !(is(_mergedMidNumMidNumLetQ, current)) {
 		return false
 	}
 

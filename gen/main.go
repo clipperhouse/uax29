@@ -103,7 +103,7 @@ func generate(prop prop) error {
 		rangeTables["AHLetter"] = rangetable.Merge(rangeTables["ALetter"], rangeTables["Hebrew_Letter"])
 		rangeTables["MidNumLetQ"] = rangetable.Merge(rangeTables["MidNumLet"], rangetable.New('\''))
 
-		// an optimization for wb13a
+		// an optimization for wb3a
 		rangeTables["mergedCRLFNewline"] = rangetable.Merge(
 			rangeTables["CR"],
 			rangeTables["LF"],
@@ -115,6 +115,24 @@ func generate(prop prop) error {
 			rangeTables["Extend"],
 			rangeTables["Format"],
 			rangeTables["ZWJ"],
+		)
+
+		// an optimization for wb6
+		rangeTables["mergedMidLetterMidNumLetQ"] = rangetable.Merge(
+			rangeTables["MidLetter"],
+			rangeTables["MidNumLetQ"],
+		)
+
+		// an optimization for wb7
+		rangeTables["mergedAHLetterExtendFormatZWJ"] = rangetable.Merge(
+			rangeTables["AHLetter"],
+			rangeTables["mergedExtendFormatZWJ"],
+		)
+
+		// an optimization for wb11
+		rangeTables["mergedMidNumMidNumLetQ"] = rangetable.Merge(
+			rangeTables["MidNum"],
+			rangeTables["MidNumLetQ"],
 		)
 
 		// an optimization for wb13b
