@@ -78,19 +78,56 @@ func (sc *Scanner) Scan() bool {
 			// true indicates break
 			break
 		case
-			sc.sb5(),
-			sc.sb6(),
+			sc.sb5():
+			// true indicates continue
+			sc.accept()
+			continue
+		case
+			sc.sb6():
+			// true indicates continue
+			sc.accept()
+			continue
+		case
 			sc.sb7():
 			// true indicates continue
 			sc.accept()
 			continue
+		case
+			sc.sb8():
+			// true indicates continue
+			sc.accept()
+			continue
+		case
+			sc.sb8a():
+			// true indicates continue
+			sc.accept()
+			continue
+		case
+			sc.sb9():
+			// true indicates continue
+			sc.accept()
+			continue
+		case
+			sc.sb10():
+			// true indicates continue
+			sc.accept()
+			continue
+		case
+			sc.sb11():
+			// true indicates accept & break
+			break
+		case
+			sc.sb998():
+			sc.accept()
+			continue
+			// true indicates continue
 		}
 
 		// If we fall through all the above rules, it's a word break, aka WB999
 		break
 	}
 
-	return sc.sb998()
+	return sc.emit()
 }
 
 // Bytes returns the current token as a byte slice, after a successful call to Scan
@@ -156,8 +193,8 @@ func (sc *Scanner) sb5() (accept bool) {
 // seekForward looks ahead until it hits a rune satisfying one of the range tables,
 // ignoring Extend|Format|ZWJ
 // See: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by WB4)
-func (sc *Scanner) seekForward(rts ...*unicode.RangeTable) bool {
-	for i := sc.pos + 1; i < len(sc.buffer); i++ {
+func (sc *Scanner) seekForward(pos int, rts ...*unicode.RangeTable) bool {
+	for i := pos + 1; i < len(sc.buffer); i++ {
 		r := sc.buffer[i]
 
 		// Ignore Extend|Format
@@ -240,9 +277,166 @@ func (sc *Scanner) sb7() (accept bool) {
 	return sc.seekPrevious(sc.pos, _mergedUpperLower)
 }
 
-// wb999 implements https://unicode.org/reports/tr29/#SB999
-// i.e. word break
+var _mergedOLetterUpperLowerParaSepSATerm = rangetable.Merge(OLetter, Upper, Lower, _mergedParaSep, _mergedSATerm)
+var _mergedSATerm = rangetable.Merge(STerm, ATerm)
+
+// wb6 implements https://unicode.org/reports/tr29/#SB6
+func (sc *Scanner) sb8() (accept bool) {
+	if !sc.seekForward(sc.pos-1, Lower) {
+		return false
+	}
+
+	current := sc.buffer[sc.pos]
+	if !is(_mergedOLetterUpperLowerParaSepSATerm, current) {
+		return true
+	}
+
+	pos := sc.pos
+
+	sp := pos
+	for {
+		sp = sc.seekPreviousIndex(sp, Sp)
+		if sp < 0 {
+			break
+		}
+		pos = sp
+	}
+
+	close := pos
+	for {
+		close = sc.seekPreviousIndex(close, Close)
+		if close < 0 {
+			break
+		}
+		pos = close
+	}
+
+	return sc.seekPrevious(pos, ATerm)
+}
+
+var _mergedSContinueSATerm = rangetable.Merge(SContinue, _mergedSATerm)
+
+// wb6 implements https://unicode.org/reports/tr29/#SB6
+func (sc *Scanner) sb8a() (accept bool) {
+	current := sc.buffer[sc.pos]
+	if !is(_mergedSContinueSATerm, current) {
+		return false
+	}
+
+	pos := sc.pos
+
+	sp := pos
+	for {
+		sp = sc.seekPreviousIndex(sp, Sp)
+		if sp < 0 {
+			break
+		}
+		pos = sp
+	}
+
+	close := pos
+	for {
+		close = sc.seekPreviousIndex(close, Close)
+		if close < 0 {
+			break
+		}
+		pos = close
+	}
+
+	return sc.seekPrevious(pos, _mergedSATerm)
+}
+
+var _mergedCloseSpParaSep = rangetable.Merge(Close, Sp, _mergedParaSep)
+
+// wb6 implements https://unicode.org/reports/tr29/#SB6
+func (sc *Scanner) sb9() (accept bool) {
+	current := sc.buffer[sc.pos]
+	if !is(_mergedCloseSpParaSep, current) {
+		return false
+	}
+
+	pos := sc.pos
+
+	close := pos
+	for {
+		close = sc.seekPreviousIndex(close, Close)
+		if close < 0 {
+			break
+		}
+		pos = close
+	}
+
+	return sc.seekPrevious(pos, _mergedSATerm)
+}
+
+var _mergedSpParaSep = rangetable.Merge(Sp, _mergedParaSep)
+
+// wb6 implements https://unicode.org/reports/tr29/#SB6
+func (sc *Scanner) sb10() (accept bool) {
+	current := sc.buffer[sc.pos]
+	if !is(_mergedSpParaSep, current) {
+		return false
+	}
+
+	pos := sc.pos
+
+	sp := pos
+	for {
+		sp = sc.seekPreviousIndex(sp, Sp)
+		if sp < 0 {
+			break
+		}
+		pos = sp
+	}
+
+	close := pos
+	for {
+		close = sc.seekPreviousIndex(close, Close)
+		if close < 0 {
+			break
+		}
+		pos = close
+	}
+
+	return sc.seekPrevious(pos, _mergedSATerm)
+}
+
+// wb6 implements https://unicode.org/reports/tr29/#SB6
+func (sc *Scanner) sb11() (breaking bool) {
+	pos := sc.pos
+
+	ps := sc.seekPreviousIndex(pos, _mergedSpParaSep)
+	if ps >= 0 {
+		pos = ps
+	}
+
+	sp := pos
+	for {
+		sp = sc.seekPreviousIndex(sp, Sp)
+		if sp < 0 {
+			break
+		}
+		pos = sp
+	}
+
+	close := pos
+	for {
+		close = sc.seekPreviousIndex(close, Close)
+		if close < 0 {
+			break
+		}
+		pos = close
+	}
+
+	return sc.seekPrevious(pos, _mergedSATerm)
+}
+
+// sb998 implements https://unicode.org/reports/tr29/#SB998
 func (sc *Scanner) sb998() bool {
+	return sc.pos > 0
+}
+
+func (sc *Scanner) emit() bool {
 	// Get the bytes & reset
 	sc.bytes = sc.bb.Bytes()
 	sc.bb.Reset()
