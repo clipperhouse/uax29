@@ -5,14 +5,14 @@ An implementation of sentence boundaries from [Unicode text segmentation](https:
 ```go
 import "github.com/clipperhouse/uax29/sentences"
 
-text := "This is an example. A second sentence follows."
+text := "This is a test. “Is it?”, he wondered."
 reader := strings.NewReader(text)
 
 scanner := sentences.NewScanner(reader)
 
 // Scan returns true until error or EOF
 for scanner.Scan() {
-	fmt.Printf("%q\n", scanner.Text())
+	fmt.Printf("%s\n", scanner.Text())
 }
 
 // Gotta check the error (because we depend on I/O).

@@ -33,25 +33,23 @@ If I am reading my benchmarks correctly, `uax29/words` processes around 2MM toke
 
 ### Conformance
 
-We use the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29), thanks to [bleve](https://github.com/blevesearch/segment/blob/master/tables_test.go). Status:
+We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#Tests29), thanks to [bleve](https://github.com/blevesearch/segment/blob/master/tables_test.go). Status:
 
 ![Go](https://github.com/clipperhouse/uax29/workflows/Go/badge.svg)
 
-The [spec](https://unicode.org/reports/tr29/#Word_Boundaries) has many nods to practicality and judgment for the implementer. One place where we vary from the strict spec is to consider underscore `_` a valid mid-word/mid-number character, helpful for things like user_names.
-
 ### Status
 
-- The [word boundary rules](https://unicode.org/reports/tr29/#Word_Boundaries) have been implemented in the words package
+- The [word boundary rules](https://unicode.org/reports/tr29/#Word_Boundaries) have been implemented in the `words` package
 
-- The [sentence boundary rules](https://unicode.org/reports/tr29/#Sentence_Boundaries) have been implemented in the sentences package
+- The [sentence boundary rules](https://unicode.org/reports/tr29/#Sentence_Boundaries) have been implemented in the `sentences` package
 
-- We code-gen the Unicode categories relevant to UAX 29 by running `go generate` at the repository root.
+- The official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29) passes for words and sentences
 
-- The official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29) passes.
+- We code-gen the Unicode categories relevant to UAX 29 by running `go generate` at the repository root
 
-- Support for [grapheme rules](https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries) and perhaps [sentence rules](https://unicode.org/reports/tr29/#Sentence_Boundaries) might be next steps.
+- Support for [grapheme rules](https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries) might be next
 
-- There is [discussion](https://groups.google.com/d/msg/golang-nuts/_79vJ65KuXc/B_QgeU6rAgAJ) of implementing the above in Go’s [`x/text`](https://godoc.org/golang.org/x/text) package.
+- There is [discussion](https://groups.google.com/d/msg/golang-nuts/_79vJ65KuXc/B_QgeU6rAgAJ) of implementing the above in Go’s [`x/text`](https://godoc.org/golang.org/x/text) package
 
 ### See also
 

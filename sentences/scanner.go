@@ -1,4 +1,4 @@
-// Package sentences provides a scanner for Unicode text segmentation word boundaries: https://unicode.org/reports/tr29/#Word_Boundaries
+// Package sentences provides a scanner for Unicode text segmentation sentence boundaries: https://unicode.org/reports/tr29/#Sentence_Boundaries
 package sentences
 
 import (
@@ -15,7 +15,7 @@ import (
 //
 //	scanner := sentences.NewScanner(reader)
 //	for scanner.Scan() {
-//		fmt.Printf("%q\n", scanner.Text())
+//		fmt.Printf("%s\n", scanner.Text())
 //	}
 //	if err := scanner.Err(); err != nil {
 //		log.Fatal(err)
