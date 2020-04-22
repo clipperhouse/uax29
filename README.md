@@ -41,7 +41,9 @@ The [spec](https://unicode.org/reports/tr29/#Word_Boundaries) has many nods to p
 
 ### Status
 
-- The [word boundary rules](https://unicode.org/reports/tr29/#Word_Boundaries) have been implemented.
+- The [word boundary rules](https://unicode.org/reports/tr29/#Word_Boundaries) have been implemented in the words package
+
+- The [sentence boundary rules](https://unicode.org/reports/tr29/#Sentence_Boundaries) have been implemented in the sentences package
 
 - We code-gen the Unicode categories relevant to UAX 29 by running `go generate` at the repository root.
 

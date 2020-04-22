@@ -38,19 +38,3 @@ We use the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#T
 ![Go](https://github.com/clipperhouse/uax29/workflows/Go/badge.svg)
 
 The [spec](https://unicode.org/reports/tr29/#Word_Boundaries) has many nods to practicality and judgment for the implementer. One place where we vary from the strict spec is to consider underscore `_` a valid mid-word/mid-number character, helpful for things like user_names.
-
-### Status
-
-- The [word boundary rules](https://unicode.org/reports/tr29/#Word_Boundaries) have been implemented.
-
-- We code-gen the Unicode categories relevant to UAX 29 by running `go generate` at the repository root.
-
-- The official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29) passes.
-
-- Support for [grapheme rules](https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries) and perhaps [sentence rules](https://unicode.org/reports/tr29/#Sentence_Boundaries) might be next steps.
-
-- There is [discussion](https://groups.google.com/d/msg/golang-nuts/_79vJ65KuXc/B_QgeU6rAgAJ) of implementing the above in Go’s [`x/text`](https://godoc.org/golang.org/x/text) package.
-
-### See also
-
-[jargon](https://github.com/clipperhouse/jargon), a text pipelines package for CLI and Go, which consumes this package.
