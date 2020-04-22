@@ -67,7 +67,7 @@ func (sc *Scanner) Scan() bool {
 			continue
 		case sc.wb2():
 			// true indicates break
-			goto breaking
+			break
 		case
 			sc.wb3():
 			// true indicates continue
@@ -77,7 +77,7 @@ func (sc *Scanner) Scan() bool {
 			sc.wb3a(),
 			sc.wb3b():
 			// true indicates break
-			goto breaking
+			break
 		case
 			sc.wb3c(),
 			sc.wb3d(),
@@ -103,11 +103,11 @@ func (sc *Scanner) Scan() bool {
 			continue
 		}
 
-	breaking:
 		// If we fall through all the above rules, it's a word break, aka WB999
-
-		return sc.wb999()
+		break
 	}
+
+	return sc.wb999()
 }
 
 // Bytes returns the current token as a byte slice, after a successful call to Scan
