@@ -48,7 +48,7 @@ type Scanner struct {
 func (sc *Scanner) Scan() bool {
 	for {
 		// Fill the buffer with enough runes for lookahead
-		for len(sc.buffer) < sc.pos+4 {
+		for len(sc.buffer) < sc.pos+6 {
 			r, eof, err := sc.readRune()
 			if err != nil {
 				sc.err = err
@@ -78,49 +78,25 @@ func (sc *Scanner) Scan() bool {
 			// true indicates break
 			break
 		case
-			sc.sb5():
-			// true indicates continue
-			sc.accept()
-			continue
-		case
-			sc.sb6():
-			// true indicates continue
-			sc.accept()
-			continue
-		case
-			sc.sb7():
-			// true indicates continue
-			sc.accept()
-			continue
-		case
-			sc.sb8():
-			// true indicates continue
-			sc.accept()
-			continue
-		case
-			sc.sb8a():
-			// true indicates continue
-			sc.accept()
-			continue
-		case
-			sc.sb9():
-			// true indicates continue
-			sc.accept()
-			continue
-		case
+			sc.sb5(),
+			sc.sb6(),
+			sc.sb7(),
+			sc.sb8(),
+			sc.sb8a(),
+			sc.sb9(),
 			sc.sb10():
 			// true indicates continue
 			sc.accept()
 			continue
 		case
 			sc.sb11():
-			// true indicates accept & break
+			// true indicates break
 			break
 		case
 			sc.sb998():
+			// true indicates continue
 			sc.accept()
 			continue
-			// true indicates continue
 		}
 
 		// If we fall through all the above rules, it's a word break, aka WB999
@@ -150,20 +126,20 @@ func (sc *Scanner) Err() error {
 
 var is = unicode.Is
 
-// wb1 implements https://unicode.org/reports/tr29/#SB1
+// sb1 implements https://unicode.org/reports/tr29/#SB1
 func (sc *Scanner) sb1() (accept bool) {
 	sot := sc.pos == 0 // "start of text"
 	eof := len(sc.buffer) == sc.pos
 	return sot && !eof
 }
 
-// wb2 implements https://unicode.org/reports/tr29/#SB2
+// sb2 implements https://unicode.org/reports/tr29/#SB2
 func (sc *Scanner) sb2() (breaking bool) {
 	// eof
 	return len(sc.buffer) == sc.pos
 }
 
-// wb3 implements https://unicode.org/reports/tr29/#SB3
+// sb3 implements https://unicode.org/reports/tr29/#SB3
 func (sc *Scanner) sb3() (accept bool) {
 	current := sc.buffer[sc.pos]
 	if !is(LF, current) {
@@ -176,7 +152,7 @@ func (sc *Scanner) sb3() (accept bool) {
 
 var _mergedParaSep = rangetable.Merge(Sep, CR, LF)
 
-// wb3a implements https://unicode.org/reports/tr29/#SB3a
+// sb4 implements https://unicode.org/reports/tr29/#SB4
 func (sc *Scanner) sb4() (breaking bool) {
 	previous := sc.buffer[sc.pos-1]
 	return is(_mergedParaSep, previous)
@@ -184,7 +160,7 @@ func (sc *Scanner) sb4() (breaking bool) {
 
 var _mergedExtendFormat = rangetable.Merge(Extend, Format)
 
-// wb4 implements https://unicode.org/reports/tr29/#SB4
+// sb5 implements https://unicode.org/reports/tr29/#SB5
 func (sc *Scanner) sb5() (accept bool) {
 	current := sc.buffer[sc.pos]
 	return is(_mergedExtendFormat, current)
@@ -250,7 +226,7 @@ func (sc *Scanner) seekPrevious(pos int, rts ...*unicode.RangeTable) bool {
 	return sc.seekPreviousIndex(pos, rts...) >= 0
 }
 
-// wb5 implements https://unicode.org/reports/tr29/#SB5
+// sb6 implements https://unicode.org/reports/tr29/#SB6
 func (sc *Scanner) sb6() (accept bool) {
 	current := sc.buffer[sc.pos]
 	if !is(Numeric, current) {
@@ -262,36 +238,42 @@ func (sc *Scanner) sb6() (accept bool) {
 
 var _mergedUpperLower = rangetable.Merge(Upper, Lower)
 
-// wb6 implements https://unicode.org/reports/tr29/#SB6
+// sb7 implements https://unicode.org/reports/tr29/#SB7
 func (sc *Scanner) sb7() (accept bool) {
 	current := sc.buffer[sc.pos]
-	if !(is(Upper, current)) {
+	if !is(Upper, current) {
 		return false
 	}
 
 	previous := sc.seekPreviousIndex(sc.pos, ATerm)
-	if !(previous > 0) {
+	if previous < 0 {
 		return false
 	}
 
-	return sc.seekPrevious(sc.pos, _mergedUpperLower)
+	return sc.seekPrevious(previous, _mergedUpperLower)
 }
 
 var _mergedOLetterUpperLowerParaSepSATerm = rangetable.Merge(OLetter, Upper, Lower, _mergedParaSep, _mergedSATerm)
 var _mergedSATerm = rangetable.Merge(STerm, ATerm)
 
-// wb6 implements https://unicode.org/reports/tr29/#SB6
+// sb8 implements https://unicode.org/reports/tr29/#SB8
 func (sc *Scanner) sb8() (accept bool) {
-	if !sc.seekForward(sc.pos-1, Lower) {
+	// This loop is the 'regex':
+	// ( ¬(OLetter | Upper | Lower | ParaSep | SATerm) )*
+	pos := sc.pos
+	for pos < len(sc.buffer) {
+		current := sc.buffer[pos]
+		if is(_mergedOLetterUpperLowerParaSepSATerm, current) {
+			break
+		}
+		pos++
+	}
+
+	if !sc.seekForward(pos-1, Lower) {
 		return false
 	}
 
-	current := sc.buffer[sc.pos]
-	if !is(_mergedOLetterUpperLowerParaSepSATerm, current) {
-		return true
-	}
-
-	pos := sc.pos
+	pos = sc.pos
 
 	sp := pos
 	for {
@@ -316,7 +298,7 @@ func (sc *Scanner) sb8() (accept bool) {
 
 var _mergedSContinueSATerm = rangetable.Merge(SContinue, _mergedSATerm)
 
-// wb6 implements https://unicode.org/reports/tr29/#SB6
+// sb8a implements https://unicode.org/reports/tr29/#SB8a
 func (sc *Scanner) sb8a() (accept bool) {
 	current := sc.buffer[sc.pos]
 	if !is(_mergedSContinueSATerm, current) {
@@ -348,7 +330,7 @@ func (sc *Scanner) sb8a() (accept bool) {
 
 var _mergedCloseSpParaSep = rangetable.Merge(Close, Sp, _mergedParaSep)
 
-// wb6 implements https://unicode.org/reports/tr29/#SB6
+// sb9 implements https://unicode.org/reports/tr29/#SB9
 func (sc *Scanner) sb9() (accept bool) {
 	current := sc.buffer[sc.pos]
 	if !is(_mergedCloseSpParaSep, current) {
@@ -371,7 +353,7 @@ func (sc *Scanner) sb9() (accept bool) {
 
 var _mergedSpParaSep = rangetable.Merge(Sp, _mergedParaSep)
 
-// wb6 implements https://unicode.org/reports/tr29/#SB6
+// sb10 implements https://unicode.org/reports/tr29/#SB10
 func (sc *Scanner) sb10() (accept bool) {
 	current := sc.buffer[sc.pos]
 	if !is(_mergedSpParaSep, current) {
@@ -401,7 +383,7 @@ func (sc *Scanner) sb10() (accept bool) {
 	return sc.seekPrevious(pos, _mergedSATerm)
 }
 
-// wb6 implements https://unicode.org/reports/tr29/#SB6
+// sb11 implements https://unicode.org/reports/tr29/#SB11
 func (sc *Scanner) sb11() (breaking bool) {
 	pos := sc.pos
 

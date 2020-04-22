@@ -12,7 +12,7 @@ import (
 
 func TestUnicodeSegments(t *testing.T) {
 	var passed, failed int
-	for _, test := range segment.UnicodeSentenceTests {
+	for i, test := range segment.UnicodeSentenceTests {
 		rv := make([][]byte, 0)
 		scanner := sentences.NewScanner(bytes.NewReader(test.Input))
 		for scanner.Scan() {
@@ -23,7 +23,7 @@ func TestUnicodeSegments(t *testing.T) {
 		}
 		if !reflect.DeepEqual(rv, test.Output) {
 			failed++
-			// t.Fatalf("test %d, expected:\n%#v\ngot:\n%#v\nfor: '%s'\ncomment: %s", i, test.Output, rv, test.Input, test.Comment)
+			t.Fatalf("test %d, expected:\n%#v\ngot:\n%#v\nfor: '%s'\ncomment: %s", i, test.Output, rv, test.Input, test.Comment)
 		} else {
 			passed++
 		}
