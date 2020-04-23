@@ -36,7 +36,7 @@ func main() {
 			packagename: "sentences",
 		},
 		{
-			url:         "https://www.unicode.org/Public/13.0.0/ucd/emoji/emoji-data.txt",
+			url:         "https://unicode.org/Public/emoji/12.0/emoji-data.txt",
 			packagename: "emoji",
 		},
 	}
