@@ -13,7 +13,7 @@ import (
 
 // NewScanner tokenizes a reader into a stream of grapheme clusters according to Unicode Text Segmentation boundaries https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries
 // Iterate through the stream by calling Scan() until false.
-//	text := "This is an example. And another!"
+//	text := "Good dog! 👍🏼🐶"
 //	reader := strings.NewReader(text)
 //
 //	scanner := graphemes.NewScanner(reader)
