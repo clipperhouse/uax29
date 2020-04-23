@@ -8,7 +8,7 @@ import (
 	"unicode"
 )
 
-// NewScanner tokenizes a reader into a stream of tokens according to Unicode Text Segmentation word boundaries https://unicode.org/reports/tr29/#Word_Boundaries
+// NewScanner tokenizes a reader into a stream of sentence tokens according to Unicode Text Segmentation sentence boundaries https://unicode.org/reports/tr29/#Sentence_Boundaries
 // Iterate through the stream by calling Scan() until false.
 //	text := "This is an example. And another!"
 //	reader := strings.NewReader(text)
@@ -42,7 +42,7 @@ type Scanner struct {
 	err   error
 }
 
-// Scan advances to the next token, returning true if successful. Returns false on error or EOF.
+// Scan advances to the next sentence, returning true if successful. Returns false on error or EOF.
 func (sc *Scanner) Scan() bool {
 	for {
 		// Fill the buffer with enough runes for lookahead
@@ -119,7 +119,7 @@ func (sc *Scanner) Err() error {
 	return sc.err
 }
 
-// Word boundary rules: https://unicode.org/reports/tr29/#Word_Boundaries
+// Sentence boundary rules: https://unicode.org/reports/tr29/#Sentence_Boundaries
 // In most cases, returning true means 'keep going'; check the name of the return var for clarity
 
 var is = unicode.Is
@@ -161,8 +161,8 @@ func (sc *Scanner) sb5() (accept bool) {
 }
 
 // seekForward looks ahead until it hits a rune satisfying one of the range tables,
-// ignoring Extend|Format|ZWJ
-// See: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by WB4)
+// ignoring Extend|Format
+// See: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by SB5)
 func (sc *Scanner) seekForward(pos int, rts ...*unicode.RangeTable) bool {
 	for i := pos + 1; i < len(sc.buffer); i++ {
 		r := sc.buffer[i]
@@ -187,8 +187,8 @@ func (sc *Scanner) seekForward(pos int, rts ...*unicode.RangeTable) bool {
 }
 
 // seekPreviousIndex works backward until it hits a rune satisfying one of the range tables,
-// ignoring Extend|Format|ZWJ, and returns the index of the rune in the buffer
-// See: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by WB4)
+// ignoring Extend|Format, and returns the index of the rune in the buffer
+// See: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by SB5)
 func (sc *Scanner) seekPreviousIndex(pos int, rts ...*unicode.RangeTable) int {
 	// Start at the end of the buffer and move backwards
 	for i := pos - 1; i >= 0; i-- {
@@ -214,8 +214,8 @@ func (sc *Scanner) seekPreviousIndex(pos int, rts ...*unicode.RangeTable) int {
 }
 
 // seekPreviousIndex works backward ahead until it hits a rune satisfying one of the range tables,
-// ignoring ExtendFormatZWJ, reporting success
-// Logic is here: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by WB4)
+// ignoring Extend|Format, reporting success
+// Logic is here: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by SB5)
 func (sc *Scanner) seekPrevious(pos int, rts ...*unicode.RangeTable) bool {
 	return sc.seekPreviousIndex(pos, rts...) >= 0
 }
