@@ -8,7 +8,6 @@ import (
 	"unicode"
 
 	"github.com/clipperhouse/uax29/emoji"
-	"golang.org/x/text/unicode/rangetable"
 )
 
 // NewScanner tokenizes a reader into a stream of grapheme clusters according to Unicode Text Segmentation boundaries https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries
@@ -145,8 +144,6 @@ func (sc *Scanner) gb3() (accept bool) {
 	return is(CR, previous)
 }
 
-var _mergedControlCRLF = rangetable.Merge(Control, CR, LF)
-
 // gb4 implements https://unicode.org/reports/tr29/#GB4
 func (sc *Scanner) gb4() (breaking bool) {
 	previous := sc.buffer[sc.pos-1]
@@ -158,8 +155,6 @@ func (sc *Scanner) gb5() (breaking bool) {
 	current := sc.buffer[sc.pos]
 	return is(_mergedControlCRLF, current)
 }
-
-var _mergedLVLVLVT = rangetable.Merge(L, V, LV, LVT)
 
 // gb6 implements https://unicode.org/reports/tr29/#GB6
 func (sc *Scanner) gb6() (accept bool) {
@@ -176,9 +171,6 @@ func (sc *Scanner) gb6() (accept bool) {
 	return is(L, previous)
 }
 
-var _mergedVT = rangetable.Merge(V, T)
-var _mergedLVV = rangetable.Merge(LV, V)
-
 // gb7 implements https://unicode.org/reports/tr29/#GB7
 func (sc *Scanner) gb7() (accept bool) {
 	if sc.pos < 1 {
@@ -194,8 +186,6 @@ func (sc *Scanner) gb7() (accept bool) {
 	return is(_mergedLVV, previous)
 }
 
-var _mergedLVTT = rangetable.Merge(LVT, T)
-
 // gb8 implements https://unicode.org/reports/tr29/#GB8
 func (sc *Scanner) gb8() (accept bool) {
 	if sc.pos < 1 {
@@ -210,8 +200,6 @@ func (sc *Scanner) gb8() (accept bool) {
 	previous := sc.buffer[sc.pos-1]
 	return is(_mergedLVTT, previous)
 }
-
-var _mergedExtendZWJ = rangetable.Merge(Extend, ZWJ)
 
 // gb9 implements https://unicode.org/reports/tr29/#GB9
 func (sc *Scanner) gb9() (accept bool) {

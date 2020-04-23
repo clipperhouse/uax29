@@ -190,11 +190,44 @@ func generate(prop prop) error {
 			rangeTables["mergedParaSep"],
 		)
 
-		// var _mergedSpParaSep = rangetable.Merge(Sp, _mergedParaSep)
-
 		rangeTables["mergedSpParaSep"] = rangetable.Merge(
 			rangeTables["Sp"],
 			rangeTables["mergedParaSep"],
+		)
+	}
+
+	if prop.packagename == "graphemes" {
+		rangeTables["mergedControlCRLF"] = rangetable.Merge(
+			rangeTables["Control"],
+			rangeTables["CR"],
+			rangeTables["LF"],
+		)
+
+		rangeTables["mergedLVLVLVT"] = rangetable.Merge(
+			rangeTables["L"],
+			rangeTables["V"],
+			rangeTables["LV"],
+			rangeTables["LVT"],
+		)
+
+		rangeTables["mergedVT"] = rangetable.Merge(
+			rangeTables["V"],
+			rangeTables["T"],
+		)
+
+		rangeTables["mergedLVV"] = rangetable.Merge(
+			rangeTables["LV"],
+			rangeTables["V"],
+		)
+
+		rangeTables["mergedLVTT"] = rangetable.Merge(
+			rangeTables["LVT"],
+			rangeTables["T"],
+		)
+
+		rangeTables["mergedExtendZWJ"] = rangetable.Merge(
+			rangeTables["Extend"],
+			rangeTables["ZWJ"],
 		)
 	}
 
