@@ -1,0 +1,423 @@
+{{Distinguish|Emoticon}}
+{{pp|small=yes}}
+{{short description|Ideograms or smileys used in electronic messages and webpages}}
+{{Use mdy dates|date=June 2018}}
+[[File:Noto Emoji KitKat 263a.svg|thumb|200px|An emoji, created by the [[Noto fonts|Noto]] project]]
+{{Contains emoticon|compact=yes}}
+{{Contains Ruby annotation}}
+{{Multiple images
+ | direction = vertical
+ | width = 100
+ | footer = Color emoji from [[Google]]'s [[Noto Emoji Project]] used by [[Gmail]], [[Google Hangouts]], [[Chrome OS]] and [[Android (operating system)|Android]]
+ | image1 = Noto Emoji Oreo 1f405.svg
+ | image2 = Noto Emoji Oreo 1f192.svg
+ | image3 = Noto Emoji Oreo 1f475.svg
+ | image4 = Noto Emoji Oreo 1f4a3.svg
+ |align=|caption1=|caption2=}}
+{{Nihongo|'''Emoji'''|{{ruby-ja|絵文字|えもじ}}|extra={{IPAc-en|lang|ɪ|ˈ|m|oʊ|dʒ|i:}}; {{IPA-ja|emodʑi|lang}}; singular ''emoji'', plural ''emoji'' or ''emojis''<ref>{{cite web|url=http://dictionary.cambridge.org/dictionary/english/emoji|title=emoji Meaning in the Cambridge English Dictionary|publisher=|accessdate=March 30, 2017}}</ref>|lead=yes}} are [[ideogram]]s and [[smiley]]s used in electronic messages and [[web page]]s. Emoji exist in various genres, including facial expressions, common objects, places and types of weather, and animals. They are much like [[emoticon]]s, but emoji are pictures rather than [[typographic approximation]]s; the term "emoji" in the strict sense refers to such pictures which can be represented as [[character encoding|encoded characters]], but it is sometimes applied to [[Sticker (messaging)|messaging stickers]] by extension.<ref>{{cite news |url=https://www.theguardian.com/technology/2015/feb/06/difference-between-emoji-and-emoticons-explained |title=Don't know the difference between emoji and emoticons? Let me explain |first=Alex |last=Hern |date=February 6, 2015 |work=[[The Guardian]]}}</ref> Originally meaning [[pictograph]], the word ''emoji'' comes from Japanese {{nihongo||絵|[[wikt:絵|e]]|"picture"}} + {{nihongo||文字|[[wikt:文字|moji]]|"character"}}; the resemblance to the English words ''emotion'' and ''emoticon'' is [[False cognate|purely coincidental]].<ref>{{cite book |url=https://books.google.com/books?id=VPO4CgAAQBAJ|title=New Words for Old: Recycling Our Language for the Modern World |first=Caroline |last=Taggart |date=November 5, 2015 |publisher=Michael O'Mara Books |isbn=9781782434733 |via=Google Books |quote=Hard on the heels of the emoticon comes the Japanese-born ''emoji'', also a <u>DIGITAL</u> icon used to express emotion, but more sophisticated in terms of imagery than those that are created by pressing a colon followed by a parenthesis. ''Emoji'' is made up of the Japanese for ''picture'' (''e'') and ''character'' (''moji''), so its resemblance to emotion and emoticon is a particularly happy coincidence. |access-date=October 25, 2017}}</ref> The [[ISO 15924]] script code for emoji is <code>Zsye</code>.
+
+Originating on [[Japanese mobile phone culture|Japanese mobile phones]] in 1997, emoji became increasingly popular worldwide in the 2010s after being added to several mobile operating systems.<ref name=":0">{{cite web |last=Blagdon |first=Jeff |title=How emoji conquered the world |url=https://www.theverge.com/2013/3/4/3966140/how-emoji-conquered-the-world |work=The Verge |publisher=Vox Media |accessdate=November 6, 2013 |date=March 4, 2013}}</ref><ref>{{cite magazine|title=Smile, You're Speaking EMOJI: The fast evolution of a wordless tongue|date=November 16, 2014|url=https://nymag.com/daily/intelligencer/2014/11/emojis-rapid-evolution.html|first=Adam|last=Sternbergh|magazine=[[New York (magazine)|New York]]}}</ref><ref>{{cite web|url=http://www.android.com/versions/kit-kat-4-4/|title=Android – 4.4 KitKat|work=android.com}}</ref> They are now considered to be a large part of [[popular culture]] in the West.<ref>{{cite news |url=https://www.nbcnews.com/video/how-emojis-took-center-stage-in-american-pop-culture-1001844803597 |title=How Emojis took center stage in American pop culture |date=July 17, 2017 |work=NBC News}}</ref> In 2015, [[OxfordDictionaries.com|Oxford Dictionaries]] named the [[Face with Tears of Joy emoji]] (😂) the [[Word of the year#Oxford|Word of the Year]].<ref>{{cite web| url=https://www.pbs.org/newshour/rundown/oxford-dictionary-says-the-2015-word-of-the-year-is-an-emoji/| title=Oxford Dictionaries 2015 Word of the Year is an Emoji| date=November 17, 2015| publisher=PBS Newshour| access-date=August 23, 2017}}</ref><ref>Philiop Seargeant. The Emoji Revolution: How Technology is Shaping the Future of Communication. Cambridge, Cambridge University Press, 2019.</ref>
+
+==History==
+===The origin of Emoji pictograms (1990s)===
+{{Infobox Unicode block
+|symbols = Emoji
+|1_0_0 = 81
+|3_0 = 2
+|3_2 = 8
+|4_0 = 8
+|4_1 = 17
+|5_1 = 4
+|5_2 = 28
+|6_0 = 722
+|6_1 = 13
+|7_0 = 106
+|8_0 = 30
+|9_0 = 72
+|10_0 = 56
+|11_0 = 66
+|12_0 = 61
+|13_0 = 55
+|note = These counts are for emoji that are single Unicode characters;<ref name="EmojiData"/><ref>{{cite web|url=https://www.unicode.org/versions/enumeratedversions.html|title=Enumerated Versions of The Unicode Standard|work=The Unicode Standard|accessdate=August 17, 2016}}</ref> many more emoji are composed of sequences of two or more characters.<ref name="ZWJSequences"/> Emoji were first defined in Unicode 6.0, and pre-6.0 characters were only defined as emoji in 6.0 or later.
+}}
+
+The emoji was predated by the [[emoticon]],<ref>{{cite news| url=https://www.independent.co.uk/life-style/gadgets-and-tech/news/happy-30th-birthday-emoticon-8120158.html| title=Happy 30th Birthday Emoticon!| date=September 8, 2012| newspaper=Independent| access-date=November 30, 2017}}</ref> a basic text-based version of the now established [[Unicode]] emoji language and likely took inspiration from [[pictogram]]s. Numerous attempts in the 1990s were made in [[Europe]], [[Japan]] and the [[United States]] to enhance the basic [[emoticon]] to make it more desirable for use.<ref>{{cite web| url=http://www.rd.com/culture/history-of-emoji/| title=Why Do We Use Emojis Anyway? A Fascinating History of Emoticons| date=December 9, 2016| publisher=Readers Digest| access-date=November 30, 2017}}</ref><ref>{{cite web| url=https://www.ovrdrv.com/emoji-101/| title=Emoji 101| date=October 14, 2015| publisher=Overdrive Interactive| accessdate=November 30, 2017}}</ref> The emoji is based on the premise of using text markers to form images. This dates back to the 1960s, when [[Russia]]n novelist and professor [[Vladimir Nabokov]] stated in an interview with ''[[The New York Times]]'' ''"I often think there should exist a special typographical sign for a smile — some sort of concave mark, a supine round bracket."''<ref name=Nabokov1973>{{Citation| last = Nabokov| first = Vladimir| year = 1973| title = Strong Opinions| pages = 133–134| doi = 10.2277/052153643X| isbn = 0-679-72609-8| location = New York| url-access = registration| url = https://archive.org/details/isbn_9780679726098}}</ref> However, it wasn't until the 1980s when computer scientist [[Scott Fahlman]] invented the [[emoticon]], by suggesting that :-) and :-( could replace language.<ref>{{Citation | title = -) turns 25| publisher = [[Associated Press]]| date = 2007-09-20| url = http://www.cnn.com/2007/TECH/09/18/emoticon.anniversary.ap/index.html| accessdate = 2007-09-20 |archiveurl =https://web.archive.org/web/20071012051803/http://www.cnn.com/2007/TECH/09/18/emoticon.anniversary.ap/index.html <!-- Bot retrieved archive --> |archivedate = 2007-10-12}}</ref>
+
+In the early 1990s, there were a number of digital [[smiley]]s and [[emoticon]]s that were used in fonts, [[pictogram]]s, graphical representations, and even welcome messages. The font [[Wingdings]], designed and used on [[Microsoft]] platforms, used [[smiley]] and sad faces in its language and first appeared on [[Windows]] and other [[Microsoft]] platforms from 1990 onwards. In late 1995, it was announced in the French newspaper, [[Le Monde]], that telecoms company [[Alcatel-Lucent|Alcatel]] would be launching a mobile phone to be released in 1996. The newspaper article displays the BC 600, with the welcome screen displaying a digital [[smiley]] face.<ref>{{cite news |title=Souriez! Le GSM présente un nouveau visage |publisher=[[Le Monde]] |date=November 7, 1995 |language=French|page=13}}</ref> Versions of the [[Nokia]] phone also contained sets of graphics, which in 2001 they were still referring to as [[smiley]]s.{{citation needed|date=January 2020}}
+
+Numerous claims have been made to who invented the first emoji. Those making the claims drew inspiration from many sources, including [[pictogram]]s and symbols, [[smiley]]s and digital interpretations of language. Some of the precursors to the emoji can include theories by both [[Vladimir Nabokov]] and [[Scott Fahlman]]. One of the more notable claims was by [[Shigetaka Kurita]] in 1999.<ref name=Steinmetz2015>{{cite web|last=Steinmetz|first=Katy|url=http://time.com/4114886/oxford-word-of-the-year-2015-emoji/|title=Oxford's 2015 Word of the Year Is This Emoji|work=[[Time (magazine)|Time]]|date=November 16, 2015|accessdate=July 28, 2017}}</ref><ref>{{cite web|url=https://nymag.com/daily/intelligencer/2014/11/emojis-rapid-evolution.html|title=Smile, You're Speaking Emoji|author=Sternbergh, Adam|date=November 16, 2014}}</ref> Kurita created a set of emojis while working on [[NTT DoCoMo]]'s [[i-mode]] [[Mobile web]] platform.<ref name="Meet Shigetaka Kurita, the Father of Emoji">{{cite web|last1=Negishi|first1=Mayumi|title=Meet Shigetaka Kurita, the Father of Emoji|url=https://blogs.wsj.com/japanrealtime/2014/03/26/meet-shigetaka-kurita-the-father-of-emoji|website=[[Wall Street Journal]]|date=March 26, 2014|accessdate=August 16, 2015}}</ref> According to interviews, he took inspiration from weather pictograms, used to depict the weather conditions at any given time. He also drew inspiration from [[Chinese characters]] and street sign [[pictogram]]s.<ref name="Meet Shigetaka Kurita, the Father of Emoji"/><ref>{{cite web|title=NTT DoCoMo Emoji List|url=https://www.nttdocomo.co.jp/service/imode_mail/function/pictograph|publisher=nttdocomo.co.jp}}</ref><ref name="Why and how I created emoji">{{cite web|first=Mamiko |last=Nakano |translator1=Mitsuyo Inaba Lee |title=Why and how I created emoji: Interview with Shigetaka Kurita |url=http://ignition.co/105 |website=Ignition |accessdate=August 16, 2015 |url-status=dead |archiveurl=https://web.archive.org/web/20160610220635/http://ignition.co/105 |archivedate=June 10, 2016 }}</ref> Kurita's work is now displayed in the [[Museum of Modern Art]] in [[New York City]].<ref>{{cite web |last1=Ness |first1=Amanda |title=Look Who's Smiley Now: MoMA Acquires Original Emoji |url=https://www.nytimes.com/2016/10/27/arts/design/look-whos-smiley-now-moma-acquires-original-emoji.html |newspaper=[[New York Times]] |date=October 26, 2016}}</ref>
+
+[[Emojipedia]] released findings in early 2019 stating they believed a set of 90 emojis for the J-Phone, predated Kurita's design. Known as the [[SoftBank]] emoji set, they predicted it dated back to 1997. The set was first released on [[Japan]]'s J-Phone and is the first phone known to contain a set of emojis as part of its typeface. Many of the images would later be included in the [[Unicode Standard]], such as [[Pile of Poo emoji|Pile of Poo]]. The J-Phone didn't sell well due to its high retail price and therefore mass-market adoption didn't take place at the time.<ref>{{Cite web | last=Alt | first=Matt | title=Why Japan Got Over Emojis | url=https://slate.com/technology/2015/12/emojis-are-no-longer-cool-in-japan.html | date=December 7, 2015 | accessdate=January 22, 2019 }}</ref> The first set of emojis by [[SoftBank]] contained no color, unlike Kurita's which did use color. Both sets were made up of generic images that depicted, numbers, sports, the time, moon phases and the weather. Both Kurita and [[SoftBank]]'s designs were 12 x 12 pixels emoji pictograms.<ref>{{cite web |title=Correcting the Record on the First Emoji Set |url=https://blog.emojipedia.org/correcting-the-record-on-the-first-emoji-set/ |publisher=[[Emojipedia]] |date=March 8, 2019}}</ref>
+
+[[Japan]] was the first country to widely adopt the early emoji sets for use on [[mobile phone]]s. [[Mobile phone industry in Japan#Providers|Japanese mobile operators]] NTT DoCoMo, [[au (mobile phone company)|au]], and [[SoftBank Mobile]] (formerly [[Vodafone]]) all implemented emoji sets in the late 1990s to their phones. These companies each defined their own variants of emoji using proprietary standards. The first set of 176 12×12 pixel emoji was created as part of i-mode's messaging features to help facilitate electronic communication, and to serve as a distinguishing feature from other services.<ref name=":0"/> Kurita created the first 180 emoji based on the expressions that he observed people making and other things in the city.<ref name="Why and how I created emoji"/> 
+
+When transmitted on NTT DoCoMo, emoji symbols are specified as a two-[[byte]] sequence, in the private-use range E63E through E757 in the [[Unicode]] character space, or F89F through F9FC for [[Shift JIS]]. The basic specification has 1706 symbols, with 76 more added in phones that support [[C-HTML]] 4.0. Emoji pictograms by Japanese mobile phone brand [[Au (mobile phone company)|Au]] are specified using the [[HTML element#Images and objects|IMG tag]].{{dubious|reason=KDDI (au) have a Shift_JIS emoji format listed in EmojiSources.txt from the Unicode Character Database, and also available in ICU. Corresponding Unicode/UCS proposal documents (e.g. UTC L2/10-132) list this alongside additional PUA and "JIS" (i.e. 7-bit JIS X 0208 extension) encodings for KDDI (au) emoji. So while it is very plausible that img tags were used in certain contexts, this does not seem to be the only format KDDI/au used.|date=March 2020}} SoftBank Mobile emoji support colors and animation, and use different formats on 2G versus 3G:<ref>{{citation|mode=cs1 |url=https://github.com/kawanet/Encode-JP-Emoji |title=Emoji encodings and cross-mapping tables in pure Perl |first=Yusuke |last=Kawasaki |date=2010}}</ref> in the 2G format, they are encoded in sequences using the {{control code link|ESC|Escape}} and {{control code link|SI|Shift In}} control characters, whereas in the 3G format, they are encoded in Shift JIS between F741 and FBDE.<ref>{{cite web |url=https://www.unicode.org/Public/UCD/latest/ucd/EmojiSources.txt |title=Emoji Sources |work=Unicode Character Database |author=Unicode Consortium |author-link=Unicode Consortium}}</ref><ref>{{cite web |url=https://android.googlesource.com/platform/external/skia/+/donut-release2/emoji/gmojiraw.txt |title=GMoji Raw |work=[[Skia Graphics Engine|Skia]] Emoji |author=Android Open Source Project |author-link=Android Open Source Project |date=2009}}</ref>
+
+===Development of emoji sets (2000–2009)===
+The basic 12x12 pixel emoji in [[Japan]] grew in popularity across various platforms over the next decade. This was aided by the introduction of [[i-mode]], which for many was the origins of the [[smartphone]]. [[i-mode]] also saw the introduction of emojis in conversation form on messenger [[Application software|apps]]. By 2004, [[i-mode]] had 40 million subscribers, meaning numerous people were exposed to the emoji for the first time between 2000 and 2004. The popularity of i-mode led to other manufacturers competing with similar offerings and therefore developed their own emoji sets. While emoji adoption was high in [[Japan]] during this time, the companies failed to collaborate and come up with a uniform set of emojis to be used across all platforms in the country.<ref>{{cite web |last1=Blagdon |first1=Jeff |title=How emoji conquered the world |url=https://www.theverge.com/2013/3/4/3966140/how-emoji-conquered-the-world |publisher=[[The Verge]] |date=March 4, 2013}}</ref>
+
+The [[Universal Coded Character Set]] ([[Unicode]]), overseen by the [[Unicode Consortium]] and [[ISO/IEC JTC 1/SC 2]], had been established as the international standard for text representation ([[ISO/IEC 10646]]) since 1993, although variants of [[Shift JIS]] remained relatively common in Japan. Unicode included several characters which would subsequently be classified as emoji, including some from [[North America]]n or [[Western Europe]]an sources such as [[ITC Zapf Dingbats]] or [[Code page 437|DOS code page 437]],<ref>{{cite web |title=Unicode 1.1 Emoji List |url=https://emojipedia.org/unicode-1.1/ |publisher=[[Emojipedia]]}}</ref> but had not incorporated the Japanese cellular emoji characters. Unicode's coverage of written characters was extended several times by new editions during the 2000s, with little interest in incorporating the Japanese cellular emoji sets, although symbol characters which would subsequently be classified as emoji continued to be added. For example, Unicode 4.0 release contained 16 new emojis, which included direction arrows, a yellow warning, and an eject button.<ref>{{cite web |title=Unicode 4.0 List |url=https://emojipedia.org/unicode-4.0/ |publisher=[[Emojipedia]]}}</ref>
+
+Additionally, other [[dingbat]] fonts such as [[Wingdings]] or [[Webdings]] included additional pictographic symbols in custom [[pi font]] encodings. For example, a [[national park]] pictogram (🏞) was available in Webdings at [[hexadecimal|0x]]50, corresponding to the capital letter [[P (letter)|P]] in [[ASCII]]. Unlike Zapf Dingbats, many of these would not be available as Unicode emoji until 2014.<ref name="hexuswebdings" />
+
+[[The Smiley Company]] developed The Smiley Dictionary, which was launched in 2001. The desktop platform was aimed at allowing people to insert smileys as text when sending emails and writing on a [[desktop computer]].<ref name=eveningstandard>{{cite web |last1=Speare-Cole |first1=Rebecca |title=Man behind iconic smiley face symbol says limited number of emojis restricts freedom of speech |url=https://www.standard.co.uk/news/uk/man-behind-iconic-smiley-face-symbol-says-limited-number-of-emojis-restricts-freedom-of-speech-a4282786.html |publisher=[[Evening Standard]]}}</ref> The smiley toolbar offered a variety of symbols and smileys and was used on platforms such as [[MSN Messenger]].<ref>{{cite web |last1=Golby |first1=Joel |title=The Man Who Owns the Smiley Face |url=https://www.vice.com/en_uk/article/j5pyyb/the-man-who-owns-the-smiley-face |publisher=[[Vice (magazine)]] |date=August 9, 2017}}</ref> [[Nokia]] as one of the largest telecoms companies globally at the time, were still referring to today's emoji sets as [[smiley]]s in 2001.{{citation needed|date=January 2020}} The digital smiley movement was headed up by Nicolas Loufrani, the CEO of The Smiley Company.<ref name=eveningstandard /> He created a smiley toolbar, which was  available at smileydictionary.com during the early 2000s to be sent as emojis are today.<ref>{{cite web |last1=Hutchins |first1=Robert |title=SmileyWorld's CEO Nicolas Loufrani on plagiarism, the school market and a push for more toys |url=https://www.licensing.biz/smileyworlds-ceo-nicolas-loufrani-on-plagiarism-the-school-market-and-a-push-for-more-toys/ |publisher=[[Licensing.biz]] |date=March 7, 2016}}</ref>
+
+Mobile providers in both the [[United States]] and [[Europe]] began discussions on how to introduce their own emoji sets from 2004 onwards. It wasn't until [[Google]] employees requested that [[Unicode]] look into the possibility of a uniform emoji set did many companies begin to take the emoji seriously. [[Apple Inc.|Apple]] quickly followed and began to collaborate with not only [[Google]], but also providers in [[Europe]] and [[Japan]]. In August 2007, [[Mark Davis (Unicode)|Mark Davis]] and his colleagues Kat Momoi and Markus Scherer wrote the first draft for consideration by the Unicode Technical Committee to introduce emojis into the [[Unicode|Unicode standard]]. Peter Edberg and Yasuo Kida joined the collaborative efforts from [[Apple Inc.]] shortly after and the official UTC proposal as co-authors came in January 2009. 
+
+Separately, a proposal had been submitted in 2008 to add the [[ARIB STD B24 character set|ARIB extended characters]] used in broadcasting in Japan to Unicode. This included several pictographic symbols.<ref>{{citation|mode=cs1 |url=https://www.unicode.org/L2/L2008/08077r2-japanese-tv.pdf |title=Japanese TV Symbols |id=UTC L2/08-077R2 / ISO/IEC JTC1/SC2/WG2 N3397 |last=Suignard |first=Michel |date=2008-03-11}}</ref> These were added in Unicode 5.2 in 2009, a year before the cellular emoji sets were fully added; they include several characters which either also appeared amongst the cellular emoji<ref name="utcL210132">{{cite web |url=https://www.unicode.org/L2/L2010/10132-emojidata.pdf |id=UTC L2/10-132 |title=Emoji Symbols: Background Data—Background data for Proposal for Encoding Emoji Symbols |first1=Markus |last1=Scherer |first2=Mark |last2=Davis |first3=Kat |last3=Momoi |first4=Darick |last4=Tong |first5=Yasuo |last5=Kida |first6=Peter |last6=Edberg}}</ref> or were subsequently classified as emoji.<ref>{{cite web |url=https://emojipedia.org/unicode-5.2/ |title=Unicode 5.2 Emoji List |work=Emojipedia |author=Emojipedia |author-link=Emojipedia}}</ref>
+
+Throughout 2009, members of the [[Unicode Consortium]] and national standardization bodies of various countries gave feedback and proposed changes to the international standardization of the emoji. The feedback from various bodies in the United States, Europe, and Japan agreed on a set of 722 emojis as the standard set, which would be released in 2010 as Unicode 6.0. This is seen by many as the first true set of uniform emojis due to the sheer number of emojis that were introduced, as only 15% (114) of the 722 emojis can be traced back to emoji sets prior to Unicode 6.0.<ref>{{cite web|url=https://www.unicode.org/faq/emoji_dingbats.html|title=FAQ – Emoji & Dingbats|work=unicode.org}}</ref>{{citation needed|date=January 2020}}
+
+===Modern-day emojis (2010–present)===
+The introduction of the new emojis by [[Unicode]] in 2009, saw the introduction of some of the most notable emojis used today. Despite the long association with [[Japan]], emojis like [[Face with Tears of Joy emoji|Tears of Joy]] had no origin in the country and can only be traced back to [[Unicode|Unicode 6.0]].<ref>{{cite web |last1=Meisenzahl |first1=Mary |title=We now know the 10 most popular emoji for the first time ever |url=https://www.businessinsider.com/most-popular-emoji-unicode-consortium-2019-10?r=US&IR=T#7-two-hearts-4 |publisher=[[BusinessInsider]] |date=October 11, 2019}}</ref> The introduction of the new emojis had numerous teething issues, with feedback from many on the cultural differences between different countries and also the misuse. Famously, both the peach and the eggplant were used for other meanings and others were often used for criminal purposes. This led to the gun emoji getting removed and replaced with a water gun.{{citation needed|date=January 2020}}
+
+The popularity of emoji has caused pressure from vendors and international markets to add additional designs into the Unicode standard to meet the demands of different cultures. Unicode 7.0 added approximately 250 emoji, many from the [[Webdings]] and [[Wingdings]] fonts.<ref name="hexuswebdings">{{cite web| url=http://hexus.net/tech/news/software/71157-host-new-characters-emoji-introduced-unicode-70/| title=Host of New Characters and Emoji Introduced in Unicode 7.0| date=June 17, 2014| publisher=Hexus| access-date=November 30, 2017}}</ref> Some characters now defined as emoji are inherited from a variety of pre-Unicode messenger systems not only used in Japan, including [[Yahoo Messenger|Yahoo]] and [[MSN Messenger]].<ref name="Emoji Additions: Animals, Compatibility, and More Popular Requests; Emoji tranche 5">{{cite web|title=Emoji Additions: Animals, Compatibility, and More Popular Requests; Emoji tranche 5|url=https://www.unicode.org/L2/L2015/15054r4-emoji-tranche5.pdf|publisher=Unicode|accessdate=August 18, 2015}}</ref> Unicode 8.0 added another 41 emoji, including articles of sports equipment such as the cricket bat, food items such as the [[taco]], signs of the [[Zodiac]], new facial expressions, and symbols for places of worship.<ref>{{cite web|title=Unicode 8.0.0|url=http://unicode.org/versions/Unicode8.0.0/|publisher=Unicode Consortium|accessdate=June 17, 2015}}</ref> Corporate demand for emoji standardization has placed pressures on the Unicode Consortium, with some members complaining that it had overtaken the group's traditional focus on standardizing characters used for minority languages and transcribing historical records.<ref name="Inside 'Emojigeddon'">{{cite web|last1=Warzel|first1=Charlie|title=Inside 'Emojigeddon': The Fight Over The Future of the Unicode Consortium|url=https://www.buzzfeed.com/charliewarzel/inside-emojigeddon-the-fight-over-the-future-of-the-unicode|website=Buzzfeed|accessdate=September 15, 2017}}</ref>
+
+Emoji characters vary slightly between platforms within the limits in meaning defined by the Unicode specification, as companies have tried to provide artistic presentations of ideas and objects.<ref name="Lost in translation: Android emoji vs iOS emoji">{{cite web|last1=Allsopp |first1=Ashleigh |title=Lost in translation: Android emoji vs iOS emoji |url=http://www.techadvisor.co.uk/opinion/mobile-phone/lost-in-translation-android-emoji-vs-ios-emoji |url-status=dead |archive-url=https://web.archive.org/web/20141228093209/http://www.techadvisor.co.uk/opinion/mobile-phone/lost-in-translation-android-emoji-vs-ios-emoji/ |archive-date=December 28, 2014 |date=December 15, 2014 |website=Tech Advisor |accessdate=August 15, 2015 }}</ref> For example, following an Apple tradition, the calendar emoji on Apple products always shows July 17, the date in 2002 Apple announced its [[iCal]] calendar application for [[macOS]]. This led some Apple product users to initially nickname July 17 "[[World Emoji Day]]".<ref>{{Cite news|title = Letting Our Emojis Get in the Way|url=https://www.nytimes.com/2015/07/18/nytnow/letting-our-emojis-get-in-the-way.html|newspaper=[[The New York Times]]|date=July 17, 2015|accessdate=August 25, 2015|first=Kathryn|last=Varn}}</ref> Other emoji fonts show different dates or do not show a specific one.<ref name="Calendar emoji">{{cite web|title=Calendar emoji|url=http://emojipedia.org/calendar|website=[[Emojipedia]]|accessdate=August 15, 2015}}</ref>
+
+Some Apple emoji are very similar to the SoftBank standard, since SoftBank was the first Japanese network on which the iPhone launched. For example, {{unichar|1F483|DANCER|nlink=💃}} is female on Apple and SoftBank standards but male or gender-neutral on others.<ref name="How Emoji Get Lost In Translation">{{cite news|last1=Bosker|first1=Bianca|title=How Emoji Get Lost in Translation|url=https://www.huffingtonpost.com/2014/06/27/emoji-meaning_n_5530638.html|work=Huffington Post|date=June 27, 2014|accessdate=August 15, 2015}}</ref>
+
+Journalists have noted that the ambiguity of emoji has allowed them to take on culture-specific meanings not present in the original [[glyph]]s. For example, {{unichar|1F485|NAIL POLISH|nlink=💅}} has been described as being used in English-language communities to signify "non-caring fatuousness" and "anything from shutting [[wikt:hater|haters]] down to a sense of accomplishment".<ref name="How to (pretend to) be young and down with the internet">{{cite news|last1=Hern|first1=Alex|title=How to (pretend to) be young and down with the internet|url=https://www.theguardian.com/commentisfree/2015/aug/12/how-to-be-young-internet-lol-facebook|work=[[The Guardian]]|date=August 12, 2015|accessdate=August 15, 2015}}</ref><ref name="The 31 Most Nail Care Emoji Moments Of 2014">{{cite web|last1=Jewell|first1=Hannah|title=The 31 Most Nail Care Emoji Moments of 2014|url=https://www.buzzfeed.com/hannahjewell/the-most-nail-care-emoji-moments-of-2014|website=Buzzfeed|date=December 13, 2014|accessdate=August 15, 2015}}</ref><ref name="The Five Non-Negotiable Best Emojis in the Land">{{cite web|first1=Alexander|last1=Abad-Santos|first2=Allie |last2=Jones|title=The Five Non-Negotiable Best Emojis in the Land|url=http://www.thewire.com/culture/2014/03/the-only-five-emojis-you-need/359646/|website=The Atlantic Wire|date= March 26, 2014|accessdate=August 15, 2015}}</ref> Unicode manuals sometimes provide notes on auxiliary meanings of an object to guide designers on how emoji may be used, for example noting that some users may expect {{unichar|1F4BA|SEAT}} to stand for "a reserved or ticketed seat, as for an airplane, train, or theater".<ref name="Unicode Consortium">{{cite web|title=Miscellaneous Symbols and Pictographs|url=https://www.unicode.org/charts/beta/nameslist/n_1F300.html|website=Unicode Consortium|accessdate=September 15, 2017}}</ref>
+
+{{asof|2017|July}}, there were 2,666 emoji on the official Unicode Standard list.<ref>{{cite web| url=https://www.bbc.com/news/technology-40612529| title=Emojis Honoured in World Celebration| date=July 17, 2017| publisher=BBC| access-date=November 30, 2017}}</ref>
+
+===Cultural influence===
+{{Multiple images
+| align = left
+| width = 50
+| footer = Color illustrations of {{unichar|1F602|FACE WITH TEARS OF JOY|nlink=Face with Tears of Joy emoji}} from [[Twitter]], [[Noto Emoji Project]] and [[Firefox OS]]
+| image1 = Twemoji 1f602.svg
+| image2 = Noto Emoji Oreo 1f602.svg
+| image3 = Fxemoji u1F602.svg
+| direction = 
+| total_width = 
+| alt1 = 
+| caption1 = 
+| caption2 = 
+}}
+
+[[Oxford Dictionaries]] named {{unichar|1F602|FACE WITH TEARS OF JOY|nlink=Face with Tears of Joy emoji}}<ref>{{cite web|url=http://emojipedia.org/face-with-tears-of-joy/|title=Face With Tears of Joy Emoji|publisher=Emojipedia.org}}</ref> its 2015 [[Word of the year#Oxford|Word of the Year]].<ref name="Oxford2015">{{cite web|url=http://blog.oxforddictionaries.com/2015/11/word-of-the-year-2015-emoji|title=Oxford names 'emoji' 2015 Word of the Year|work=[[Oxford Dictionaries]]|date=November 16, 2015|accessdate=January 20, 2016}}</ref> Oxford noted that 2015 had seen a sizable increase in the use of the word "emoji" and recognized its impact on popular culture.<ref name="Oxford2015"/> Oxford Dictionaries President Caspar Grathwohl expressed that "traditional alphabet scripts have been struggling to meet the rapid-fire, visually focused demands of 21st Century communication. It's not surprising that a pictographic script like emoji has stepped in to fill those gaps—it's flexible, immediate, and infuses tone beautifully."<ref name=Waldman2015>{{cite web|last=Waldman|first=Katy|url=http://www.slate.com/blogs/lexicon_valley/2015/11/16/the_face_with_tears_of_joy_emoji_is_the_word_of_the_year_says_oxford_dictionaries.html|title=This Year's Word of the Year Isn't Even a Word 😂😂😂|work=Lexicon Valley|publisher=[[Slate (magazine)|Slate]]|date=November 16, 2015|accessdate=July 29, 2017}}</ref> [[SwiftKey]] found that "Face with Tears of Joy" was the most popular emoji across the world.<ref>{{cite news|url=https://www.washingtonpost.com/news/morning-mix/wp/2015/11/17/for-first-time-ever-an-emoji-is-crowned-oxford-dictionaries-word-of-the-year|title=For first time ever, an emoji is crowned Oxford Dictionaries' Word of the Year|work=[[The Washington Post]]|last=Wang|first=Yanan|date=November 17, 2015|accessdate=January 20, 2016}}</ref> The [[American Dialect Society]] declared {{unichar|1F346|AUBERGINE}} to be the "Most Notable Emoji" of 2015 in their Word of the Year vote.<ref name=AmericanDialect>{{cite web |url=http://www.americandialect.org/2015-word-of-the-year-is-singular-they |title=2015 Word of the Year is singular 'they' |publisher=American Dialect Society |website=www.americandialect.org |date=January 8, 2016 |access-date=October 19, 2017}}</ref>
+
+Some emoji are specific to Japanese culture, such as a [[Dogeza|bowing]] businessman ({{unichar|1F647}}), the [[shoshinsha mark]] used to indicate a beginner driver ({{unichar|1F530}}), a white flower ({{unichar|1F4AE}}) used to denote "brilliant homework",<ref>{{cite web|url=http://emojipedia.org/white-flower|title=White Flower Emoji|publisher=Emojipedia.org|accessdate=July 22, 2015}}</ref> or a group of emoji representing popular foods: [[ramen]] noodles ({{unichar|1F35C}}), [[dango]] ({{unichar|1F361}}), [[onigiri]] ({{unichar|1F359}}), [[Japanese curry]] ({{unichar|1F35B}}), and [[sushi]] ({{unichar|1F363}}). [[Unicode Consortium]] founder [[Mark Davis (Unicode)|Mark Davis]] compared the use of emoji to a developing language, particularly mentioning the American use of eggplant ({{unichar|1F346}}) to represent a [[phallus]].<ref name=Bromwich>{{cite news |url=https://www.nytimes.com/2015/10/21/technology/how-emojis-find-their-way-to-phones.html |title=How Emojis find their way to phones |work=[[The New York Times]] |author=Bromwich, Jonah |date=October 20, 2015 |accessdate=October 19, 2017}}</ref> Some linguists have classified emoji and [[emoticon]]s as [[discourse marker]]s.<ref>{{Cite web|url=https://theconversation.com/emoticons-and-symbols-arent-ruining-language-theyre-revolutionizing-it-38408|title=Emoticons and symbols aren't ruining language – they're revolutionizing it|last=Collister|first=Lauren|website=The Conversation|date=April 6, 2015|access-date=March 25, 2016}}</ref>
+
+In December 2015 a [[sentiment analysis]] of emoji was published,<ref>{{cite journal|last1=Kralj Novak|first1=P.|last2=Smailović|first2=J.|last3=Sluban|first3=B.|last4=Mozetič|first4=I.|title=Sentiment of Emojis|journal=PLOS ONE|date=2015|volume=10|issue=12|page=e0144296|doi=10.1371/journal.pone.0144296|pmid=26641093|arxiv=1509.07761|bibcode=2015PLoSO..1044296K}}</ref> and the Emoji Sentiment Ranking 1.0<ref>{{cite web|title=Emoji Sentiment Ranking|url=http://kt.ijs.si/data/Emoji_sentiment_ranking|accessdate=December 8, 2015}}</ref> was provided. In 2016, a musical about emoji premiered in Los Angeles.<ref name="playbill.com">{{cite web|last1=Gans|first1=Andrew|title=New Musical About Emojis Will Premiere in Los Angeles|url=http://www.playbill.com/article/new-musical-about-emojis-will-premiere-in-los-angeles|website=Playbill|date=April 12, 2016|accessdate=December 23, 2016}}</ref><ref name="timeout.com">{{cite web|last1=Cary|first1=Stephanie|title='Emojiland' is bringing your phone's emojis to life in LA|url=https://www.timeout.com/los-angeles/blog/emojiland-is-bringing-your-phones-emojis-to-life-in-la-050316|website=Timeout|date=April 14, 2016|accessdate=December 23, 2016}}</ref>  The computer-animated ''[[The Emoji Movie]]'' was released in summer 2017.<ref>{{cite web|last1=Fleming|first1=Mike Jr.|title=Emoji at Center of Bidding Battle Won By Sony Animation; Anthony Leondis To Direct|url=https://deadline.com/2015/07/emoji-movie-sony-pictures-animation-anthony-leondis-kung-fu-panda-secrets-of-the-masters-1201482768|website=Deadline|date=July 2015|accessdate=November 19, 2015}}</ref><ref>{{cite web|last1=Lawrence|first1=Derek|title=The Emoji Movie: Here's what the critics are saying|url=https://ew.com/movies/2017/07/27/emoji-movie-review-roundup/|website=Entertainment Weekly|date=July 27, 2017|accessdate=August 13, 2017}}</ref>
+
+In January 2017, in what is believed to be the first large-scale study of emoji usage, researchers at the [[University of Michigan]] analysed over 1.2 billion messages input via the Kika Emoji Keyboard<ref>{{cite web| url=http://ns.umich.edu/new/releases/24857-emojis-how-we-assign-meaning-to-these-ever-popular-symbols| title=Emojis: How We Assign Meaning to These Ever-Popular Symbols| date=May 19, 2017| publisher=University of Michigan| access-date=November 30, 2017}}</ref> and announced that the Face With Tears of Joy was the most popular emoji. The Heart and the Heart eyes emoji stood second and third respectively. The study also found that the French use heart emoji the most.<ref>{{cite web| url=http://www.futurity.org/emoji-countries-1328712-2/| title=People Around the World Use These Emojis The Most| date=January 3, 2017| publisher=Futurity| access-date=November 30, 2017}}</ref> People in countries like Australia, France and the Czech Republic used more happy emoji, while this was not so for people in Mexico, Colombia, Chile and Argentina, where people used more negative emoji in comparison to cultural hubs known for restraint and self-discipline, like Turkey, France and Russia.<ref>{{cite web|url=http://www.thehindu.com/sci-tech/technology/internet/%E2%80%98Face-with-tears-of-joy%E2%80%99-is-the-most-popular-emoji-says-study/article17025261.ece|title='Face with tears of joy' is the most popular emoji, says study|website=[[The Hindu]]|date=January 12, 2017}}</ref>
+
+There has been discussion among legal experts on whether or not emoji could be admissible as evidence in court trials.<ref>{{cite book|title=The Semiotics of Emoji|last1=Danesi|first1=Marcel|date=2015|publisher=Bloomsbury|page=139}}</ref><ref>{{cite magazine|url=http://www.slate.com/articles/technology/users/2015/10/emoticons_and_emojis_as_evidence_in_court.html|title=Exhibit A: ;-)|date=October 16, 2015|magazine=Slate|access-date=November 30, 2017}}</ref> Furthermore, as emoji continue to develop and grow as a "language" of symbols, there may also be the potential of the formation of emoji "dialects".<ref>{{Cite news|url=https://www.nytimes.com/2014/07/27/fashion/emoji-have-won-the-battle-of-words.html|title=The Emoji Have Won the Battle of Words|last=Bennett|first=Jessica|date=July 25, 2014|work=[[The New York Times]]|access-date=February 28, 2017|issn=0362-4331}}</ref> Emoji are being used as more than just to show reactions and emotions.<ref>{{cite magazine|url=https://www.wired.com/2016/04/the-science-of-emoji/|title=The Emoji is the Birth of a New Type of Language (? No Joke)|date=April 19, 2016|magazine=Wired|access-date=November 30, 2017}}</ref> Snapchat have even incorporated emoji in their trophy and friends system with each emoji showing a complex meaning.<ref>{{Cite news|url=https://snapchatemojimeanings.com|title=Snapchat Emoji Meanings|access-date=February 28, 2017}}</ref>
+
+==== Emoji that further modern causes ====
+In the second part of 2019, a [[menstruation|period]] emoji will be released that is expected to break the stigma of menstruation.<ref name=":02">{{Cite web|url=https://www.npr.org/sections/goatsandsoda/2019/02/08/692481425/why-period-activists-think-the-drop-of-blood-emoji-is-a-huge-win|title=Why Period Activists Think The 'Drop Of Blood' Emoji Is A Huge Win|website=NPR.org|language=en|access-date=2019-02-11}}</ref> In addition to normalizing periods, it will also be relevant to describe medical topics such as donating blood and other blood-related activities.<ref name=":02" />
+
+A mosquito emoji was added in 2018 to raise awareness for diseases spread by the insect, such as dengue and malaria.<ref>{{Cite web|url=https://ccp.jhu.edu/2017/09/18/creating-buzz-proposing-mosquito-emoji-public-health/|title=Creating Buzz: Proposing a Mosquito Emoji for Public Health|last=Desmon|first=Stephanie|date=2017-09-18|website=Johns Hopkins Center for Communication Programs|language=en-US|access-date=2019-02-11}}</ref>
+
+==<span id="Emoji communication problems">Emoji communication problems</span>==
+Research has shown that emoji are often misunderstood. In some cases, this misunderstanding is related to how the actual emoji design is interpreted by the viewer;<ref name="DailyDotMisunderstandEmojis">{{Cite news|url=https://www.dailydot.com/debug/emoji-miscommunicate/|title=Emoji can lead to huge misunderstandings, research finds|work=Daily Dot|first=Selena|last=Larson|date=April 11, 2016|accessdate=March 30, 2017}}</ref> in other cases, the emoji that was sent is not shown in the same way on the receiving side.<ref name="GrouplensEmojiMiscommunication">{{Cite web|url=https://grouplens.org/blog/investigating-the-potential-for-miscommunication-using-emoji/|title=Investigating the Potential for Miscommunication Using Emoji|publisher=Grouplens|first=Hannah|last=Miller|date=April 5, 2016|accessdate=March 30, 2017}}</ref>
+
+The first issue relates to the cultural or contextual interpretation of the emoji. When the author picks an emoji, they think about it in a certain way, but the same character may not trigger the same thoughts in the mind of the receiver.<ref>{{cite web| url=https://motherboard.vice.com/en_us/article/78kzn9/what-the-emoji-youre-sending-actually-look-like-to-your-friends| title=What the Emoji You're Sending Actually Look Like to Your Friends| date=November 12, 2015| publisher=Motherboard| access-date=November 30, 2017}}</ref> (See also [[Models of communication]].)
+
+For example, people in China have developed a system for using emoji subversively, so that a smiley face could be sent to convey a despising, mocking, and even obnoxious attitude, as the orbicularis oculi (the muscle near that upper eye corner) on the face of the emoji does not move, and the orbicularis oris (the one near the mouth) tightens, which is believed to be a sign of suppressing a smile.<ref>{{cite web|url=https://qz.com/944693/chinese-people-mean-something-very-different-when-they-send-you-a-smiley-emoji/ |title=Chinese people mean something very different when they send you a smiley emoji |website=Quartz|date=March 29, 2017}}</ref>
+
+The second problem relates to technology and branding. When an author of a message picks an emoji from a list, it is normally encoded in a non-graphical manner during the transmission, and if the author and the reader do not use the same software or operating system for their devices, the reader's device may visualize the same emoji in a different way. Small changes to a character's look may completely alter its perceived meaning with the receiver.
+
+===Controversial emoji===
+Some emoji have been involved in controversy due to their perceived meanings. Multiple arrests and imprisonments have followed usage of pistol ({{unichar|1F52B}}), knife ({{unichar|1F5E1}}), and bomb ({{unichar|1F4A3}}) emoji in ways that were deemed by authorities to constitute credible threats.<ref name=AppleGun>{{cite web |url=http://money.cnn.com/2016/08/01/technology/apple-pistol-emoji/index.html |title=Apple replaces the pistol emoji with a water gun |last=Kelly |first=Heather |website=[[CNN]] Tech |date=August 2, 2017 |access-date=October 19, 2017}}</ref>
+
+In the lead-up to the [[2016 Summer Olympics]], the Unicode Consortium considered proposals to add several Olympic-related emoji, including medals and events such as [[handball]] and [[water polo]].<ref name=newsweek>{{cite web |url=https://www.newsweek.com/new-emoji-candidates-be-voted-spring-2016-385196 |title=New Emoji Candidates to Be Voted On in Spring 2016 |last=Ziv |first=Stan |website=[[Newsweek]] |date=20 October 2015 |access-date=1 October 2018}}</ref> By October 2015, these candidate emoji included "[[ISSF shooting events|rifle]]" ({{unichar|1F946}}) and "[[modern pentathlon]]" ({{unichar|1F93B}}).<ref name=ep20151031>{{Cite news |url=https://emojipedia.org/unicode-9.0/ |title=Unicode 9.0 Emoji List |date=31 October 2015 |work=Emojipedia |access-date=1 October 2018 |language=en |archive-url=https://web.archive.org/web/20151031233229/https://emojipedia.org/unicode-9.0/ |archive-date=2015-10-31 |url-status=unfit}}</ref><ref name="OlympicRifle" /> However, in 2016, Apple and Microsoft opposed these two emoji, and the characters were added without emoji presentations, meaning that software is expected to render them in black-and-white rather than color, and emoji-specific software such as onscreen keyboards will generally not include them. In addition, while the original incarnations of the modern pentathlon emoji depicted its five events, including a man pointing a gun, the final glyph contains a person riding a horse, along with a laser pistol target in the corner.<ref name=AppleGun /><ref name="OlympicRifle">{{cite web |url=https://www.buzzfeed.com/charliewarzel/thanks-to-apples-influence-youre-not-getting-a-rifle-emoji |title=Thanks To Apple's Influence, You're Not Getting A Rifle Emoji |last=Warzel |first=Charlie |website=[[BuzzFeed]] |date=June 17, 2016 |access-date=October 19, 2017}}</ref><ref name=AppleStops>{{cite web |url=http://www.cbc.ca/news/trending/rifle-emoji-dropped-unicode-9-0-update-apple-microsoft-1.3645884 |title=Apple stops Unicode from releasing a rifle emoji, gun advocates get mad |website=[[CBC News]] |date=June 22, 2016 |access-date=October 19, 2017}}</ref>
+
+On August 1, 2016, Apple announced that in [[iOS 10]], the pistol emoji ({{unichar|1F52B}}) would be changed from a realistic [[revolver]] to a [[water pistol]].<ref name=AppleGun /> Conversely, the following day, Microsoft pushed out an update to Windows 10 that changed its longstanding depiction of the pistol emoji as a toy [[ray-gun]] to a real revolver.<ref name=MicrosoftGun>{{cite web |url=https://www.engadget.com/2016/08/04/microsoft-new-real-gun-emoji/ |title=Microsoft just changed its toy gun emoji to a real pistol |last=Low |first=Cherlynn |website=[[Engadget]] |date=August 4, 2016 |access-date=October 19, 2017}}</ref> Microsoft stated that the change was made to bring the glyph more in line with industry-standard designs and customer expectations.<ref name=MicrosoftGun /> By 2018, most major platforms such as Google, Microsoft, Samsung, Facebook, and Twitter had transitioned their rendering of the pistol emoji to match Apple's water gun implementation.<ref>{{Cite news|url=https://blog.emojipedia.org/all-major-vendors-commit-to-gun-redesign/|title=All Major Vendors Commit to Gun Redesign|date=April 27, 2018|work=Emojipedia|access-date=May 13, 2018|language=en}}</ref>
+
+The [[eggplant]] ({{lang-en-GB|aubergine|link=no}}) emoji ({{unichar|1F346}}) has also seen controversy due to its being used, almost solely in the United States, to represent a penis.<ref name=AmericanDialect /><ref name=Bromwich /><ref name=EggplantRising>{{cite web |url=http://www.slate.com/articles/technology/users/2015/04/eggplant_rising_how_the_purple_fruit_surpassed_the_banana_as_the_most_phallic.html |title=Eggplant rising: How the purple fruit surpassed the banana as the most phallic food |last=Hess |first=Amanda |website=[[Slate (magazine)|Slate]] |date=April 3, 2015 |access-date=October 19, 2017}}</ref><ref name=SordidHistory>{{cite web |url=https://firstwefeast.com/features/2015/06/eggplant-emoji-history |title=The Complete (and Sometimes Sordid) History of the Eggplant Emoji |last=Hofmann |first=Regan |website=[[First We Feast]] |date=June 3, 2015 |access-date=October 19, 2017}}</ref> Beginning in December 2014, the [[hashtag]] {{nobr|#EggplantFridays}} began to rise to popularity on [[Instagram]] for use in marking photos featuring clothed or unclothed penises.<ref name=EggplantRising /><ref name=SordidHistory /> This became such a popular trend that beginning in April 2015, Instagram disabled the ability to search for not only the {{nobr|#EggplantFridays}} tag, but also other eggplant-containing hashtags, including simply {{nobr|#eggplant}} and {{nobr|#🍆}}.<ref name=EggplantRising /><ref name=SordidHistory /><ref name=InstagramBlocks>{{cite web |url=http://money.cnn.com/2015/04/29/technology/eggplant-instagram-offensive/ |title=Instagram blocks 'offensive' eggplant emoji hashtag |last=Goldman |first=David |website=[[CNN]] Tech |date=April 29, 2015 |access-date=October 19, 2017}}</ref>
+
+The peach emoji ({{unichar|1F351}}) has likewise been used as a euphemistic icon for [[buttocks]], with a 2016 [[Emojipedia]] analysis revealing that only 7% of English language tweets with the peach emoji refer to the actual fruit.<ref>{{cite web|url=https://blog.emojipedia.org/how-we-really-use-the-peach|title=How We Really Use The Peach|first=Hamdan|last=Azhar|date=December 16, 2016|work=Emojipedia|accessdate=July 7, 2018}}</ref><ref>{{cite web|url=https://nymag.com/selectall/2016/12/what-does-peach-emoji-mean-its-a-butt.html|title=Very Official Study Finds Peach Emoji Most Often Paired With Eggplant|first=Madison|last=Kircher|date=December 16, 2016|work=Emojipedia|accessdate=July 7, 2018}}</ref><ref>{{cite web|url=https://metro.co.uk/2018/01/18/what-do-the-aubergine-and-peach-emoji-mean-7240646/|title=What do the aubergine and peach emoji mean?|first=Avinash|last=Bhunjun|date=January 18, 2018|work=Metro UK|accessdate=July 7, 2018}}</ref> In 2016, Apple attempted to redesign the emoji to less resemble buttocks. This was met with fierce backlash in beta testing and Apple reversed its decision by the time it went live to the public.<ref>{{cite web|url=https://www.theguardian.com/technology/2016/nov/16/everything-is-peachy-as-apple-restores-emojis-bum-features|title=Everything's peachy as Apple restores emoji's 'bum' features|first=Alex|last=Hern|date=November 16, 2016|work=The Guardian|accessdate=December 20, 2017}}</ref>
+
+In December 2017, a lawyer in [[Delhi]], India, threatened to file suit against [[WhatsApp]] for allowing use of the [[The finger|middle finger]] emoji ({{unichar|1F595}}) on the basis that the company is "directly abetting the use of an offensive, lewd, obscene gesture" in violation of the [[Indian Penal Code]].<ref>{{Cite news|url=http://metro.co.uk/2017/12/27/lawyer-demands-whatsapp-gets-rid-lewd-middle-finger-emoji-7186571/|title=Lawyer demands WhatsApp gets rid of the 'lewd' middle finger emoji|date=December 27, 2017|work=Metro|access-date=December 28, 2017|language=en-GB}}</ref>
+
+==Emoji versus text presentation==
+Unicode defines [[Variant form (Unicode)|variation sequences]] for many of its emoji to indicate their desired presentation.
+{{quote |text=Emoji characters can have two main kinds of presentation:
+* an ''emoji presentation'', with colorful and perhaps whimsical shapes, even animated
+* a ''text presentation'', such as black & white |source=Unicode Technical Report #51: Unicode Emoji<ref name="UTR51"/>}}
+
+Specifying the desired presentation is done by following the base emoji with either U+FE0E VARIATION SELECTOR-15 (VS15) for text or U+FE0F VARIATION SELECTOR-16 (VS16) for emoji-style.<ref name="UniStdVarTxt">{{Cite web|url=https://www.unicode.org/Public/UNIDATA/StandardizedVariants.txt|title=UCD: Standardized Variation Sequences|publisher=Unicode Consortium|accessdate=August 17, 2016}}</ref>
+
+{| border="1" cellspacing="0" cellpadding="5" class="wikitable nounderlines" style="border-collapse:collapse;background:#FFFFFF;font-size:150%;text-align:center"
+|+ style="font-size: 67%" | Sample emoji variation sequences
+|- style="background:#F8F8F8;font-size: 67%"
+! scope="col" style="text-align:right" | U+ || 2139 || 231B || 26A0 || 2712 || 2764 || 1F004 || 1F21A
+|- style="background:#F8F8F8;font-size: 67%"
+! scope="col" style="text-align:left" | default&nbsp;presentation || text || emoji || text || text || text || emoji || emoji
+|-
+! scope="col" style="background:#F8F8F8;font-size: 67%;text-align:left" | base&nbsp;code&nbsp;point
+| ℹ || ⌛ || ⚠ || ✒ || ❤ || 🀄 || 🈚
+|-
+! scope="col" style="background:#F8F8F8;font-size: 67%;text-align:left" | base+VS15 (text)
+| {{emoji presentation|ℹ|text}} || {{emoji presentation|⌛|text}} || {{emoji presentation|⚠|text}} || {{emoji presentation|✒|text}} || {{emoji presentation|❤|text}} || {{emoji presentation|🀄|text}} || {{emoji presentation|🈚|text}}
+|-
+! scope="col" style="background:#F8F8F8;font-size: 67%;text-align:left" | base+VS16 (emoji)
+| {{emoji presentation|ℹ}} || {{emoji presentation|⌛}} || {{emoji presentation|⚠}} || {{emoji presentation|✒}} || {{emoji presentation|❤}} || {{emoji presentation|🀄}} || {{emoji presentation|🈚}}
+|-
+! scope="col" style="background:#F8F8F8;font-size: 67%;text-align:left" | Twemoji image
+| [[File:Twemoji2 2139.svg|22px]]
+| [[File:Twemoji2 231b.svg|22px]]
+| [[File:Twemoji2 26a0.svg|22px]]
+| [[File:Twemoji2 2712.svg|22px]]
+| [[File:Twemoji2 2764.svg|22px]]
+| [[File:Twemoji2 1f004.svg|22px]]
+| [[File:Twemoji2 1f21a.svg|22px]]
+|}
+
+==Skin color==
+{{Main|Emoji modifiers}}
+
+Five symbol modifier characters were added with Unicode 8.0 to provide a range of skin tones for human emoji. These modifiers are called EMOJI MODIFIER FITZPATRICK TYPE-1-2, {{not a typo|-|3}}, {{not a typo|-|4}}, {{not a typo|-|5}}, and {{not a typo|-|6}} (U+1F3FB–U+1F3FF): 🏻 🏼 🏽 🏾 🏿. They are based on the [[Fitzpatrick scale]] for classifying human skin color. Human emoji that are not followed by one of these five modifiers should be displayed in a generic, non-realistic skin tone, such as bright yellow (<span style="color: #ffcc22;font-size:large;">■</span>), blue (<span style="color: #3399CC;font-size:large;">■</span>), or gray (<span style="color: #CCCCCC;font-size:large;">■</span>).<ref name="UTR51"/> Non-human emoji (like {{unichar|26FD|FUEL PUMP}}) are unaffected by the Fitzpatrick modifiers.
+As of Unicode 13.0, Fitzpatrick modifiers can be used with 116 human emoji spread across six blocks: [[Dingbat#Skin tones|Dingbats]], [[Emoticons (Unicode block)#Skin tones|Emoticons]], [[Miscellaneous Symbols#Skin tones|Miscellaneous Symbols]], [[Miscellaneous Symbols and Pictographs#Skin tones|Miscellaneous Symbols and Pictographs]], [[Supplemental Symbols and Pictographs#Skin tones|Supplemental Symbols and Pictographs]], and [[Transport and Map Symbols#Skin tones|Transport and Map Symbols]].<ref name="EmojiData"/>
+
+The following table shows both the Unicode characters and the open-source "Twemoji" images, designed by [[Twitter]]:
+
+{| border="1" cellspacing="0" cellpadding="5" class="wikitable nounderlines" style="border-collapse:collapse;background:#FFFFFF;font-size:150%;text-align:center"
+|+ style="font-size:small" | Sample use of Fitzpatrick modifiers
+|-style="background:#F8F8F8;font-size:67%"
+! scope="col" colspan="2" style="text-align:left" | Code point
+! scope="col" | Default
+! scope="col" | FITZ-1-2
+! scope="col" | FITZ-3
+! scope="col" | FITZ-4
+! scope="col" | FITZ-5
+! scope="col" | FITZ-6
+|-
+! rowspan="2" scope="row" style="font-size:67%;text-align:left" | U+1F9D2: Child
+! scope="row" style="font-size:67%;text-align:left" | Text
+| 🧒
+| 🧒🏻
+| 🧒🏼
+| 🧒🏽
+| 🧒🏾
+| 🧒🏿
+|-
+! scope="row" style="font-size:67%;text-align:left" | Image
+| [[File:Twemoji2 1f9d2.svg|30px]]
+| [[File:Twemoji2 1f9d2-1f3fb.svg|30px]]
+| [[File:Twemoji2 1f9d2-1f3fc.svg|30px]]
+| [[File:Twemoji2 1f9d2-1f3fd.svg|30px]]
+| [[File:Twemoji2 1f9d2-1f3fe.svg|30px]]
+| [[File:Twemoji2 1f9d2-1f3ff.svg|30px]]
+|-
+! rowspan="2" scope="row" style="font-size:67%;text-align:left" | U+1F466: Boy
+! scope="row" style="font-size:67%;text-align:left" | Text
+| 👦
+| 👦🏻
+| 👦🏼
+| 👦🏽
+| 👦🏾
+| 👦🏿
+|-
+! scope="row" style="font-size:67%;text-align:left" | Image
+| [[File:Twemoji2 1f466.svg|30px]]
+| [[File:Twemoji2 1f466-1f3fb.svg|30px]]
+| [[File:Twemoji2 1f466-1f3fc.svg|30px]]
+| [[File:Twemoji2 1f466-1f3fd.svg|30px]]
+| [[File:Twemoji2 1f466-1f3fe.svg|30px]]
+| [[File:Twemoji2 1f466-1f3ff.svg|30px]]
+|-
+! rowspan="2" scope="row" style="font-size:67%;text-align:left" | U+1F467: Girl
+! scope="row" style="font-size:67%;text-align:left" | Text
+| 👧
+| 👧🏻
+| 👧🏼
+| 👧🏽
+| 👧🏾
+| 👧🏿
+|-
+! scope="row" style="font-size:67%;text-align:left" | Image
+| [[File:Twemoji2 1f467.svg|30px]]
+| [[File:Twemoji2 1f467-1f3fb.svg|30px]]
+| [[File:Twemoji2 1f467-1f3fc.svg|30px]]
+| [[File:Twemoji2 1f467-1f3fd.svg|30px]]
+| [[File:Twemoji2 1f467-1f3fe.svg|30px]]
+| [[File:Twemoji2 1f467-1f3ff.svg|30px]]
+|-
+! rowspan="2" scope="row" style="font-size:67%;text-align:left" | U+1F9D1: Adult
+! scope="row" style="font-size:67%;text-align:left" | Text
+| 🧑
+| 🧑🏻
+| 🧑🏼
+| 🧑🏽
+| 🧑🏾
+| 🧑🏿
+|-
+! scope="row" style="font-size:67%;text-align:left" | Image
+| [[File:Twemoji2 1f9d1.svg|30px]]
+| [[File:Twemoji2 1f9d1-1f3fb.svg|30px]]
+| [[File:Twemoji2 1f9d1-1f3fc.svg|30px]]
+| [[File:Twemoji2 1f9d1-1f3fd.svg|30px]]
+| [[File:Twemoji2 1f9d1-1f3fe.svg|30px]]
+| [[File:Twemoji2 1f9d1-1f3ff.svg|30px]]
+|-
+! rowspan="2" scope="row" style="font-size:67%;text-align:left" | U+1F468: Man
+! scope="row" style="font-size:67%;text-align:left" | Text
+| 👨
+| 👨🏻
+| 👨🏼
+| 👨🏽
+| 👨🏾
+| 👨🏿
+|-
+! scope="row" style="font-size:67%;text-align:left" | Image
+| [[File:Twemoji2 1f468.svg|30px]]
+| [[File:Twemoji2 1f468-1f3fb.svg|30px]]
+| [[File:Twemoji2 1f468-1f3fc.svg|30px]]
+| [[File:Twemoji2 1f468-1f3fd.svg|30px]]
+| [[File:Twemoji2 1f468-1f3fe.svg|30px]]
+| [[File:Twemoji2 1f468-1f3ff.svg|30px]]
+|-
+! rowspan="2" scope="row" style="font-size:67%;text-align:left" | U+1F469: Woman
+! scope="row" style="font-size:67%;text-align:left" | Text
+| 👩
+| 👩🏻
+| 👩🏼
+| 👩🏽
+| 👩🏾
+| 👩🏿
+|-
+! scope="row" style="font-size:67%;text-align:left" | Image
+| [[File:Twemoji2 1f469.svg|30px]]
+| [[File:Twemoji2 1f469-1f3fb.svg|30px]]
+| [[File:Twemoji2 1f469-1f3fc.svg|30px]]
+| [[File:Twemoji2 1f469-1f3fd.svg|30px]]
+| [[File:Twemoji2 1f469-1f3fe.svg|30px]]
+| [[File:Twemoji2 1f469-1f3ff.svg|30px]]
+|}
+
+==Joining==
+Implementations may use [[Zero-width joiner|U+200D ZERO WIDTH JOINER]] (ZWJ) between emoji to make them behave like a single, unique emoji character.<ref name="UTR51"/>
+(Systems that don't support this should ignore the ZWJ character.)
+
+For example, the sequence U+1F468 MAN, U+200D ZWJ, U+1F469 WOMAN, U+200D ZWJ, U+1F467 GIRL (👨‍👩‍👧) could be displayed as a single emoji depicting a family with a man, a woman, and a girl if the implementation supports it. Systems that don't support it would ignore the ZWJs, showing the base emoji in the sequence: U+1F468 MAN, U+1F469 WOMAN, U+1F467 GIRL (👨👩👧).
+
+Unicode previously maintained a catalog of emoji ZWJ sequences that are supported on at least one commonly available platform. The consortium has since switched to only document sequences that are ''recommended for general interchange'' (RGI).<ref name="ZWJSequences">{{Cite web|url=https://www.unicode.org/emoji/charts/emoji-zwj-sequences.html|title=Emoji ZWJ Sequences Catalog|publisher=Unicode Consortium|date=June 14, 2016}}</ref>
+
+==Unicode blocks==
+{{split section|Unicode emojis|discuss=Talk:Emoji#Split proposed for Unicode blocks section to Unicode emojis article|date=October 2019}}
+{{Main|Dingbat#Dingbats Unicode block|l1=Dingbats (Unicode block)|Emoticons (Unicode block)|Miscellaneous Symbols|l3=Miscellaneous Symbols (Unicode block)|Miscellaneous Symbols and Pictographs|l4=Miscellaneous Symbols and Pictographs (Unicode block)|Supplemental Symbols and Pictographs|l5=Supplemental Symbols and Pictographs (Unicode block)|Symbols and Pictographs Extended-A|l6=Symbols and Pictographs Extended-A (Unicode block)|Transport and Map Symbols|l7=Transport and Map Symbols (Unicode block)}}
+Unicode 13.0 represents emoji using 1,367 characters spread across 24 blocks, of which 26 are [[Regional Indicator Symbol]]s that combine in pairs to form flag emoji, and 12 (#, * and 0–9) are base characters for [[keycap]] emoji sequences:<ref name="EmojiData">{{Cite web|url=https://unicode.org/Public/UNIDATA/emoji/emoji-data.txt|title=UCD: Emoji Data for UTR #51|publisher=Unicode Consortium|date=January 28, 2020}}</ref><ref name="UTR51">{{Cite web|url=https://unicode.org/reports/tr51/|title=UTR #51: Unicode Emoji|publisher=Unicode Consortium|date=February 11, 2020}}</ref>
+
+637 of the 768 code points in the [[Miscellaneous Symbols and Pictographs]] block are considered emoji. 240 of the 254 code points in the [[Supplemental Symbols and Pictographs]] block are considered emoji.  All of the 57 code points in the [[Symbols and Pictographs Extended-A]] block are considered emoji.  All of the 80 code points in the [[Emoticons]] block are considered emoji. 101 of the 114 code points in the [[Transport and Map Symbols]] block are considered emoji. 83 of the 256 code points in the [[Miscellaneous Symbols]] block are considered emoji. 33 of the 192 code points in the [[Dingbat#Unicode|Dingbats]] block are considered emoji.
+
+{{Emoji (Unicode block)}}
+
+Additional emoji can be found in the following Unicode blocks: [[Arrows (Unicode block)|Arrows]] (8 code points considered emoji), [[Basic Latin (Unicode block)|Basic Latin]] (12), [[CJK Symbols and Punctuation]] (2), [[Enclosed Alphanumeric Supplement]] (41), [[Enclosed Alphanumerics]] (1), [[Enclosed CJK Letters and Months]] (2), [[Enclosed Ideographic Supplement]] (15), [[General Punctuation]] (2), [[Geometric Shapes]] (8), [[Geometric Shapes Extended]] (12), [[Latin-1 Supplement (Unicode block)|Latin-1 Supplement]] (2), [[Letterlike Symbols]] (2), [[Mahjong Tiles (Unicode block)|Mahjong Tiles]] (1), [[Miscellaneous Symbols and Arrows (Unicode block)|Miscellaneous Symbols and Arrows]] (7), [[Miscellaneous Technical]] (18), [[Playing cards in Unicode|Playing Cards]] (1), and [[Supplemental Arrows-B (Unicode block)|Supplemental Arrows-B]] (2).
+
+===Additions===
+Some vendors, most notably Microsoft, Samsung and HTC, add emoji presentation to some other existing Unicode characters or coin their own ZWJ sequences.
+
+Microsoft displays all [[Mahjong Tiles (Unicode block)|Mahjong tiles]] (U+1F000‥2B, not just {{unichar|1F004|MAHJONG TILE RED DRAGON}}) and alternative card suits ({{unichar|2661}}, {{unichar|2662}}, {{unichar|2664}}, {{unichar|2666}}) as emoji. They also support additional pencils ({{unichar|270E}}, {{unichar|2710}}) and a heart-shaped bullet ({{unichar|2765}}).
+
+While only {{unichar|261D}} is officially an emoji, Microsoft and Samsung add the other three directions as well ({{unichar|261C}}, {{unichar|261E}}, {{unichar|261F}}).
+Both vendors pair the standard checked ballot box emoji {{unichar|2611}} with its crossed variant {{unichar|2612}}, but only Samsung also has the empty ballot box {{unichar|2610}}.
+
+Samsung almost completely covers the rest of the [[Miscellaneous Symbols]] block (U+2600‥FF) as emoji, which includes Chess pieces, game die faces, some traffic sign as well as genealogical and astronomical symbols for instance.
+
+HTC supports most additional pictographs from the [[Miscellaneous Symbols and Pictographs]] (U+1F300‥5FF) and [[Transport and Map Symbols]] (U+1F680‥FF) blocks. Some of them are also shown as emoji on Samsung devices.
+
+The open source projects Emojidex and Emojitwo are trying to cover all of these extensions established by major vendors.
+
+==Implementation==
+The exact appearance of emoji is not prescribed but varies between fonts, in the same way that normal typefaces can display letters differently. For example, the [[Apple Color Emoji]] typeface is proprietary to Apple, and can only be used on Apple devices (without additional [[Hacker culture#Programming|hacking]]).<ref>{{cite web|title=[MOD] Apple Color Emoji system-wide for KitKat+ (updated with unicorns)|url=http://forum.xda-developers.com/showthread.php?t=2563757|publisher=XDA Developers|accessdate=January 15, 2015}}</ref> Different computing companies have developed their own fonts to display emoji, some of which have been [[Open source software|open-sourced]] to permit their reuse.<ref>{{cite web|last1=Davidson|first1=Mike|title=Open sourcing Twitter emoji for everyone|url=https://blog.twitter.com/2014/open-sourcing-twitter-emoji-for-everyone|website=Twitter developer blog|publisher=Twitter|accessdate=January 15, 2015}}</ref><ref>{{cite web|title=Emoji One: Open Source Emoji|url=http://www.emojione.com|publisher=Emoji One|accessdate=January 15, 2015}}</ref> Both colour and monochrome emoji typefaces exist, as well as at least one animated design.<ref>{{cite web|last1=El Khoury|first1=Rita|title=Woohoo! Animated Emoji Easter Eggs Overload The Latest Hangouts With Their Cuteness, Hehehehe|url=http://www.androidpolice.com/2014/12/11/woohoo-animated-emoji-easter-eggs-make-overload-latest-hangouts-cuteness-hehehehe|website=Android Police|date=December 11, 2014|accessdate=January 15, 2015}}</ref>
+
+===Android===
+[[Android (operating system)|Android]] devices support emoji differently depending on the operating system version. Google added native emoji support to Android in July 2013 with Android 4.3,<ref name="CNet_4.3">{{cite web|url=https://www.cnet.com/products/google-android-4-3-jelly-bean/|title=Google Android 4.3 is here, and it tastes like Jelly Bean|publisher=}}</ref> and to the Google Keyboard in November 2013 for devices running Android 4.4 and later.<ref>{{cite web|url=http://www.pocket-lint.com/news/124960-google-adds-sms-to-hangouts-android-app-emoji-to-kitkat-keyboard|title=Google adds SMS to Hangouts Android app, Emoji to KitKat keyboard|accessdate=April 17, 2014}}</ref> Android 7.0 Nougat added Unicode 9 emoji, skin tone modifiers, and a redesign of many existing emoji.<ref>{{Cite web|url=http://blog.emojipedia.org/android-7-0-emoji-changelog/|title=Android 7.0 Nougat Emoji Changelog|date=August 22, 2016|access-date=August 23, 2016}}</ref>
+
+Emoji are also supported by the [[Google Hangouts]] application (independent of the keyboard in use), in both Hangouts and [[Text messaging|SMS]] modes.<ref>{{cite web|url=https://play.google.com/store/apps/details?id=com.google.android.talk|title=Hangouts – Google Play|accessdate=April 17, 2014}}</ref> Several third-party messaging and keyboard applications (such as IQQI Keyboard) for Android devices<ref>{{cite web|url=https://market.android.com/search?q=emoji&c=apps|title=emoji – Google Play|publisher=Market.android.com|accessdate=November 9, 2012}}</ref> provide plugins that allow the use of emoji. Some apps, e.g. [[WhatsApp]], come with Apple emoji for internal use.{{clarify|date=September 2017}} With Android 8 (Oreo), Google added a compatibility library that, if included by app developers, makes the latest Noto emoji available on any platform since Android 4.3.<ref name="EmojiCompat">{{cite web | url = https://blog.emojipedia.org/fewer-empty-boxes-ahead-for-android-users/ |title= Fewer Empty Boxes for Android Users | publisher = Emojipedia | first = Florence | last = Ion | date= July 24, 2017 }}</ref>
+
+Until 2016, mobile phone vendors HTC and LG deployed variants of NotoColorEmoji.ttf with custom glyphs; Samsung still does. Some Japanese mobile carriers used to equip branded Android devices with emoji glyphs that were closer to the original ones, but apparently have stopped updating these circa 2015.{{clarify|date=September 2017}}
+
+===Apple===
+Apple first introduced emoji to their desktop operating system with the release of [[macOS|OS X]] [[Mac OS X Lion|10.7 Lion]], in 2011. Users can view emoji characters sent through email and messaging applications, which are commonly shared by mobile users, as well as any other application. Users can create emoji symbols using the "Characters" special input panel from almost any native application by selecting the "Edit" menu and pulling down to "Special Characters", or by the key combination {{key press|Command|Option|T}}. The desktop OS uses the [[Apple Color Emoji]] font that was introduced earlier in [[iOS]]. This provides users with full color pictographs.<ref>{{cite web|url=http://osxdaily.com/2011/08/20/emoji-mac-os-x-lion|title=Access and Use Emoji in Mac OS X|publisher=Osxdaily.com|date=August 20, 2011|accessdate=January 18, 2014}}</ref>
+
+The emoji keyboard was first available in Japan with the release of [[iPhone OS 2|iPhone OS version 2.2]] in 2008.<ref>{{Cite web|title=Apple releases iPhone Software v2.2|url=https://appleinsider.com/article/?id=10447|website=AppleInsider|accessdate=February 28, 2017}}</ref> The emoji keyboard was not officially made available outside of Japan until [[iOS 5|iOS version 5.0]].<ref>{{Cite web|title=Standard Emoji keyboard arrives to iOS 5, here's how to enable it|url=https://9to5mac.com/2011/06/08/standard-emoji-keyboard-arrives-to-ios-5-heres-how-to-enable-it/|website=9to5Mac|accessdate=February 28, 2017}}</ref> From iPhone OS 2.2 through to iOS 4.3.5 (2011), those outside Japan could access the keyboard but had to use a third party app to enable it. The first of such apps was developed by [[Josh Gare]]; emoji beginning to be embraced by popular culture outside Japan has been attributed to these apps.<ref>{{Cite web|title=Young App Creators Earning Thousands A Day|url=http://news.sky.com/story/young-app-creators-earning-thousands-a-day-10448979|website=Sky News|accessdate=February 28, 2017}}</ref><ref>{{Cite web|title=The man who brought us the Emoji|url=http://businessblog.o2.co.uk/man-brought-us-emoji/|website=O2|date=October 16, 2015|accessdate=February 28, 2017}}</ref> iOS was updated to support [[Fitzpatrick scale|Fitzpatrick skin-tone modifiers]] with version 8.3.<ref>{{Cite news|title=The 'Diversity' of Emojis|url=https://www.huffingtonpost.com/allison-underhill/the-diversity-of-emojis_b_7038798.html|work=The Huffington Post|first=Allison|last=Underhill|date=April 10, 2015|accessdate=December 15, 2015}}</ref>
+
+[[OS X Mavericks|OS X 10.9 Mavericks]] introduced a dedicated emoji input palette in most text input boxes using the key combination {{key press|Command|Ctrl|Space}}.<ref>{{cite news|last=Cipriani|first=Jason|url=http://howto.cnet.com/8301-11310_39-57608984-285/how-to-access-emoji-in-os-x-10.9-mavericks|title=How to access emoji in OS X 10.9 Mavericks|work=CNET|date=October 23, 2013|accessdate=January 18, 2014}}</ref>
+
+Apple has revealed that the "face with tears of joy" is the most popular emoji among English speaking Americans. On second place is the "heart" emoji followed by the "Loudly Crying Face".<ref>{{Cite news|url=https://www.macrumors.com/2017/11/03/face-with-tears-of-joy-most-popular-emoji/|title=Apple Says 'Face With Tears of Joy' is Most Popular Emoji in United States Among English Speakers|access-date=November 3, 2017|language=en}}</ref><ref>{{Cite web|url=https://emojipedia.org/people/|title=😃 Emoji People and Smileys Meanings|website=emojipedia.org|language=en|access-date=November 3, 2017}}</ref>
+
+On July 17, 2018, for the [[World Emoji Day]], Apple announced that it will be adding 70 more emoji in its 2018 [[iOS]] update, including the long-awaited, red hair, white hair, curly hair and bald emoji.<ref>{{Cite news|url=https://money.cnn.com/2018/07/16/technology/apple-emoji-preview/index.html|title=Redheads, lobsters and cupcakes: Apple shows off new iOS emojis|last=Kelly|first=Heather|work=CNNMoney|access-date=2018-07-17}}</ref><ref>{{Cite web|url=https://www.msn.com/en-us/money/other/apple-emoji-will-soon-include-people-with-curly-hair-white-hair-and-superpowers/ar-AAAaj39|title=Apple emoji will soon include people with curly hair, white hair and superpowers|website=www.msn.com|language=en-US|access-date=2018-07-17}}</ref>
+
+On September 12, 2017, Apple announced that the [[Messages (software)|Messages]] app on the [[iPhone]]s with [[Face ID]] would get "animoji", which are versions of standard emoji that are custom-animated with the use of [[facial motion capture]] to reflect the sender's expressions. These animoji can also utilize [[lip sync]] to appear to speak audio messages recorded by the sender. Apple had created 3D models of all standard emoji prior to its late-2016 OS updates from which the static default 2D graphics had been rendered. A select set of these models are being reused for creating still images and short animations dynamically.
+
+With the release of [[iOS 13]], Apple introduced "memoji" that allows the use of an avatar that a user can use to personalize messages; this feature does not require Face ID.<ref>{{Cite news|url=https://www.howtogeek.com/450743/how-to-create-and-use-memoji-and-animoji-on-an-iphone/|title=How to Create and Use Memoji and Animoji on an iPhone|publisher=How to Geek|date=2020-01-18|access-date=2020-03-20}}</ref>
+
+===Chrome OS===
+[[Chrome OS]], through its inclusion of the [[Noto fonts]], supports the emoji set introduced through Unicode 6.2. As of Chrome OS 41, Noto Color Emoji is the default font for most emoji.
+
+===Linux===
+[[Ubuntu version history#Ubuntu 18.04 LTS (Bionic Beaver)|Ubuntu 18.04]] and [[Fedora (operating system)|Fedora]] 28 support color emoji by default, using [[Noto fonts|Noto Color Emoji]].<ref>{{Cite news|url=https://www.omgubuntu.co.uk/2017/11/ubuntu-finally-long-last-time-support-color-emoji|title=Ubuntu 18.04 Will Support Color Emoji – OMG! Ubuntu!|date=2017-11-08|work=OMG! Ubuntu!|access-date=2018-06-09|language=en-US}}</ref><ref>{{Cite news|url=https://fedoramagazine.org/whats-new-fedora-28-workstation/|title=What's New in Fedora 28 Workstation – Fedora Magazine|date=2018-05-01|work=Fedora Magazine|access-date=2018-06-09|language=en-US}}</ref> Some [[Linux distribution]]s require the installation of extra fonts.<ref>{{cite web|url=https://www.kirsle.net/blog/entry/make-emoji-work-in-linux|title=Make Emoji Work in Linux|last=Petherbridge|first=Noah|date=April 4, 2013|website=Kistle blog|accessdate=October 7, 2014}}</ref> Color emoji are supported by [[FreeType]] and [[Cairo (graphics)|Cairo]].<ref>{{cite web|last1=LEMBERG|first1=Werner|title=[ft-announce] FreeType now supports color emojis|url=https://lists.nongnu.org/archive/html/freetype-announce/2013-05/msg00001.html|accessdate=April 13, 2018}}</ref><ref>{{cite news|last1=Larabel|first1=Michael|title=Cairo 1.15.8 Released With Support For Colored Emoji – Phoronix|url=https://www.phoronix.com/scan.php?page=news_item&px=Cairo-1.15.8-Colored-Emoji|accessdate=April 13, 2018|work=Phoronix|language=en}}</ref>
+
+===Microsoft Windows===
+An update for the Segoe UI Symbol font in [[Windows 7]] and in Windows Server 2008 R2 brought a subset of the monochrome Unicode set to those operating systems.<ref name="An update for the Segoe UI symbol font in Windows 7 and in Windows Server 2008 R2 is available">{{cite web |url=http://support.microsoft.com/kb/2729094|title=An update for the Segoe UI symbol font in Windows 7 and in Windows Server 2008 R2 is available|publisher=Microsoft Support}}</ref> The font update rebranded the font as ''Segoe UI Symbol''. The difference between the two fonts is that Segoe UI lacks any and all emoji characters, while Segoe UI Symbol and Segoe UI Emoji include them. [[Windows 8]] and higher supports the full Unicode emoji characters through Microsoft's [[Segoe UI]] family of fonts. Emoji characters are accessed through the onscreen keyboard's "smiley" key. As of [[Windows 8.1]] Preview, Segoe UI Emoji font supplies full-color pictographs. Differently from macOS and iOS, color glyphs are only supplied when the application supports Microsoft's [[DirectWrite]] API, and Segoe UI Emoji is explicitly declared, otherwise monochrome glyphs appear.<ref>{{cite web| url=https://msdn.microsoft.com/globalization/mt791278| title=Script and Font Support in Windows| publisher=Microsoft| access-date=August 23, 2017| archive-url=https://web.archive.org/web/20170923123305/https://msdn.microsoft.com/globalization/mt791278| archive-date=September 23, 2017| url-status=dead}}</ref> Segoe UI Emoji and its full-color emoji set is not fully supported by all programs written for Windows; for example, among Web browsers, [[Internet Explorer]] and [[Google Chrome]] can use the font, but [[Firefox]] initially did not (that browser now supports full color emoji and includes the EmojiOne set in installation). [[Windows 10|Windows 10 Anniversary Update]] added Unicode 9 emoji.<ref>{{cite web| url=https://www.windowscentral.com/windows-10-anniversary-update-adds-over-52000-new-emoji| title=Windows 10 Anniversary Update Adds Over 52,000 New Emojis, Including NinjaCat| date=August 2, 2016| publisher=Windows Central| access-date=August 23, 2017}}</ref>
+
+===Internationalized domain names===
+{{Main|Emoji domain|Internationalized domain name}}
+
+A limited number of [[top-level domain]]s allow registration of domain names containing emoji characters. Emoji-containing subdomains are also possible under any top-level domain.
+
+===Social media===
+[[Facebook]] and [[Twitter]] replace all Unicode emoji used on their websites with their own custom graphics.
+
+Facebook has different sets for the main site and for its Messenger service, where only the former provides complete coverage. [[Facebook reactions]] are only partially compatible with standard emoji.{{citation needed|date=September 2017}}
+
+Twitter has released Twemoji, which is their emoji graphics together with a Javascript library to handle them, under the [[Creative Commons license|Creative Commons CC-BY 4.0 license]] and the [[MIT License|MIT open-source license]], respectively.<ref>{{cite web |title=GitHub – twitter/twemoji: Twitter Emoji for Everyone |url=https://github.com/twitter/twemoji |website=[[GitHub]] |date=July 20, 2017 |accessdate=September 24, 2017}}</ref> The Android and iOS Twitter apps use emoji native to the platform they are running on.{{clarify|date=September 2017}}
+
+===General===
+Any operating system that supports adding additional fonts to the system can add an emoji-supporting font.
+
+EmojiOne version 2.3, an open-source font available under free license, supports the full emoji set in color through Unicode Emoji 3.0, i.e. Unicode 9.0. EmojiOne version 3.1, with a stricter license that disallows the redistribution of vector images, supports Unicode Emoji 5.0, hence characters added in Unicode 10.0. EmojiTwo, an open-source fork of EmojiOne 2.3, aims to add all emoji from 2017 and later.
+
+Note, however, that not all operating systems have support for color fonts, so in these cases emoji might have to be rendered as black-and-white line art or not at all. [[OpenType]] version 1.8 standardizes four different formats for color fonts: one built upon standard glyphs and backed by Microsoft; one built upon [[SVG]] and backed by Mozilla, Adobe, and others; one based upon [[Portable Network Graphics|PNG]] chunks and backed by Google; and one supporting a variety of embedded image formats, but preferably PNG, backed by Apple. This means that color fonts need to come in several formats to be usable on multiple operating systems.
+
+The font ''Symbola'' contains all emoji through version 10.0 as normal monochrome glyphs. Through version 10, Symbola was a [[Open-source Unicode typefaces|public domain font]]; beginning with version 11 in 2018, Symbola has been copyrighted with a ban on commercial use and derivative works. Other typefaces including a significant number of emoji characters include [[Noto fonts|Noto Emoji]], Adobe Source Emoji, and [[Quivira (typeface)|Quivira]].
+
+==In popular culture==
+* The 2009 film ''[[Moon (film)|Moon]]'' featured a robot named GERTY who communicates using a neutral-toned synthesized voice together with a screen showing emoji representing the corresponding emotional content.<ref>{{cite web |url=https://typesetinthefuture.com/2014/02/11/moon/ |title=Moon |last=Addey |first=Dave |website=Typeset in the Future |date=February 11, 2014 |access-date=August 23, 2017}}</ref>
+* In 2014, the [[Library of Congress]] acquired an emoji version of [[Herman Melville]]'s ''[[Moby Dick]]'' created by Fred Benenson.<ref>{{cite magazine| url=http://www.smithsonianmag.com/arts-culture/text-me-ishmael-reading-moby-dick-emoji-180949825/| title=Text Me, Ishmael: Reading Moby Dick in Emoji| date=March 2014| magazine=Smithsonian Magazine| access-date=August 23, 2017}}</ref><ref>{{cite magazine| url=https://www.bustle.com/articles/9208-emoji-dick-moby-dick-translated-into-emoji-icons-this-exists| title=Emoji Dick: Moby Dick, Translated Into Emoji Icons. This Exists| date=November 19, 2013| magazine=Bustle| access-date=August 23, 2017}}</ref>
+* A musical called ''Emojiland'' premiered at Rockwell Table & Stage in Los Angeles in May 2016,<ref name="playbill.com"/><ref name="timeout.com"/> after selected songs were presented at the same venue in 2015.<ref>{{cite web|last1=News Desk|first1=BWW|title=EMOJILAND: THE MUSICAL Plays Rockwell Table & Stage|url=http://www.broadwayworld.com/los-angeles/article/Photo-Flash-EMOJILAND-THE-MUSICAL-Plays-Rockwell-Table-Stage-20150807|website=BroadwayWorld|date=August 7, 2015|accessdate=December 23, 2016}}</ref><ref>{{cite web|last1=News Desk|first1=BWW|title=EMOJILAND Premieres Two Additional Songs at Rockwell LA|url=http://www.broadwayworld.com/los-angeles/article/Photo-Flash-EMOJILAND-Premieres-Two-Additional-Songs-at-Rockwell-LA-20151015|website=BroadwayWorld|date=October 15, 2015|accessdate=December 23, 2016}}</ref>
+* In October 2016, the [[Museum of Modern Art]] acquired the original collection of emoji distributed by NTT Docomo in 1999.<ref>{{cite web| url=http://mashable.com/2016/10/26/original-emoji-moma/#GYC.YU_AumqJ| title=These Emoji Are Now Part of MoMA's Permanent Collection| date=October 26, 2016| publisher=Mashable| access-date=August 23, 2017}}</ref>
+* In November 2016, the first emoji-themed convention, Emojicon, was held in San Francisco.<ref>{{cite web|url=http://time.com/4559662/emojicon-emoji-convention-2016/|title=What It's Like Inside the World's First Emoji Convention|website=Time}}</ref>
+* In March 2017, the first episode of [[Samurai Jack (season 5)|the fifth season of ''Samurai Jack'']] featured alien characters who communicate in emoji.<ref>{{cite news|first=Daniel|last=DeAngelo|title=The Face-palming Finale of 'Samurai Jack'|url=https://studybreaks.com/2017/06/14/samurai-jack-2-2/|accessdate=July 7, 2017|work=Study Breaks|date=June 14, 2017}}</ref>
+* In April 2017, the ''[[Doctor Who]]'' episode "[[Smile (Doctor Who)|Smile]]" featured nanobots called Vardy, which communicate through robotic avatars that use emoji (without any accompanying speech output) and are sometimes referred to by the time travelers as "Emojibots".<ref>{{cite web|last=Mulkern|first=Patrick|title=Doctor Who Smile review: 'A grief tsunami! It's a tough one to sell and I'm not buying it'|url=http://www.radiotimes.com/news/2017-04-22/doctor-who-smile-review-a-grief-tsunami-its-a-tough-one-to-sell-and-im-not-buying-it|website=Radio Times|accessdate=April 23, 2017}}</ref>
+* On July 28, 2017, [[Sony Pictures Animation]] released ''[[The Emoji Movie]]'', a 3D computer animated movie featuring the voices of [[Patrick Stewart]], [[Christina Aguilera]], [[Sofía Vergara]], [[Anna Faris]], [[T. J. Miller]], and other notable actors and comedians.<ref name=Dec2015CS>{{cite web|last1=Perry|first1=Spencer|title=Emoji Movie, Animated Spider-Man and Peter Rabbit Get Release Dates|url=https://www.comingsoon.net/movies/news/642987-sony-animation-dates-the-emoji-movie-delays-animated-spider-man|accessdate=December 23, 2015|publisher=ComingSoon.net|date=December 22, 2015|language=en-US|url-status=live|archiveurl=https://web.archive.org/web/20151223163139/http://www.comingsoon.net/movies/news/642987-sony-animation-dates-the-emoji-movie-delays-animated-spider-man|archivedate=December 23, 2015}}</ref>
+
+==See also==
+* [[Emojipedia]]
+* [[iConji]]
+* [[Emoticon#Japanese style|Kaomoji]]
+* [[Emojli]]
+* [[Hieroglyphics]]
+* [[Blob emoji]]
+
+==References==
+{{Reflist|30em}}
+
+==External links==
+{{sisterlinks|d=Q1049294|c=category:Emoji|wikt=emoji|voy=no|species=no|s=no|m=no|mw=no|n=no|q=no|b=Digital Technology and Cultures/Pragmatism and Emoji as a Universal Language|v=Motivation and emotion/Book/2018/Emoticons, emoji, and the electronic communication of emotion}}
+* [https://www.unicode.org/reports/tr51/ Unicode Technical Report #51: Unicode emoji]
+* [https://www.unicode.org/faq/emoji_dingbats.html The Unicode FAQ – Emoji & Dingbats]
+* [http://sites.google.com/site/unicodesymbols/Home/emoji-symbols Emoji Symbols]&nbsp;– the original proposals for encoding of Emoji symbols as Unicode characters
+* [https://www.unicode.org/~scherer/emoji4unicode/snapshot/utc Background data for Unicode proposal]
+* [http://emojitracker.com emojitracker] – list of most popularly used emoji on the Twitter platform; updated in real-time
+
+{{Emoji navbox|state=expanded}}
+{{Internet slang}}
+{{List of writing systems}}
+{{Portal bar|1990s|Internet|Japan|Technology|Writing}}
+
+[[Category:Emoji| ]]
+[[Category:Computer-related introductions in 1997]]
+[[Category:Computer icons]]
+[[Category:Internet culture]]
+[[Category:Internet slang]]
+[[Category:Japanese inventions]]
+[[Category:Japanese writing system terms]]
+[[Category:Japanese writing system]]
+[[Category:Online chat]]
+[[Category:Pictograms]]
