@@ -23,9 +23,9 @@ if err := scanner.Err(); err != nil {
 
 [GoDoc](https://godoc.org/github.com/clipperhouse/uax29/words)
 
-### Why use a tokenizer?
+### Why tokenize?
 
-Any time our code operates on individual words, we are tokenizing. Often, we do it ad hoc, such as splitting on spaces. This causes inconsistent results and edge cases. Tokenization in a code base should be deliberate and consistent.
+Any time our code operates on individual words, we are tokenizing. Often, we do it ad hoc, such as splitting on spaces, which gives inconsistent results. Best to do it consistently.
 
 ### Performance
 
