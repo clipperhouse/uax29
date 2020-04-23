@@ -46,7 +46,7 @@ type Scanner struct {
 func (sc *Scanner) Scan() bool {
 	for {
 		// Fill the buffer with enough runes for lookahead
-		for len(sc.buffer) < sc.pos+6 {
+		for len(sc.buffer) < sc.pos+8 {
 			r, eof, err := sc.readRune()
 			if err != nil {
 				sc.err = err
