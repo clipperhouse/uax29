@@ -97,7 +97,7 @@ func (sc *Scanner) Scan() bool {
 			continue
 		}
 
-		// If we fall through all the above rules, it's a word break, aka WB999
+		// If we fall through all the above rules, it's a sentence break
 		break
 	}
 
