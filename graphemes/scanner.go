@@ -207,13 +207,13 @@ func (sc *Scanner) gb9() (accept bool) {
 	return is(_mergedExtendZWJ, current)
 }
 
-// gb9 implements https://unicode.org/reports/tr29/#GB9A
+// gb9 implements https://unicode.org/reports/tr29/#GB9a
 func (sc *Scanner) gb9a() (accept bool) {
 	current := sc.buffer[sc.pos]
 	return is(SpacingMark, current)
 }
 
-// gb9 implements https://unicode.org/reports/tr29/#GB9B
+// gb9 implements https://unicode.org/reports/tr29/#GB9b
 func (sc *Scanner) gb9b() (accept bool) {
 	if sc.pos < 1 {
 		return false
