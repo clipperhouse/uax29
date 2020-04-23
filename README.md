@@ -1,4 +1,4 @@
-An implementation of word boundaries from [Unicode text segmentation](https://unicode.org/reports/tr29/#Word_Boundaries) (UAX 29), for Unicode version 12.0.
+This package tokenizes text based on [Unicode text segmentation](https://unicode.org/reports/tr29/#Word_Boundaries) (UAX 29), for Unicode version 12.0.
 
 ### Usage
 
@@ -22,6 +22,10 @@ if err := scanner.Err(); err != nil {
 ```
 
 [GoDoc](https://godoc.org/github.com/clipperhouse/uax29/words)
+
+### Why use a tokenizer?
+
+Any time our code operates on individual words, we are tokenizing. Often, we do it ad hoc, such as splitting on spaces. This causes inconsistent results and edge cases. Tokenization in a code base should be deliberate and consistent.
 
 ### Performance
 
