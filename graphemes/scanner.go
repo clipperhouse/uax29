@@ -44,8 +44,25 @@ type Scanner struct {
 	err   error
 }
 
-// Scan advances to the next grapheme cluster, returning true if successful. Returns false on error or EOF.
+// reset creates a new bytes.Buffer on the Scanner, and clears previous values
+func (sc *Scanner) reset() {
+	// Drop the emitted runes (optimization to avoid growing array)
+	copy(sc.buffer, sc.buffer[sc.pos:])
+	sc.buffer = sc.buffer[:len(sc.buffer)-sc.pos]
+
+	sc.pos = 0
+
+	var bb bytes.Buffer
+	sc.bb = bb
+
+	sc.bytes = nil
+	sc.err = nil
+}
+
+// Scan advances to the next token, returning true if successful. Returns false on error or EOF.
 func (sc *Scanner) Scan() bool {
+	sc.reset()
+
 	for {
 		// Fill the buffer with enough runes for lookahead
 		for len(sc.buffer) < sc.pos+8 {
@@ -323,16 +340,7 @@ func (sc *Scanner) gb13() (accept bool) {
 // gb999 implements https://unicode.org/reports/tr29/#GB999
 // i.e. break
 func (sc *Scanner) gb999() bool {
-	// Get the bytes & reset
 	sc.bytes = sc.bb.Bytes()
-	sc.bb.Reset()
-
-	// Drop the emitted runes (optimization to avoid growing array)
-	copy(sc.buffer, sc.buffer[sc.pos:])
-	sc.buffer = sc.buffer[:len(sc.buffer)-sc.pos]
-
-	sc.pos = 0
-
 	return len(sc.bytes) > 0
 }
 

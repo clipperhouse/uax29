@@ -34,7 +34,7 @@ func TestUnicodeSegments(t *testing.T) {
 		rv := make([][]byte, 0)
 		scanner := graphemes.NewScanner(bytes.NewReader(test.Input))
 		for scanner.Scan() {
-			rv = append(rv, []byte(scanner.Text()))
+			rv = append(rv, scanner.Bytes())
 		}
 		if err := scanner.Err(); err != nil {
 			t.Fatal(err)
