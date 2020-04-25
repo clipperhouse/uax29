@@ -104,12 +104,12 @@ func (sc *Scanner) Scan() bool {
 		}
 
 		// WB3a
-		if is(_mergedCRLFNewline, previous) {
+		if is(_CRǀLFǀNewline, previous) {
 			break
 		}
 
 		// WB3b
-		if is(_mergedCRLFNewline, current) {
+		if is(_CRǀLFǀNewline, current) {
 			break
 		}
 
@@ -126,7 +126,7 @@ func (sc *Scanner) Scan() bool {
 		}
 
 		// WB4
-		if is(_mergedExtendFormatZWJ, current) {
+		if is(_ExtendǀFormatǀZWJ, current) {
 			sc.accept()
 			continue
 		}
@@ -138,14 +138,14 @@ func (sc *Scanner) Scan() bool {
 		}
 
 		// WB6
-		if is(_mergedMidLetterMidNumLetQ, current) && sc.seekForward(AHLetter) && sc.seekPrevious(sc.pos, AHLetter) {
+		if is(_MidLetterǀMidNumLetQ, current) && sc.seekForward(AHLetter) && sc.seekPrevious(sc.pos, AHLetter) {
 			sc.accept()
 			continue
 		}
 
 		// WB7
 		if is(AHLetter, current) {
-			previousIndex := sc.seekPreviousIndex(sc.pos, _mergedMidLetterMidNumLetQ)
+			previousIndex := sc.seekPreviousIndex(sc.pos, _MidLetterǀMidNumLetQ)
 			if previousIndex >= 0 && sc.seekPrevious(previousIndex, AHLetter) {
 				sc.accept()
 				continue
@@ -193,7 +193,7 @@ func (sc *Scanner) Scan() bool {
 
 		// WB11
 		if is(Numeric, current) {
-			previousIndex := sc.seekPreviousIndex(sc.pos, _mergedMidNumMidNumLetQ)
+			previousIndex := sc.seekPreviousIndex(sc.pos, _MidNumǀMidNumLetQ)
 			if previousIndex >= 0 && sc.seekPrevious(previousIndex, Numeric) {
 				sc.accept()
 				continue
@@ -201,7 +201,7 @@ func (sc *Scanner) Scan() bool {
 		}
 
 		// WB12
-		if is(_mergedMidNumMidNumLetQ, current) && sc.seekForward(Numeric) && sc.seekPrevious(sc.pos, Numeric) {
+		if is(_MidNumǀMidNumLetQ, current) && sc.seekForward(Numeric) && sc.seekPrevious(sc.pos, Numeric) {
 			sc.accept()
 			continue
 		}
@@ -213,13 +213,13 @@ func (sc *Scanner) Scan() bool {
 		}
 
 		// WB13a
-		if is(ExtendNumLet, current) && sc.seekPrevious(sc.pos, _mergedAHLetterNumericKatakanaExtendNumLet) {
+		if is(ExtendNumLet, current) && sc.seekPrevious(sc.pos, _AHLetterǀNumericǀKatakanaǀExtendNumLet) {
 			sc.accept()
 			continue
 		}
 
 		// WB13b
-		if is(_mergedAHLetterNumericKatakana, current) && sc.seekPrevious(sc.pos, ExtendNumLet) {
+		if is(_AHLetterǀNumericǀKatakana, current) && sc.seekPrevious(sc.pos, ExtendNumLet) {
 			sc.accept()
 			continue
 		}
@@ -232,7 +232,7 @@ func (sc *Scanner) Scan() bool {
 			count := 0
 			for i := sc.pos - 1; i >= 0; i-- {
 				r := sc.buffer[i]
-				if is(_mergedExtendFormatZWJ, r) {
+				if is(_ExtendǀFormatǀZWJ, r) {
 					continue
 				}
 				if !is(Regional_Indicator, r) {
@@ -260,7 +260,7 @@ func (sc *Scanner) Scan() bool {
 			count := 0
 			for i := sc.pos - 1; i >= 0; i-- {
 				r := sc.buffer[i]
-				if is(_mergedExtendFormatZWJ, r) {
+				if is(_ExtendǀFormatǀZWJ, r) {
 					continue
 				}
 				if !is(Regional_Indicator, r) {
@@ -312,7 +312,7 @@ func (sc *Scanner) seekForward(rts ...*unicode.RangeTable) bool {
 		r := sc.buffer[i]
 
 		// Ignore Extend|Format|ZWJ
-		if is(_mergedExtendFormatZWJ, r) {
+		if is(_ExtendǀFormatǀZWJ, r) {
 			continue
 		}
 
@@ -339,7 +339,7 @@ func (sc *Scanner) seekPreviousIndex(pos int, rts ...*unicode.RangeTable) int {
 		r := sc.buffer[i]
 
 		// Ignore Extend|Format|ZWJ
-		if is(_mergedExtendFormatZWJ, r) {
+		if is(_ExtendǀFormatǀZWJ, r) {
 			continue
 		}
 

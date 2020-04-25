@@ -1380,7 +1380,7 @@ var _Upper = &unicode.RangeTable{
 	LatinOffset: 3,
 }
 
-// a 'denormalized' range table for perf and readability
+// _mergedCloseSpParaSep is a merged (denormalized) range table for perf and readability
 var _mergedCloseSpParaSep = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x9, 0xd, 1},
@@ -1436,7 +1436,7 @@ var _mergedCloseSpParaSep = &unicode.RangeTable{
 	LatinOffset: 8,
 }
 
-// a 'denormalized' range table for perf and readability
+// _mergedExtendFormat is a merged (denormalized) range table for perf and readability
 var _mergedExtendFormat = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xad, 0xad, 1},
@@ -1729,7 +1729,7 @@ var _mergedExtendFormat = &unicode.RangeTable{
 	LatinOffset: 1,
 }
 
-// a 'denormalized' range table for perf and readability
+// _mergedOLetterUpperLowerParaSepSATerm is a merged (denormalized) range table for perf and readability
 var _mergedOLetterUpperLowerParaSepSATerm = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xa, 0xd, 3},
@@ -2373,7 +2373,7 @@ var _mergedOLetterUpperLowerParaSepSATerm = &unicode.RangeTable{
 	LatinOffset: 10,
 }
 
-// a 'denormalized' range table for perf and readability
+// _mergedParaSep is a merged (denormalized) range table for perf and readability
 var _mergedParaSep = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0xa, 0xd, 3},
@@ -2383,7 +2383,7 @@ var _mergedParaSep = &unicode.RangeTable{
 	LatinOffset: 1,
 }
 
-// a 'denormalized' range table for perf and readability
+// _mergedSATerm is a merged (denormalized) range table for perf and readability
 var _mergedSATerm = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x21, 0x2e, 13},
@@ -2453,7 +2453,7 @@ var _mergedSATerm = &unicode.RangeTable{
 	LatinOffset: 2,
 }
 
-// a 'denormalized' range table for perf and readability
+// _mergedSContinueSATerm is a merged (denormalized) range table for perf and readability
 var _mergedSContinueSATerm = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x21, 0x21, 1},
@@ -2537,7 +2537,7 @@ var _mergedSContinueSATerm = &unicode.RangeTable{
 	LatinOffset: 3,
 }
 
-// a 'denormalized' range table for perf and readability
+// _mergedSpParaSep is a merged (denormalized) range table for perf and readability
 var _mergedSpParaSep = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x9, 0xd, 1},
@@ -2551,7 +2551,7 @@ var _mergedSpParaSep = &unicode.RangeTable{
 	LatinOffset: 2,
 }
 
-// a 'denormalized' range table for perf and readability
+// _mergedUpperLower is a merged (denormalized) range table for perf and readability
 var _mergedUpperLower = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x41, 0x5a, 1},

@@ -959,7 +959,7 @@ var _ZWJ = &unicode.RangeTable{
 	},
 }
 
-// a 'denormalized' range table for perf and readability
+// _mergedControlCRLF is a merged (denormalized) range table for perf and readability
 var _mergedControlCRLF = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x0, 0x1f, 1},
@@ -983,7 +983,7 @@ var _mergedControlCRLF = &unicode.RangeTable{
 	LatinOffset: 2,
 }
 
-// a 'denormalized' range table for perf and readability
+// _mergedExtendZWJ is a merged (denormalized) range table for perf and readability
 var _mergedExtendZWJ = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x300, 0x36f, 1},
@@ -1288,7 +1288,7 @@ var _mergedExtendZWJ = &unicode.RangeTable{
 	},
 }
 
-// a 'denormalized' range table for perf and readability
+// _mergedLVLVLVT is a merged (denormalized) range table for perf and readability
 var _mergedLVLVLVT = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x1100, 0x11a7, 1},
@@ -1298,7 +1298,7 @@ var _mergedLVLVLVT = &unicode.RangeTable{
 	},
 }
 
-// a 'denormalized' range table for perf and readability
+// _mergedLVTT is a merged (denormalized) range table for perf and readability
 var _mergedLVTT = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x11a8, 0x11ff, 1},
@@ -1705,7 +1705,7 @@ var _mergedLVTT = &unicode.RangeTable{
 	},
 }
 
-// a 'denormalized' range table for perf and readability
+// _mergedLVV is a merged (denormalized) range table for perf and readability
 var _mergedLVV = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x1160, 0x11a7, 1},
@@ -1714,7 +1714,7 @@ var _mergedLVV = &unicode.RangeTable{
 	},
 }
 
-// a 'denormalized' range table for perf and readability
+// _mergedVT is a merged (denormalized) range table for perf and readability
 var _mergedVT = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x1160, 0x11ff, 1},

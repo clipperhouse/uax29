@@ -104,47 +104,51 @@ func generate(prop prop) error {
 		rangeTables["MidNumLetQ"] = rangetable.Merge(rangeTables["MidNumLet"], rangetable.New('\''))
 
 		// an optimization for wb3a
-		rangeTables["mergedCRLFNewline"] = rangetable.Merge(
+		rangeTables["CRǀLFǀNewline"] = rangetable.Merge(
 			rangeTables["CR"],
 			rangeTables["LF"],
 			rangeTables["Newline"],
 		)
 
 		// an optimization for wb4 and subsequent
-		rangeTables["mergedExtendFormatZWJ"] = rangetable.Merge(
+		rangeTables["ExtendǀFormatǀZWJ"] = rangetable.Merge(
 			rangeTables["Extend"],
 			rangeTables["Format"],
 			rangeTables["ZWJ"],
 		)
 
 		// an optimization for wb6
-		rangeTables["mergedMidLetterMidNumLetQ"] = rangetable.Merge(
+		rangeTables["MidLetterǀMidNumLetQ"] = rangetable.Merge(
 			rangeTables["MidLetter"],
 			rangeTables["MidNumLetQ"],
 		)
 
 		// an optimization for wb7
-		rangeTables["mergedAHLetterExtendFormatZWJ"] = rangetable.Merge(
+		rangeTables["AHLetterǀExtendǀFormatǀZWJ"] = rangetable.Merge(
 			rangeTables["AHLetter"],
-			rangeTables["mergedExtendFormatZWJ"],
+			rangeTables["Extend"],
+			rangeTables["Format"],
+			rangeTables["ZWJ"],
 		)
 
 		// an optimization for wb11
-		rangeTables["mergedMidNumMidNumLetQ"] = rangetable.Merge(
+		rangeTables["MidNumǀMidNumLetQ"] = rangetable.Merge(
 			rangeTables["MidNum"],
 			rangeTables["MidNumLetQ"],
 		)
 
 		// an optimization for wb13b
-		rangeTables["mergedAHLetterNumericKatakana"] = rangetable.Merge(
+		rangeTables["AHLetterǀNumericǀKatakana"] = rangetable.Merge(
 			rangeTables["AHLetter"],
 			rangeTables["Numeric"],
 			rangeTables["Katakana"],
 		)
 
 		// an optimization for wb13a
-		rangeTables["mergedAHLetterNumericKatakanaExtendNumLet"] = rangetable.Merge(
-			rangeTables["mergedAHLetterNumericKatakana"],
+		rangeTables["AHLetterǀNumericǀKatakanaǀExtendNumLet"] = rangetable.Merge(
+			rangeTables["AHLetter"],
+			rangeTables["Numeric"],
+			rangeTables["Katakana"],
 			rangeTables["ExtendNumLet"],
 		)
 	}
@@ -289,7 +293,7 @@ func write(prop prop, rts map[string]*unicode.RangeTable) error {
 	fmt.Fprintf(&buf, "var (\n")
 	fmt.Fprintf(&buf, "\t// See https://unicode.org/reports/tr29/\n")
 	for _, category := range categories {
-		if strings.HasPrefix(category, "merged") {
+		if strings.HasPrefix(category, "merged") || strings.Contains(category, "ǀ") {
 			// Skip the merged cateogries
 			continue
 		}
@@ -299,8 +303,8 @@ func write(prop prop, rts map[string]*unicode.RangeTable) error {
 
 	for _, category := range categories {
 		rt := rts[category]
-		if strings.HasPrefix(category, "merged") {
-			fmt.Fprintln(&buf, "// a 'denormalized' range table for perf and readability")
+		if strings.HasPrefix(category, "merged") || strings.Contains(category, "ǀ") {
+			fmt.Fprintf(&buf, "// _%s is a merged (denormalized) range table for perf and readability\n", category)
 		}
 		fmt.Fprintf(&buf, "var _%s = ", category)
 		print(&buf, rt)
