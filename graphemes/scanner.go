@@ -77,44 +77,132 @@ func (sc *Scanner) Scan() bool {
 			sc.buffer = append(sc.buffer, r)
 		}
 
-		switch {
-		case sc.gb1():
-			// true indicates continue
-			sc.accept()
-			continue
-		case sc.gb2():
-			// true indicates break
-			break
-		case
-			sc.gb3():
-			// true indicates continue
-			sc.accept()
-			continue
-		case
-			sc.gb4(),
-			sc.gb5():
-			// true indicates break
-			break
-		case
-			sc.gb6(),
-			sc.gb7(),
-			sc.gb8(),
-			sc.gb9(),
-			sc.gb9a(),
-			sc.gb9b(),
-			sc.gb11(),
-			sc.gb12(),
-			sc.gb13():
-			// true indicates continue
+		sot := sc.pos == 0 // "start of text"
+		eof := len(sc.buffer) == sc.pos
+
+		// GB1
+		if sot && !eof {
 			sc.accept()
 			continue
 		}
 
+		// GB2
+		if eof {
+			break
+		}
+
+		current := sc.buffer[sc.pos]
+		previous := sc.buffer[sc.pos-1]
+
+		// GB3
+		if is(LF, current) && is(CR, previous) {
+			sc.accept()
+			continue
+		}
+
+		// GB4
+		if is(_mergedControlCRLF, previous) {
+			break
+		}
+
+		// GB5
+		if is(_mergedControlCRLF, current) {
+			break
+		}
+
+		// GB6
+		if is(_mergedLVLVLVT, current) && is(L, previous) {
+			sc.accept()
+			continue
+		}
+
+		// GB7
+		if is(_mergedVT, current) && is(_mergedLVV, previous) {
+			sc.accept()
+			continue
+		}
+
+		// GB8
+		if is(T, current) && is(_mergedLVTT, previous) {
+			sc.accept()
+			continue
+		}
+
+		// GB9
+		if is(_mergedExtendZWJ, current) {
+			sc.accept()
+			continue
+		}
+
+		// GB9a
+		if is(SpacingMark, current) {
+			sc.accept()
+			continue
+		}
+
+		// GB9b
+		if is(Prepend, previous) {
+			sc.accept()
+			continue
+		}
+
+		// GB11
+		if is(emoji.Extended_Pictographic, current) && is(ZWJ, previous) && sc.seekPrevious(sc.pos-1, emoji.Extended_Pictographic) {
+			sc.accept()
+			continue
+		}
+
+		// GB12
+		if is(Regional_Indicator, current) {
+			// Buffer comprised entirely of an odd number of RI
+			ok := true
+			count := 0
+			for i := sc.pos - 1; i >= 0; i-- {
+				r := sc.buffer[i]
+				if !is(Regional_Indicator, r) {
+					ok = false
+				}
+				count++
+			}
+
+			if ok {
+				// If we fall through, we've seen the whole buffer,
+				// so it's all Regional_Indicator
+				odd := count > 0 && count%2 == 1
+				if odd {
+					sc.accept()
+					continue
+				}
+			}
+		}
+
+		// GB13
+		if is(Regional_Indicator, current) {
+			// Last n runes represent an odd number of RI
+			ok := false
+			count := 0
+			for i := sc.pos - 1; i >= 0; i-- {
+				r := sc.buffer[i]
+				if !is(Regional_Indicator, r) {
+					odd := count > 0 && count%2 == 1
+					ok = odd
+					break
+				}
+				count++
+			}
+
+			if ok {
+				sc.accept()
+				continue
+			}
+		}
+
+		// WB999
 		// If we fall through all the above rules, it's a break
 		break
 	}
 
-	return sc.gb999()
+	return sc.token()
 }
 
 // Bytes returns the current token as a byte slice, after a successful call to Scan
@@ -136,109 +224,6 @@ func (sc *Scanner) Err() error {
 // In most cases, returning true means 'keep going'; check the name of the return var for clarity
 
 var is = unicode.Is
-
-// gb1 implements https://unicode.org/reports/tr29/#GB1
-func (sc *Scanner) gb1() (accept bool) {
-	sot := sc.pos == 0 // "start of text"
-	eof := len(sc.buffer) == sc.pos
-	return sot && !eof
-}
-
-// gb2 implements https://unicode.org/reports/tr29/#GB2
-func (sc *Scanner) gb2() (breaking bool) {
-	// eof
-	return len(sc.buffer) == sc.pos
-}
-
-// gb3 implements https://unicode.org/reports/tr29/#GB3
-func (sc *Scanner) gb3() (accept bool) {
-	current := sc.buffer[sc.pos]
-	if !is(LF, current) {
-		return false
-	}
-
-	previous := sc.buffer[sc.pos-1]
-	return is(CR, previous)
-}
-
-// gb4 implements https://unicode.org/reports/tr29/#GB4
-func (sc *Scanner) gb4() (breaking bool) {
-	previous := sc.buffer[sc.pos-1]
-	return is(_mergedControlCRLF, previous)
-}
-
-// gb5 implements https://unicode.org/reports/tr29/#GB5
-func (sc *Scanner) gb5() (breaking bool) {
-	current := sc.buffer[sc.pos]
-	return is(_mergedControlCRLF, current)
-}
-
-// gb6 implements https://unicode.org/reports/tr29/#GB6
-func (sc *Scanner) gb6() (accept bool) {
-	if sc.pos < 1 {
-		return false
-	}
-
-	current := sc.buffer[sc.pos]
-	if !is(_mergedLVLVLVT, current) {
-		return false
-	}
-
-	previous := sc.buffer[sc.pos-1]
-	return is(L, previous)
-}
-
-// gb7 implements https://unicode.org/reports/tr29/#GB7
-func (sc *Scanner) gb7() (accept bool) {
-	if sc.pos < 1 {
-		return false
-	}
-
-	current := sc.buffer[sc.pos]
-	if !is(_mergedVT, current) {
-		return false
-	}
-
-	previous := sc.buffer[sc.pos-1]
-	return is(_mergedLVV, previous)
-}
-
-// gb8 implements https://unicode.org/reports/tr29/#GB8
-func (sc *Scanner) gb8() (accept bool) {
-	if sc.pos < 1 {
-		return false
-	}
-
-	current := sc.buffer[sc.pos]
-	if !is(T, current) {
-		return false
-	}
-
-	previous := sc.buffer[sc.pos-1]
-	return is(_mergedLVTT, previous)
-}
-
-// gb9 implements https://unicode.org/reports/tr29/#GB9
-func (sc *Scanner) gb9() (accept bool) {
-	current := sc.buffer[sc.pos]
-	return is(_mergedExtendZWJ, current)
-}
-
-// gb9 implements https://unicode.org/reports/tr29/#GB9a
-func (sc *Scanner) gb9a() (accept bool) {
-	current := sc.buffer[sc.pos]
-	return is(SpacingMark, current)
-}
-
-// gb9 implements https://unicode.org/reports/tr29/#GB9b
-func (sc *Scanner) gb9b() (accept bool) {
-	if sc.pos < 1 {
-		return false
-	}
-
-	previous := sc.buffer[sc.pos-1]
-	return is(Prepend, previous)
-}
 
 // seekPreviousIndex works backward until it hits a rune satisfying one of the range tables,
 // ignoring Extend, and returns the index of the rune in the buffer
@@ -274,72 +259,9 @@ func (sc *Scanner) seekPrevious(pos int, rts ...*unicode.RangeTable) bool {
 	return sc.seekPreviousIndex(pos, rts...) >= 0
 }
 
-// gb11 implements https://unicode.org/reports/tr29/#GB11
-func (sc *Scanner) gb11() (accept bool) {
-	if sc.pos < 2 {
-		return false
-	}
-
-	current := sc.buffer[sc.pos]
-	if !is(emoji.Extended_Pictographic, current) {
-		return false
-	}
-
-	previous := sc.buffer[sc.pos-1]
-	if !is(ZWJ, previous) {
-		return false
-	}
-
-	return sc.seekPrevious(sc.pos-1, emoji.Extended_Pictographic)
-}
-
-// gb12 implements https://unicode.org/reports/tr29/#GB12
-func (sc *Scanner) gb12() (accept bool) {
-	current := sc.buffer[sc.pos]
-	if !is(Regional_Indicator, current) {
-		return false
-	}
-
-	// Buffer comprised entirely of an odd number of RI
-	count := 0
-	for i := sc.pos - 1; i >= 0; i-- {
-		r := sc.buffer[i]
-		if !is(Regional_Indicator, r) {
-			return false
-		}
-		count++
-	}
-
-	// If we fall through, we've seen the whole buffer,
-	// so it's all Regional_Indicator
-	odd := count > 0 && count%2 == 1
-	return odd
-}
-
-// gb13 implements https://unicode.org/reports/tr29/#GB13
-func (sc *Scanner) gb13() (accept bool) {
-	current := sc.buffer[sc.pos]
-	if !is(Regional_Indicator, current) {
-		return false
-	}
-
-	// Last n runes represent an odd number of RI
-	count := 0
-	for i := sc.pos - 1; i >= 0; i-- {
-		r := sc.buffer[i]
-		if !is(Regional_Indicator, r) {
-			odd := count > 0 && count%2 == 1
-			return odd
-		}
-		count++
-	}
-
-	return false
-}
-
 // gb999 implements https://unicode.org/reports/tr29/#GB999
 // i.e. break
-func (sc *Scanner) gb999() bool {
+func (sc *Scanner) token() bool {
 	sc.bytes = sc.bb.Bytes()
 	return len(sc.bytes) > 0
 }
