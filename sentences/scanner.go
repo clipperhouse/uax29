@@ -74,7 +74,7 @@ func (sc *Scanner) Scan() bool {
 		sot := sc.pos == 0 // "start of text"
 		eof := len(sc.buffer) == sc.pos
 		if sot && !eof {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
@@ -88,7 +88,7 @@ func (sc *Scanner) Scan() bool {
 
 		// SB3
 		if is(LF, current) && is(CR, previous) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
@@ -99,13 +99,13 @@ func (sc *Scanner) Scan() bool {
 
 		// SB5
 		if is(_mergedExtendFormat, current) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// SB6
 		if is(Numeric, current) && sc.seekPrevious(sc.pos, ATerm) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
@@ -113,7 +113,7 @@ func (sc *Scanner) Scan() bool {
 		if is(Upper, current) {
 			previousIndex := sc.seekPreviousIndex(sc.pos, ATerm)
 			if previousIndex >= 0 && sc.seekPrevious(previousIndex, _mergedUpperLower) {
-				sc.accept()
+				sc.pos++
 				continue
 			}
 		}
@@ -153,7 +153,7 @@ func (sc *Scanner) Scan() bool {
 				}
 
 				if sc.seekPrevious(pos, ATerm) {
-					sc.accept()
+					sc.pos++
 					continue
 				}
 			}
@@ -182,7 +182,7 @@ func (sc *Scanner) Scan() bool {
 			}
 
 			if sc.seekPrevious(pos, _mergedSATerm) {
-				sc.accept()
+				sc.pos++
 				continue
 			}
 		}
@@ -201,7 +201,7 @@ func (sc *Scanner) Scan() bool {
 			}
 
 			if sc.seekPrevious(pos, _mergedSATerm) {
-				sc.accept()
+				sc.pos++
 				continue
 			}
 		}
@@ -229,7 +229,7 @@ func (sc *Scanner) Scan() bool {
 			}
 
 			if sc.seekPrevious(pos, _mergedSATerm) {
-				sc.accept()
+				sc.pos++
 				continue
 			}
 		}
@@ -268,7 +268,7 @@ func (sc *Scanner) Scan() bool {
 
 		// SB998
 		if sc.pos > 0 {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
@@ -366,11 +366,6 @@ func (sc *Scanner) token() bool {
 	}
 	sc.bytes = bb.Bytes()
 	return len(sc.bytes) > 0
-}
-
-// accept forwards the buffer cursor (pos) by 1
-func (sc *Scanner) accept() {
-	sc.pos++
 }
 
 // readRune gets the next rune, advancing the reader
