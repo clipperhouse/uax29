@@ -77,7 +77,7 @@ func (sc *Scanner) Scan() bool {
 
 		// GB1
 		if sot && !eof {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
@@ -91,7 +91,7 @@ func (sc *Scanner) Scan() bool {
 
 		// GB3
 		if is(LF, current) && is(CR, previous) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
@@ -107,43 +107,43 @@ func (sc *Scanner) Scan() bool {
 
 		// GB6
 		if is(_mergedLVLVLVT, current) && is(L, previous) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// GB7
 		if is(_mergedVT, current) && is(_mergedLVV, previous) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// GB8
 		if is(T, current) && is(_mergedLVTT, previous) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// GB9
 		if is(_mergedExtendZWJ, current) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// GB9a
 		if is(SpacingMark, current) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// GB9b
 		if is(Prepend, previous) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// GB11
 		if is(emoji.Extended_Pictographic, current) && is(ZWJ, previous) && sc.seekPrevious(sc.pos-1, emoji.Extended_Pictographic) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
@@ -165,7 +165,7 @@ func (sc *Scanner) Scan() bool {
 				// so it's all Regional_Indicator
 				odd := count > 0 && count%2 == 1
 				if odd {
-					sc.accept()
+					sc.pos++
 					continue
 				}
 			}
@@ -187,7 +187,7 @@ func (sc *Scanner) Scan() bool {
 			}
 
 			if ok {
-				sc.accept()
+				sc.pos++
 				continue
 			}
 		}
@@ -263,11 +263,6 @@ func (sc *Scanner) token() bool {
 	}
 	sc.bytes = bb.Bytes()
 	return len(sc.bytes) > 0
-}
-
-// accept forwards the buffer cursor (pos) by 1
-func (sc *Scanner) accept() {
-	sc.pos++
 }
 
 // readRune gets the next rune, advancing the reader
