@@ -35,8 +35,6 @@ type Scanner struct {
 	// a cursor for runes in the buffer
 	pos int
 
-	bb bytes.Buffer
-
 	// outputs
 	bytes []byte
 	err   error
@@ -49,9 +47,6 @@ func (sc *Scanner) reset() {
 	sc.buffer = sc.buffer[:len(sc.buffer)-sc.pos]
 
 	sc.pos = 0
-
-	var bb bytes.Buffer
-	sc.bb = bb
 
 	sc.bytes = nil
 	sc.err = nil
@@ -365,13 +360,16 @@ func (sc *Scanner) seekPrevious(pos int, rts ...*unicode.RangeTable) bool {
 }
 
 func (sc *Scanner) token() bool {
-	sc.bytes = sc.bb.Bytes()
+	var bb bytes.Buffer
+	for _, r := range sc.buffer[:sc.pos] {
+		bb.WriteRune(r)
+	}
+	sc.bytes = bb.Bytes()
 	return len(sc.bytes) > 0
 }
 
 // accept forwards the buffer cursor (pos) by 1
 func (sc *Scanner) accept() {
-	sc.bb.WriteRune(sc.buffer[sc.pos])
 	sc.pos++
 }
 
