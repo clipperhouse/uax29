@@ -70,6 +70,8 @@ func (sc *Scanner) Scan() bool {
 			sc.buffer = append(sc.buffer, r)
 		}
 
+		// Rules: https://unicode.org/reports/tr29/#Sentence_Boundary_Rules
+
 		// SB1
 		sot := sc.pos == 0 // "start of text"
 		eof := len(sc.buffer) == sc.pos

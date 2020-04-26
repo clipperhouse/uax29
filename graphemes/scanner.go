@@ -72,6 +72,8 @@ func (sc *Scanner) Scan() bool {
 			sc.buffer = append(sc.buffer, r)
 		}
 
+		// Rules: https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundary_Rules
+
 		sot := sc.pos == 0 // "start of text"
 		eof := len(sc.buffer) == sc.pos
 
