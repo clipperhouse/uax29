@@ -75,41 +75,204 @@ func (sc *Scanner) Scan() bool {
 			sc.buffer = append(sc.buffer, r)
 		}
 
-		switch {
-		case sc.sb1():
-			// true indicates continue
+		// SB1
+		sot := sc.pos == 0 // "start of text"
+		eof := len(sc.buffer) == sc.pos
+		if sot && !eof {
 			sc.accept()
 			continue
-		case sc.sb2():
-			// true indicates break
+		}
+
+		// SB2
+		if eof {
 			break
-		case
-			sc.sb3():
-			// true indicates continue
+		}
+
+		current := sc.buffer[sc.pos]
+		previous := sc.buffer[sc.pos-1]
+
+		// SB3
+		if is(LF, current) && is(CR, previous) {
 			sc.accept()
 			continue
-		case
-			sc.sb4():
-			// true indicates break
+		}
+
+		// SB4
+		if is(_mergedParaSep, previous) {
 			break
-		case
-			sc.sb5(),
-			sc.sb6(),
-			sc.sb7(),
-			sc.sb8(),
-			sc.sb8a(),
-			sc.sb9(),
-			sc.sb10():
-			// true indicates continue
+		}
+
+		// SB5
+		if is(_mergedExtendFormat, current) {
 			sc.accept()
 			continue
-		case
-			sc.sb11():
-			// true indicates break
-			break
-		case
-			sc.sb998():
-			// true indicates continue
+		}
+
+		// SB6
+		if is(Numeric, current) && sc.seekPrevious(sc.pos, ATerm) {
+			sc.accept()
+			continue
+		}
+
+		// SB7
+		if is(Upper, current) {
+			previousIndex := sc.seekPreviousIndex(sc.pos, ATerm)
+			if previousIndex >= 0 && sc.seekPrevious(previousIndex, _mergedUpperLower) {
+				sc.accept()
+				continue
+			}
+		}
+
+		// SB8
+		{
+			// This loop is the 'regex':
+			// ( ¬(OLetter | Upper | Lower | ParaSep | SATerm) )*
+			pos := sc.pos
+			for pos < len(sc.buffer) {
+				current := sc.buffer[pos]
+				if is(_mergedOLetterUpperLowerParaSepSATerm, current) {
+					break
+				}
+				pos++
+			}
+
+			if sc.seekForward(pos-1, Lower) {
+				pos := sc.pos
+
+				sp := pos
+				for {
+					sp = sc.seekPreviousIndex(sp, Sp)
+					if sp < 0 {
+						break
+					}
+					pos = sp
+				}
+
+				close := pos
+				for {
+					close = sc.seekPreviousIndex(close, Close)
+					if close < 0 {
+						break
+					}
+					pos = close
+				}
+
+				if sc.seekPrevious(pos, ATerm) {
+					sc.accept()
+					continue
+				}
+			}
+		}
+
+		// SB8a
+		if is(_mergedSContinueSATerm, current) {
+			pos := sc.pos
+
+			sp := pos
+			for {
+				sp = sc.seekPreviousIndex(sp, Sp)
+				if sp < 0 {
+					break
+				}
+				pos = sp
+			}
+
+			close := pos
+			for {
+				close = sc.seekPreviousIndex(close, Close)
+				if close < 0 {
+					break
+				}
+				pos = close
+			}
+
+			if sc.seekPrevious(pos, _mergedSATerm) {
+				sc.accept()
+				continue
+			}
+		}
+
+		// SB9
+		if is(_mergedCloseSpParaSep, current) {
+			pos := sc.pos
+
+			close := pos
+			for {
+				close = sc.seekPreviousIndex(close, Close)
+				if close < 0 {
+					break
+				}
+				pos = close
+			}
+
+			if sc.seekPrevious(pos, _mergedSATerm) {
+				sc.accept()
+				continue
+			}
+		}
+
+		// SB10
+		if is(_mergedSpParaSep, current) {
+			pos := sc.pos
+
+			sp := pos
+			for {
+				sp = sc.seekPreviousIndex(sp, Sp)
+				if sp < 0 {
+					break
+				}
+				pos = sp
+			}
+
+			close := pos
+			for {
+				close = sc.seekPreviousIndex(close, Close)
+				if close < 0 {
+					break
+				}
+				pos = close
+			}
+
+			if sc.seekPrevious(pos, _mergedSATerm) {
+				sc.accept()
+				continue
+			}
+		}
+
+		// SB11
+		{
+			pos := sc.pos
+
+			ps := sc.seekPreviousIndex(pos, _mergedSpParaSep)
+			if ps >= 0 {
+				pos = ps
+			}
+
+			sp := pos
+			for {
+				sp = sc.seekPreviousIndex(sp, Sp)
+				if sp < 0 {
+					break
+				}
+				pos = sp
+			}
+
+			close := pos
+			for {
+				close = sc.seekPreviousIndex(close, Close)
+				if close < 0 {
+					break
+				}
+				pos = close
+			}
+
+			if sc.seekPrevious(pos, _mergedSATerm) {
+				break
+			}
+		}
+
+		// SB998
+		if sc.pos > 0 {
 			sc.accept()
 			continue
 		}
@@ -118,7 +281,7 @@ func (sc *Scanner) Scan() bool {
 		break
 	}
 
-	return sc.emit()
+	return sc.token()
 }
 
 // Bytes returns the current token as a byte slice, after a successful call to Scan
@@ -140,42 +303,6 @@ func (sc *Scanner) Err() error {
 // In most cases, returning true means 'keep going'; check the name of the return var for clarity
 
 var is = unicode.Is
-
-// sb1 implements https://unicode.org/reports/tr29/#SB1
-func (sc *Scanner) sb1() (accept bool) {
-	sot := sc.pos == 0 // "start of text"
-	eof := len(sc.buffer) == sc.pos
-	return sot && !eof
-}
-
-// sb2 implements https://unicode.org/reports/tr29/#SB2
-func (sc *Scanner) sb2() (breaking bool) {
-	// eof
-	return len(sc.buffer) == sc.pos
-}
-
-// sb3 implements https://unicode.org/reports/tr29/#SB3
-func (sc *Scanner) sb3() (accept bool) {
-	current := sc.buffer[sc.pos]
-	if !is(LF, current) {
-		return false
-	}
-
-	previous := sc.buffer[sc.pos-1]
-	return is(CR, previous)
-}
-
-// sb4 implements https://unicode.org/reports/tr29/#SB4
-func (sc *Scanner) sb4() (breaking bool) {
-	previous := sc.buffer[sc.pos-1]
-	return is(_mergedParaSep, previous)
-}
-
-// sb5 implements https://unicode.org/reports/tr29/#SB5
-func (sc *Scanner) sb5() (accept bool) {
-	current := sc.buffer[sc.pos]
-	return is(_mergedExtendFormat, current)
-}
 
 // seekForward looks ahead until it hits a rune satisfying one of the range tables,
 // ignoring Extend|Format
@@ -237,188 +364,7 @@ func (sc *Scanner) seekPrevious(pos int, rts ...*unicode.RangeTable) bool {
 	return sc.seekPreviousIndex(pos, rts...) >= 0
 }
 
-// sb6 implements https://unicode.org/reports/tr29/#SB6
-func (sc *Scanner) sb6() (accept bool) {
-	current := sc.buffer[sc.pos]
-	if !is(Numeric, current) {
-		return false
-	}
-
-	return sc.seekPrevious(sc.pos, ATerm)
-}
-
-// sb7 implements https://unicode.org/reports/tr29/#SB7
-func (sc *Scanner) sb7() (accept bool) {
-	current := sc.buffer[sc.pos]
-	if !is(Upper, current) {
-		return false
-	}
-
-	previous := sc.seekPreviousIndex(sc.pos, ATerm)
-	if previous < 0 {
-		return false
-	}
-
-	return sc.seekPrevious(previous, _mergedUpperLower)
-}
-
-// sb8 implements https://unicode.org/reports/tr29/#SB8
-func (sc *Scanner) sb8() (accept bool) {
-	// This loop is the 'regex':
-	// ( ¬(OLetter | Upper | Lower | ParaSep | SATerm) )*
-	pos := sc.pos
-	for pos < len(sc.buffer) {
-		current := sc.buffer[pos]
-		if is(_mergedOLetterUpperLowerParaSepSATerm, current) {
-			break
-		}
-		pos++
-	}
-
-	if !sc.seekForward(pos-1, Lower) {
-		return false
-	}
-
-	pos = sc.pos
-
-	sp := pos
-	for {
-		sp = sc.seekPreviousIndex(sp, Sp)
-		if sp < 0 {
-			break
-		}
-		pos = sp
-	}
-
-	close := pos
-	for {
-		close = sc.seekPreviousIndex(close, Close)
-		if close < 0 {
-			break
-		}
-		pos = close
-	}
-
-	return sc.seekPrevious(pos, ATerm)
-}
-
-// sb8a implements https://unicode.org/reports/tr29/#SB8a
-func (sc *Scanner) sb8a() (accept bool) {
-	current := sc.buffer[sc.pos]
-	if !is(_mergedSContinueSATerm, current) {
-		return false
-	}
-
-	pos := sc.pos
-
-	sp := pos
-	for {
-		sp = sc.seekPreviousIndex(sp, Sp)
-		if sp < 0 {
-			break
-		}
-		pos = sp
-	}
-
-	close := pos
-	for {
-		close = sc.seekPreviousIndex(close, Close)
-		if close < 0 {
-			break
-		}
-		pos = close
-	}
-
-	return sc.seekPrevious(pos, _mergedSATerm)
-}
-
-// sb9 implements https://unicode.org/reports/tr29/#SB9
-func (sc *Scanner) sb9() (accept bool) {
-	current := sc.buffer[sc.pos]
-	if !is(_mergedCloseSpParaSep, current) {
-		return false
-	}
-
-	pos := sc.pos
-
-	close := pos
-	for {
-		close = sc.seekPreviousIndex(close, Close)
-		if close < 0 {
-			break
-		}
-		pos = close
-	}
-
-	return sc.seekPrevious(pos, _mergedSATerm)
-}
-
-// sb10 implements https://unicode.org/reports/tr29/#SB10
-func (sc *Scanner) sb10() (accept bool) {
-	current := sc.buffer[sc.pos]
-	if !is(_mergedSpParaSep, current) {
-		return false
-	}
-
-	pos := sc.pos
-
-	sp := pos
-	for {
-		sp = sc.seekPreviousIndex(sp, Sp)
-		if sp < 0 {
-			break
-		}
-		pos = sp
-	}
-
-	close := pos
-	for {
-		close = sc.seekPreviousIndex(close, Close)
-		if close < 0 {
-			break
-		}
-		pos = close
-	}
-
-	return sc.seekPrevious(pos, _mergedSATerm)
-}
-
-// sb11 implements https://unicode.org/reports/tr29/#SB11
-func (sc *Scanner) sb11() (breaking bool) {
-	pos := sc.pos
-
-	ps := sc.seekPreviousIndex(pos, _mergedSpParaSep)
-	if ps >= 0 {
-		pos = ps
-	}
-
-	sp := pos
-	for {
-		sp = sc.seekPreviousIndex(sp, Sp)
-		if sp < 0 {
-			break
-		}
-		pos = sp
-	}
-
-	close := pos
-	for {
-		close = sc.seekPreviousIndex(close, Close)
-		if close < 0 {
-			break
-		}
-		pos = close
-	}
-
-	return sc.seekPrevious(pos, _mergedSATerm)
-}
-
-// sb998 implements https://unicode.org/reports/tr29/#SB998
-func (sc *Scanner) sb998() bool {
-	return sc.pos > 0
-}
-
-func (sc *Scanner) emit() bool {
+func (sc *Scanner) token() bool {
 	sc.bytes = sc.bb.Bytes()
 	return len(sc.bytes) > 0
 }
