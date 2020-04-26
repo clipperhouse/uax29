@@ -79,7 +79,7 @@ func (sc *Scanner) Scan() bool {
 
 		// WB1
 		if sot && !eof {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
@@ -93,7 +93,7 @@ func (sc *Scanner) Scan() bool {
 
 		// WB3
 		if is(LF, current) && is(CR, previous) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
@@ -109,31 +109,31 @@ func (sc *Scanner) Scan() bool {
 
 		// WB3c
 		if is(emoji.Extended_Pictographic, current) && is(ZWJ, previous) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// WB3d
 		if is(WSegSpace, current) && is(WSegSpace, previous) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// WB4
 		if is(_ExtendǀFormatǀZWJ, current) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// WB5
 		if is(AHLetter, current) && sc.seekPrevious(sc.pos, AHLetter) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// WB6
 		if is(_MidLetterǀMidNumLetQ, current) && sc.seekForward(AHLetter) && sc.seekPrevious(sc.pos, AHLetter) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
@@ -141,20 +141,20 @@ func (sc *Scanner) Scan() bool {
 		if is(AHLetter, current) {
 			previousIndex := sc.seekPreviousIndex(sc.pos, _MidLetterǀMidNumLetQ)
 			if previousIndex >= 0 && sc.seekPrevious(previousIndex, AHLetter) {
-				sc.accept()
+				sc.pos++
 				continue
 			}
 		}
 
 		// WB7a
 		if is(Single_Quote, current) && sc.seekPrevious(sc.pos, Hebrew_Letter) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// WB7b
 		if is(Double_Quote, current) && sc.seekForward(Hebrew_Letter) && sc.seekPrevious(sc.pos, Hebrew_Letter) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
@@ -162,26 +162,26 @@ func (sc *Scanner) Scan() bool {
 		if is(Hebrew_Letter, current) {
 			previousIndex := sc.seekPreviousIndex(sc.pos, Double_Quote)
 			if previousIndex >= 0 && sc.seekPrevious(previousIndex, Hebrew_Letter) {
-				sc.accept()
+				sc.pos++
 				continue
 			}
 		}
 
 		// WB8
 		if is(Numeric, current) && sc.seekPrevious(sc.pos, Numeric) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// WB9
 		if is(Numeric, current) && sc.seekPrevious(sc.pos, AHLetter) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// WB10
 		if is(AHLetter, current) && sc.seekPrevious(sc.pos, Numeric) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
@@ -189,32 +189,32 @@ func (sc *Scanner) Scan() bool {
 		if is(Numeric, current) {
 			previousIndex := sc.seekPreviousIndex(sc.pos, _MidNumǀMidNumLetQ)
 			if previousIndex >= 0 && sc.seekPrevious(previousIndex, Numeric) {
-				sc.accept()
+				sc.pos++
 				continue
 			}
 		}
 
 		// WB12
 		if is(_MidNumǀMidNumLetQ, current) && sc.seekForward(Numeric) && sc.seekPrevious(sc.pos, Numeric) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// WB13
 		if is(Katakana, current) && sc.seekPrevious(sc.pos, Katakana) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// WB13a
 		if is(ExtendNumLet, current) && sc.seekPrevious(sc.pos, _AHLetterǀNumericǀKatakanaǀExtendNumLet) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
 		// WB13b
 		if is(_AHLetterǀNumericǀKatakana, current) && sc.seekPrevious(sc.pos, ExtendNumLet) {
-			sc.accept()
+			sc.pos++
 			continue
 		}
 
@@ -241,7 +241,7 @@ func (sc *Scanner) Scan() bool {
 			if ok {
 				odd := count > 0 && count%2 == 1
 				if odd {
-					sc.accept()
+					sc.pos++
 					continue
 				}
 			}
@@ -266,7 +266,7 @@ func (sc *Scanner) Scan() bool {
 			}
 
 			if ok {
-				sc.accept()
+				sc.pos++
 				continue
 			}
 		}
@@ -367,11 +367,6 @@ func (sc *Scanner) token() bool {
 	}
 	sc.bytes = bb.Bytes()
 	return len(sc.bytes) > 0
-}
-
-// accept forwards the buffer cursor (pos) by 1
-func (sc *Scanner) accept() {
-	sc.pos++
 }
 
 // readRune gets the next rune, advancing the reader
