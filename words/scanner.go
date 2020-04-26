@@ -37,9 +37,6 @@ type Scanner struct {
 	// a cursor for runes in the buffer
 	pos int
 
-	// for accruing bytes to be output
-	bb bytes.Buffer
-
 	// outputs
 	bytes []byte
 	err   error
@@ -52,9 +49,6 @@ func (sc *Scanner) reset() {
 	sc.buffer = sc.buffer[:len(sc.buffer)-sc.pos]
 
 	sc.pos = 0
-
-	var bb bytes.Buffer
-	sc.bb = bb
 
 	sc.bytes = nil
 	sc.err = nil
@@ -277,11 +271,12 @@ func (sc *Scanner) Scan() bool {
 			}
 		}
 
-		// If we fall through all the above rules, it's a word break, aka WB999
+		// WB999
+		// If we fall through all the above rules, it's a word break
 		break
 	}
 
-	return sc.wb999()
+	return sc.token()
 }
 
 // Bytes returns the current token as a byte slice, after a successful call to Scan
@@ -364,16 +359,18 @@ func (sc *Scanner) seekPrevious(pos int, rts ...*unicode.RangeTable) bool {
 	return sc.seekPreviousIndex(pos, rts...) >= 0
 }
 
-// wb999 implements https://unicode.org/reports/tr29/#WB999
-// i.e. word break
-func (sc *Scanner) wb999() bool {
-	sc.bytes = sc.bb.Bytes()
+// token returns the accrued token in the buffer
+func (sc *Scanner) token() bool {
+	var bb bytes.Buffer
+	for _, r := range sc.buffer[:sc.pos] {
+		bb.WriteRune(r)
+	}
+	sc.bytes = bb.Bytes()
 	return len(sc.bytes) > 0
 }
 
 // accept forwards the buffer cursor (pos) by 1
 func (sc *Scanner) accept() {
-	sc.bb.WriteRune(sc.buffer[sc.pos])
 	sc.pos++
 }
 
