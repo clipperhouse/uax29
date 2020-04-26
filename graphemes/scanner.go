@@ -96,35 +96,35 @@ func (sc *Scanner) Scan() bool {
 		}
 
 		// GB4
-		if is(_mergedControlCRLF, previous) {
+		if is(_ControlǀCRǀLF, previous) {
 			break
 		}
 
 		// GB5
-		if is(_mergedControlCRLF, current) {
+		if is(_ControlǀCRǀLF, current) {
 			break
 		}
 
 		// GB6
-		if is(_mergedLVLVLVT, current) && is(L, previous) {
+		if is(_LǀVǀLVǀLVT, current) && is(L, previous) {
 			sc.pos++
 			continue
 		}
 
 		// GB7
-		if is(_mergedVT, current) && is(_mergedLVV, previous) {
+		if is(_VǀT, current) && is(_LVǀV, previous) {
 			sc.pos++
 			continue
 		}
 
 		// GB8
-		if is(T, current) && is(_mergedLVTT, previous) {
+		if is(T, current) && is(_LVTǀT, previous) {
 			sc.pos++
 			continue
 		}
 
 		// GB9
-		if is(_mergedExtendZWJ, current) {
+		if is(_ExtendǀZWJ, current) {
 			sc.pos++
 			continue
 		}

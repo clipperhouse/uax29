@@ -93,12 +93,12 @@ func (sc *Scanner) Scan() bool {
 		}
 
 		// SB4
-		if is(_mergedParaSep, previous) {
+		if is(_ParaSep, previous) {
 			break
 		}
 
 		// SB5
-		if is(_mergedExtendFormat, current) {
+		if is(_ExtendǀFormat, current) {
 			sc.pos++
 			continue
 		}
@@ -112,7 +112,7 @@ func (sc *Scanner) Scan() bool {
 		// SB7
 		if is(Upper, current) {
 			previousIndex := sc.seekPreviousIndex(sc.pos, ATerm)
-			if previousIndex >= 0 && sc.seekPrevious(previousIndex, _mergedUpperLower) {
+			if previousIndex >= 0 && sc.seekPrevious(previousIndex, _UpperǀLower) {
 				sc.pos++
 				continue
 			}
@@ -125,7 +125,7 @@ func (sc *Scanner) Scan() bool {
 			pos := sc.pos
 			for pos < len(sc.buffer) {
 				current := sc.buffer[pos]
-				if is(_mergedOLetterUpperLowerParaSepSATerm, current) {
+				if is(_OLetterǀUpperǀLowerǀParaSepǀSATerm, current) {
 					break
 				}
 				pos++
@@ -160,7 +160,7 @@ func (sc *Scanner) Scan() bool {
 		}
 
 		// SB8a
-		if is(_mergedSContinueSATerm, current) {
+		if is(_SContinueǀSATerm, current) {
 			pos := sc.pos
 
 			sp := pos
@@ -181,14 +181,14 @@ func (sc *Scanner) Scan() bool {
 				pos = close
 			}
 
-			if sc.seekPrevious(pos, _mergedSATerm) {
+			if sc.seekPrevious(pos, _SATerm) {
 				sc.pos++
 				continue
 			}
 		}
 
 		// SB9
-		if is(_mergedCloseSpParaSep, current) {
+		if is(_CloseǀSpǀParaSep, current) {
 			pos := sc.pos
 
 			close := pos
@@ -200,14 +200,14 @@ func (sc *Scanner) Scan() bool {
 				pos = close
 			}
 
-			if sc.seekPrevious(pos, _mergedSATerm) {
+			if sc.seekPrevious(pos, _SATerm) {
 				sc.pos++
 				continue
 			}
 		}
 
 		// SB10
-		if is(_mergedSpParaSep, current) {
+		if is(_SpǀParaSep, current) {
 			pos := sc.pos
 
 			sp := pos
@@ -228,7 +228,7 @@ func (sc *Scanner) Scan() bool {
 				pos = close
 			}
 
-			if sc.seekPrevious(pos, _mergedSATerm) {
+			if sc.seekPrevious(pos, _SATerm) {
 				sc.pos++
 				continue
 			}
@@ -238,7 +238,7 @@ func (sc *Scanner) Scan() bool {
 		{
 			pos := sc.pos
 
-			ps := sc.seekPreviousIndex(pos, _mergedSpParaSep)
+			ps := sc.seekPreviousIndex(pos, _SpǀParaSep)
 			if ps >= 0 {
 				pos = ps
 			}
@@ -261,7 +261,7 @@ func (sc *Scanner) Scan() bool {
 				pos = close
 			}
 
-			if sc.seekPrevious(pos, _mergedSATerm) {
+			if sc.seekPrevious(pos, _SATerm) {
 				break
 			}
 		}
@@ -307,7 +307,7 @@ func (sc *Scanner) seekForward(pos int, rts ...*unicode.RangeTable) bool {
 		r := sc.buffer[i]
 
 		// Ignore Extend|Format
-		if is(_mergedExtendFormat, r) {
+		if is(_ExtendǀFormat, r) {
 			continue
 		}
 
@@ -334,7 +334,7 @@ func (sc *Scanner) seekPreviousIndex(pos int, rts ...*unicode.RangeTable) int {
 		r := sc.buffer[i]
 
 		// Ignore Extend|Format
-		if is(_mergedExtendFormat, r) {
+		if is(_ExtendǀFormat, r) {
 			continue
 		}
 

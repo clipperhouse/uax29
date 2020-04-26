@@ -154,82 +154,82 @@ func generate(prop prop) error {
 	}
 
 	if prop.packagename == "sentences" {
-		rangeTables["mergedSATerm"] = rangetable.Merge(
+		rangeTables["SATerm"] = rangetable.Merge(
 			rangeTables["STerm"],
 			rangeTables["ATerm"],
 		)
 
-		rangeTables["mergedParaSep"] = rangetable.Merge(
+		rangeTables["ParaSep"] = rangetable.Merge(
 			rangeTables["Sep"],
 			rangeTables["CR"],
 			rangeTables["LF"],
 		)
 
-		rangeTables["mergedOLetterUpperLowerParaSepSATerm"] = rangetable.Merge(
+		rangeTables["OLetterǀUpperǀLowerǀParaSepǀSATerm"] = rangetable.Merge(
 			rangeTables["OLetter"],
 			rangeTables["Upper"],
 			rangeTables["Lower"],
-			rangeTables["mergedParaSep"],
-			rangeTables["mergedSATerm"],
+			rangeTables["ParaSep"],
+			rangeTables["SATerm"],
 		)
 
-		rangeTables["mergedExtendFormat"] = rangetable.Merge(
+		rangeTables["ExtendǀFormat"] = rangetable.Merge(
 			rangeTables["Extend"],
 			rangeTables["Format"],
 		)
 
-		rangeTables["mergedUpperLower"] = rangetable.Merge(
+		rangeTables["UpperǀLower"] = rangetable.Merge(
 			rangeTables["Upper"],
 			rangeTables["Lower"],
 		)
 
-		rangeTables["mergedSContinueSATerm"] = rangetable.Merge(
+		rangeTables["SContinueǀSATerm"] = rangetable.Merge(
 			rangeTables["SContinue"],
-			rangeTables["mergedSATerm"],
+			rangeTables["SATerm"],
 		)
 
-		rangeTables["mergedCloseSpParaSep"] = rangetable.Merge(
+		rangeTables["CloseǀSpǀParaSep"] = rangetable.Merge(
 			rangeTables["Close"],
 			rangeTables["Sp"],
-			rangeTables["mergedParaSep"],
+			rangeTables["ParaSep"],
 		)
 
-		rangeTables["mergedSpParaSep"] = rangetable.Merge(
+		rangeTables["SpǀParaSep"] = rangetable.Merge(
 			rangeTables["Sp"],
-			rangeTables["mergedParaSep"],
+			rangeTables["ParaSep"],
 		)
 	}
 
 	if prop.packagename == "graphemes" {
-		rangeTables["mergedControlCRLF"] = rangetable.Merge(
+		rangeTables["ControlǀCRǀLF"] = rangetable.Merge(
 			rangeTables["Control"],
 			rangeTables["CR"],
 			rangeTables["LF"],
 		)
 
-		rangeTables["mergedLVLVLVT"] = rangetable.Merge(
+		rangeTables["LǀVǀLVǀLVT"] = rangetable.Merge(
 			rangeTables["L"],
 			rangeTables["V"],
 			rangeTables["LV"],
 			rangeTables["LVT"],
 		)
 
-		rangeTables["mergedVT"] = rangetable.Merge(
+		rangeTables["VǀT"] = rangetable.Merge(
 			rangeTables["V"],
 			rangeTables["T"],
 		)
 
-		rangeTables["mergedLVV"] = rangetable.Merge(
+		rangeTables["LVǀV"] = rangetable.Merge(
 			rangeTables["LV"],
 			rangeTables["V"],
 		)
 
-		rangeTables["mergedLVTT"] = rangetable.Merge(
+		rangeTables["LVTǀT"] = rangetable.Merge(
 			rangeTables["LVT"],
 			rangeTables["T"],
 		)
 
-		rangeTables["mergedExtendZWJ"] = rangetable.Merge(
+		rangeTables["ExtendǀZWJ"] = rangetable.Merge(
 			rangeTables["Extend"],
 			rangeTables["ZWJ"],
 		)
@@ -293,7 +293,7 @@ func write(prop prop, rts map[string]*unicode.RangeTable) error {
 	fmt.Fprintf(&buf, "var (\n")
 	fmt.Fprintf(&buf, "\t// See https://unicode.org/reports/tr29/\n")
 	for _, category := range categories {
-		if strings.HasPrefix(category, "merged") || strings.Contains(category, "ǀ") {
+		if strings.Contains(category, "ǀ") {
 			// Skip the merged cateogries
 			continue
 		}
@@ -303,7 +303,7 @@ func write(prop prop, rts map[string]*unicode.RangeTable) error {
 
 	for _, category := range categories {
 		rt := rts[category]
-		if strings.HasPrefix(category, "merged") || strings.Contains(category, "ǀ") {
+		if strings.Contains(category, "ǀ") {
 			fmt.Fprintf(&buf, "// _%s is a merged (denormalized) range table for perf and readability\n", category)
 		}
 		fmt.Fprintf(&buf, "var _%s = ", category)
