@@ -13,18 +13,24 @@ import (
 type BreakFunc func(buffer Runes, pos Pos) bool
 
 // NewScanner instantiates a new Scanner
-func NewScanner(r io.Reader, breaking BreakFunc) *Scanner {
+func NewScanner(r io.Reader, breakFunc BreakFunc) *Scanner {
 	return &Scanner{
-		incoming: bufio.NewReaderSize(r, 64*1024),
-		breaking: breaking,
+		incoming:  bufio.NewReaderSize(r, 64*1024),
+		breakFunc: breakFunc,
 	}
 }
+
+// Break is the result of a BreakFunc, signaling to break at (before) the current rune
+const Break = true
+
+// Accept is the result of a BreakFunc, signaling to accept the current rune and continue
+const Accept = false
 
 // Scanner is a structure for scanning an input Reader. Use NewScanner to instantiate.
 // Loop over scanner.Scan while true.
 type Scanner struct {
-	incoming *bufio.Reader
-	breaking BreakFunc
+	incoming  *bufio.Reader
+	breakFunc BreakFunc
 
 	// a buffer of runes to evaluate
 	buffer Runes
@@ -55,12 +61,12 @@ func (sc *Scanner) Scan() bool {
 			sc.buffer = append(sc.buffer, r)
 		}
 
-		// The current rune represents a new token
-		if sc.breaking(sc.buffer, sc.pos) {
+		if sc.breakFunc(sc.buffer, sc.pos) == Break {
+			// The current rune represents a new token
 			break
 		}
 
-		// Accept the current rune and continue
+		// Otherwise, accept the current rune and continue
 		sc.pos++
 	}
 
@@ -82,7 +88,7 @@ func (sc *Scanner) Err() error {
 	return sc.err
 }
 
-// reset creates a new bytes.Buffer on the Scanner, and clears previous values
+// reset sets the Scanner to evaluate a new token
 func (sc *Scanner) reset() {
 	// Drop the emitted runes (optimization to avoid growing array)
 	copy(sc.buffer, sc.buffer[sc.pos:])

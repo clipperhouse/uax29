@@ -37,12 +37,12 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 
 	// https://unicode.org/reports/tr29/#GB1
 	if sot && !eof {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#GB2
 	if eof {
-		return true
+		return uax29.Break
 	}
 
 	current := buffer[pos]
@@ -50,53 +50,53 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 
 	// https://unicode.org/reports/tr29/#GB3
 	if is(LF, current) && is(CR, previous) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#GB4
 	if is(_ControlǀCRǀLF, previous) {
-		return true
+		return uax29.Break
 	}
 
 	// https://unicode.org/reports/tr29/#GB5
 	if is(_ControlǀCRǀLF, current) {
-		return true
+		return uax29.Break
 	}
 
 	// https://unicode.org/reports/tr29/#GB6
 	if is(_LǀVǀLVǀLVT, current) && is(L, previous) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#GB7
 	if is(_VǀT, current) && is(_LVǀV, previous) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#GB8
 	if is(T, current) && is(_LVTǀT, previous) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#GB9
 	if is(_ExtendǀZWJ, current) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#GB9a
 	if is(SpacingMark, current) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#GB9b
 	if is(Prepend, previous) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#GB11
 	if is(emoji.Extended_Pictographic, current) && is(ZWJ, previous) &&
 		buffer.SeekPrevious(pos-1, Extend, emoji.Extended_Pictographic) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#GB12
@@ -116,7 +116,7 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 		odd := count > 0 && count%2 == 1
 
 		if allRI && odd {
-			return false
+			return uax29.Accept
 		}
 	}
 
@@ -135,11 +135,11 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 		}
 
 		if odd {
-			return false
+			return uax29.Accept
 		}
 	}
 
 	// https://unicode.org/reports/tr29/#WB999
 	// If we fall through all the above rules, it's a break
-	return true
+	return uax29.Break
 }

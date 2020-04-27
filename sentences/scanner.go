@@ -38,12 +38,12 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 
 	// https://unicode.org/reports/tr29/#SB1
 	if sot && !eof {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#SB2
 	if eof {
-		return true
+		return uax29.Break
 	}
 
 	// Rules are usually of the form Cat1 × Cat2; "current" refers to the first category
@@ -54,17 +54,17 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 
 	// https://unicode.org/reports/tr29/#SB3
 	if is(LF, current) && is(CR, previous) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#SB4
 	if is(_ParaSep, previous) {
-		return true
+		return uax29.Break
 	}
 
 	// https://unicode.org/reports/tr29/#SB5
 	if is(_ExtendǀFormat, current) {
-		return false
+		return uax29.Accept
 	}
 
 	// SB5 applies to subsequent rules; there is an implied "ignoring Extend & Format"
@@ -75,14 +75,14 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 
 	// https://unicode.org/reports/tr29/#SB6
 	if is(Numeric, current) && buffer.SeekPrevious(pos, ignore, ATerm) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#SB7
 	if is(Upper, current) {
 		previousIndex := buffer.SeekPreviousIndex(pos, ignore, ATerm)
 		if previousIndex >= 0 && buffer.SeekPrevious(previousIndex, ignore, _UpperǀLower) {
-			return false
+			return uax29.Accept
 		}
 	}
 
@@ -127,7 +127,7 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 			// Having looked back past Sp's, Close's, and intervening Extend|Format,
 			// is there an ATerm?
 			if buffer.SeekPrevious(p2, ignore, ATerm) {
-				return false
+				return uax29.Accept
 			}
 		}
 	}
@@ -159,7 +159,7 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 		// Having looked back past Sp, Close, and intervening Extend|Format,
 		// is there an SATerm?
 		if buffer.SeekPrevious(p, ignore, _SATerm) {
-			return false
+			return uax29.Accept
 		}
 	}
 
@@ -180,7 +180,7 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 		// Having looked back past Close's and intervening Extend|Format,
 		// is there an SATerm?
 		if buffer.SeekPrevious(p, ignore, _SATerm) {
-			return false
+			return uax29.Accept
 		}
 	}
 
@@ -211,7 +211,7 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 		// Having looked back past Sp's, Close's, and intervening Extend|Format,
 		// is there an SATerm?
 		if buffer.SeekPrevious(p, ignore, _SATerm) {
-			return false
+			return uax29.Accept
 		}
 	}
 
@@ -248,15 +248,15 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 		// Having looked back past Sp|ParaSep, Sp's, Close's, and intervening Extend|Format,
 		// is there an SATerm?
 		if buffer.SeekPrevious(p, ignore, _SATerm) {
-			return true
+			return uax29.Break
 		}
 	}
 
 	// https://unicode.org/reports/tr29/#SB998
 	if pos > 0 {
-		return false
+		return uax29.Accept
 	}
 
 	// If we fall through all the above rules, it's a sentence break
-	return true
+	return uax29.Break
 }

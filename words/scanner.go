@@ -37,12 +37,12 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 
 	// https://unicode.org/reports/tr29/#WB1
 	if sot && !eof {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#WB2
 	if eof {
-		return true
+		return uax29.Break
 	}
 
 	current := buffer[pos]
@@ -50,32 +50,32 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 
 	// https://unicode.org/reports/tr29/#WB3
 	if is(LF, current) && is(CR, previous) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#WB3a
 	if is(_CRǀLFǀNewline, previous) {
-		return true
+		return uax29.Break
 	}
 
 	// https://unicode.org/reports/tr29/#WB3b
 	if is(_CRǀLFǀNewline, current) {
-		return true
+		return uax29.Break
 	}
 
 	// https://unicode.org/reports/tr29/#WB3c
 	if is(emoji.Extended_Pictographic, current) && is(ZWJ, previous) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#WB3d
 	if is(WSegSpace, current) && is(WSegSpace, previous) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#WB4
 	if is(_ExtendǀFormatǀZWJ, current) {
-		return false
+		return uax29.Accept
 	}
 
 	// WB4 applies to subsequent rules; there is an implied "ignoring Extend & Format & ZWJ"
@@ -86,83 +86,83 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 
 	// https://unicode.org/reports/tr29/#WB5
 	if is(AHLetter, current) && buffer.SeekPrevious(pos, ignore, AHLetter) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#WB6
 	if is(_MidLetterǀMidNumLetQ, current) && buffer.SeekForward(pos, ignore, AHLetter) && buffer.SeekPrevious(pos, ignore, AHLetter) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#WB7
 	if is(AHLetter, current) {
 		previousIndex := buffer.SeekPreviousIndex(pos, ignore, _MidLetterǀMidNumLetQ)
 		if previousIndex >= 0 && buffer.SeekPrevious(previousIndex, ignore, AHLetter) {
-			return false
+			return uax29.Accept
 		}
 	}
 
 	// https://unicode.org/reports/tr29/#WB7a
 	if is(Single_Quote, current) && buffer.SeekPrevious(pos, ignore, Hebrew_Letter) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#WB7b
 	if is(Double_Quote, current) && buffer.SeekForward(pos, ignore, Hebrew_Letter) &&
 		buffer.SeekPrevious(pos, ignore, Hebrew_Letter) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#WB7c
 	if is(Hebrew_Letter, current) {
 		previousIndex := buffer.SeekPreviousIndex(pos, ignore, Double_Quote)
 		if previousIndex >= 0 && buffer.SeekPrevious(previousIndex, ignore, Hebrew_Letter) {
-			return false
+			return uax29.Accept
 		}
 	}
 
 	// https://unicode.org/reports/tr29/#WB8
 	if is(Numeric, current) && buffer.SeekPrevious(pos, ignore, Numeric) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#WB9
 	if is(Numeric, current) && buffer.SeekPrevious(pos, ignore, AHLetter) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#WB10
 	if is(AHLetter, current) && buffer.SeekPrevious(pos, ignore, Numeric) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#WB11
 	if is(Numeric, current) {
 		previousIndex := buffer.SeekPreviousIndex(pos, ignore, _MidNumǀMidNumLetQ)
 		if previousIndex >= 0 && buffer.SeekPrevious(previousIndex, ignore, Numeric) {
-			return false
+			return uax29.Accept
 		}
 	}
 
 	// https://unicode.org/reports/tr29/#WB12
 	if is(_MidNumǀMidNumLetQ, current) && buffer.SeekForward(pos, ignore, Numeric) &&
 		buffer.SeekPrevious(pos, ignore, Numeric) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#WB13
 	if is(Katakana, current) && buffer.SeekPrevious(pos, ignore, Katakana) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#WB13a
 	if is(ExtendNumLet, current) && buffer.SeekPrevious(pos, ignore, _AHLetterǀNumericǀKatakanaǀExtendNumLet) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#WB13b
 	if is(_AHLetterǀNumericǀKatakana, current) && buffer.SeekPrevious(pos, ignore, ExtendNumLet) {
-		return false
+		return uax29.Accept
 	}
 
 	// https://unicode.org/reports/tr29/#WB15
@@ -173,7 +173,7 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 		count := 0
 		for i := pos - 1; i >= 0; i-- {
 			r := buffer[i]
-			if is(_ExtendǀFormatǀZWJ, r) {
+			if is(ignore, r) {
 				continue
 			}
 			if !is(Regional_Indicator, r) {
@@ -186,7 +186,7 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 		odd := count > 0 && count%2 == 1
 
 		if allRI && odd {
-			return false
+			return uax29.Accept
 		}
 	}
 
@@ -197,7 +197,7 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 		count := 0
 		for i := pos - 1; i >= 0; i-- {
 			r := buffer[i]
-			if is(_ExtendǀFormatǀZWJ, r) {
+			if is(ignore, r) {
 				continue
 			}
 			if !is(Regional_Indicator, r) {
@@ -208,11 +208,11 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 		}
 
 		if odd {
-			return false
+			return uax29.Accept
 		}
 	}
 
 	// https://unicode.org/reports/tr29/#WB999
 	// If we fall through all the above rules, it's a word break
-	return true
+	return uax29.Break
 }
