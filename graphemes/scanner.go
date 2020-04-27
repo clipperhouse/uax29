@@ -35,12 +35,12 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 	sot := pos == 0 // "start of text"
 	eof := len(buffer) == int(pos)
 
-	// GB1
+	// https://unicode.org/reports/tr29/#GB1
 	if sot && !eof {
 		return false
 	}
 
-	// GB2
+	// https://unicode.org/reports/tr29/#GB2
 	if eof {
 		return true
 	}
@@ -48,102 +48,98 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 	current := buffer[pos]
 	previous := buffer[pos-1]
 
-	// GB3
+	// https://unicode.org/reports/tr29/#GB3
 	if is(LF, current) && is(CR, previous) {
 		return false
 	}
 
-	// GB4
+	// https://unicode.org/reports/tr29/#GB4
 	if is(_ControlǀCRǀLF, previous) {
 		return true
 	}
 
-	// GB5
+	// https://unicode.org/reports/tr29/#GB5
 	if is(_ControlǀCRǀLF, current) {
 		return true
 	}
 
-	// GB6
+	// https://unicode.org/reports/tr29/#GB6
 	if is(_LǀVǀLVǀLVT, current) && is(L, previous) {
 		return false
 	}
 
-	// GB7
+	// https://unicode.org/reports/tr29/#GB7
 	if is(_VǀT, current) && is(_LVǀV, previous) {
 		return false
 	}
 
-	// GB8
+	// https://unicode.org/reports/tr29/#GB8
 	if is(T, current) && is(_LVTǀT, previous) {
 		return false
 	}
 
-	// GB9
+	// https://unicode.org/reports/tr29/#GB9
 	if is(_ExtendǀZWJ, current) {
 		return false
 	}
 
-	// GB9a
+	// https://unicode.org/reports/tr29/#GB9a
 	if is(SpacingMark, current) {
 		return false
 	}
 
-	// GB9b
+	// https://unicode.org/reports/tr29/#GB9b
 	if is(Prepend, previous) {
 		return false
 	}
 
-	// GB11
+	// https://unicode.org/reports/tr29/#GB11
 	if is(emoji.Extended_Pictographic, current) && is(ZWJ, previous) &&
 		buffer.SeekPrevious(pos-1, Extend, emoji.Extended_Pictographic) {
 		return false
 	}
 
-	// GB12
+	// https://unicode.org/reports/tr29/#GB12
 	if is(Regional_Indicator, current) {
 		// Buffer comprised entirely of an odd number of RI
-		ok := true
+		allRI := true
 		count := 0
 		for i := pos - 1; i >= 0; i-- {
 			r := buffer[i]
 			if !is(Regional_Indicator, r) {
-				ok = false
+				allRI = false
 				break
 			}
 			count++
 		}
 
-		if ok {
-			// If we fall through, we've seen the whole buffer,
-			// so it's all Regional_Indicator
-			odd := count > 0 && count%2 == 1
-			if odd {
-				return false
-			}
-		}
-	}
+		odd := count > 0 && count%2 == 1
 
-	// GB13
-	if is(Regional_Indicator, current) {
-		// Last n runes represent an odd number of RI
-		ok := false
-		count := 0
-		for i := pos - 1; i >= 0; i-- {
-			r := buffer[i]
-			if !is(Regional_Indicator, r) {
-				odd := count > 0 && count%2 == 1
-				ok = odd
-				break
-			}
-			count++
-		}
-
-		if ok {
+		if allRI && odd {
 			return false
 		}
 	}
 
-	// WB999
+	// https://unicode.org/reports/tr29/#GB13
+	if is(Regional_Indicator, current) {
+		// Last n runes represent an odd number of RI
+		odd := false
+		count := 0
+		for i := pos - 1; i >= 0; i-- {
+			r := buffer[i]
+			if !is(Regional_Indicator, r) {
+				odd = count > 0 && count%2 == 1
+				break
+			}
+			count++
+		}
+
+		if odd {
+			return false
+		}
+	}
+
+	// https://unicode.org/reports/tr29/#WB999
 	// If we fall through all the above rules, it's a break
 	return true
 }

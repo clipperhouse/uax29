@@ -29,47 +29,56 @@ var is = unicode.Is
 // BreakFunc implements sentence boundaries according to https://unicode.org/reports/tr29/#Sentence_Boundaries.
 // It is intended for use with uax29.Scanner.
 var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
+
 	// Rules: https://unicode.org/reports/tr29/#Sentence_Boundary_Rules
+	// true = breaking, false = accept and continue
 
 	sot := pos == 0 // "start of text"
 	eof := len(buffer) == int(pos)
 
-	// SB1
+	// https://unicode.org/reports/tr29/#SB1
 	if sot && !eof {
 		return false
 	}
 
-	// SB2
+	// https://unicode.org/reports/tr29/#SB2
 	if eof {
 		return true
 	}
 
+	// Rules are usually of the form Cat1 × Cat2; "current" refers to the first category
+	// to the right of the ×, from which we look back or forward
+
 	current := buffer[pos]
 	previous := buffer[pos-1]
 
-	// SB3
+	// https://unicode.org/reports/tr29/#SB3
 	if is(LF, current) && is(CR, previous) {
 		return false
 	}
 
-	// SB4
+	// https://unicode.org/reports/tr29/#SB4
 	if is(_ParaSep, previous) {
 		return true
 	}
 
-	// SB5
+	// https://unicode.org/reports/tr29/#SB5
 	if is(_ExtendǀFormat, current) {
 		return false
 	}
 
+	// SB5 applies to subsequent rules; there is an implied "ignoring Extend & Format"
+	// https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
+	// The Seek* methods are shorthand for "seek a category but skip over Extend & Format on the way"
+
 	ignore := _ExtendǀFormat
 
-	// SB6
+	// https://unicode.org/reports/tr29/#SB6
 	if is(Numeric, current) && buffer.SeekPrevious(pos, ignore, ATerm) {
 		return false
 	}
 
-	// SB7
+	// https://unicode.org/reports/tr29/#SB7
 	if is(Upper, current) {
 		previousIndex := buffer.SeekPreviousIndex(pos, ignore, ATerm)
 		if previousIndex >= 0 && buffer.SeekPrevious(previousIndex, ignore, _UpperǀLower) {
@@ -77,24 +86,26 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 		}
 	}
 
-	// SB8
+	// https://unicode.org/reports/tr29/#SB8
 	{
-		p1 := pos
+		p := pos
 
-		// This loop is the 'regex':
 		// ( ¬(OLetter | Upper | Lower | ParaSep | SATerm) )*
-		for int(p1) < len(buffer) {
-			r := buffer[p1]
-			if is(_OLetterǀUpperǀLowerǀParaSepǀSATerm, r) {
-				break
+		// Zero or more of not-the-above categories
+		for int(p) < len(buffer) {
+			r := buffer[p]
+			if !is(_OLetterǀUpperǀLowerǀParaSepǀSATerm, r) {
+				p++
+				continue
 			}
-			p1++
+			break
 		}
 
-		if buffer.SeekForward(p1-1, ignore, Lower) {
+		if buffer.SeekForward(p-1, ignore, Lower) {
 			p2 := pos
 
-			sp := p2
+			// Zero or more Sp
+			sp := pos
 			for {
 				sp = buffer.SeekPreviousIndex(sp, ignore, Sp)
 				if sp < 0 {
@@ -103,6 +114,7 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 				p2 = sp
 			}
 
+			// Zero or more Close
 			close := p2
 			for {
 				close = buffer.SeekPreviousIndex(close, ignore, Close)
@@ -112,117 +124,135 @@ var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
 				p2 = close
 			}
 
+			// Having looked back past Sp's, Close's, and intervening Extend|Format,
+			// is there an ATerm?
 			if buffer.SeekPrevious(p2, ignore, ATerm) {
 				return false
 			}
 		}
 	}
 
-	// SB8a
+	// https://unicode.org/reports/tr29/#SB8a
 	if is(_SContinueǀSATerm, current) {
-		pos := pos
+		p := pos
 
-		sp := pos
+		// Zero or more Sp
+		sp := p
 		for {
 			sp = buffer.SeekPreviousIndex(sp, ignore, Sp)
 			if sp < 0 {
 				break
 			}
-			pos = sp
+			p = sp
 		}
 
-		close := pos
+		// Zero or more Close
+		close := p
 		for {
 			close = buffer.SeekPreviousIndex(close, ignore, Close)
 			if close < 0 {
 				break
 			}
-			pos = close
+			p = close
 		}
 
-		if buffer.SeekPrevious(pos, ignore, _SATerm) {
+		// Having looked back past Sp, Close, and intervening Extend|Format,
+		// is there an SATerm?
+		if buffer.SeekPrevious(p, ignore, _SATerm) {
 			return false
 		}
 	}
 
-	// SB9
+	// https://unicode.org/reports/tr29/#SB9
 	if is(_CloseǀSpǀParaSep, current) {
-		pos := pos
+		p := pos
 
-		close := pos
+		// Zero or more Close's
+		close := p
 		for {
 			close = buffer.SeekPreviousIndex(close, ignore, Close)
 			if close < 0 {
 				break
 			}
-			pos = close
+			p = close
 		}
 
-		if buffer.SeekPrevious(pos, ignore, _SATerm) {
+		// Having looked back past Close's and intervening Extend|Format,
+		// is there an SATerm?
+		if buffer.SeekPrevious(p, ignore, _SATerm) {
 			return false
 		}
 	}
 
-	// SB10
+	// https://unicode.org/reports/tr29/#SB10
 	if is(_SpǀParaSep, current) {
-		pos := pos
+		p := pos
 
-		sp := pos
+		// Zero or more Sp's
+		sp := p
 		for {
 			sp = buffer.SeekPreviousIndex(sp, ignore, Sp)
 			if sp < 0 {
 				break
 			}
-			pos = sp
+			p = sp
 		}
 
-		close := pos
+		// Zero or more Close's
+		close := p
 		for {
 			close = buffer.SeekPreviousIndex(close, ignore, Close)
 			if close < 0 {
 				break
 			}
-			pos = close
+			p = close
 		}
 
-		if buffer.SeekPrevious(pos, ignore, _SATerm) {
+		// Having looked back past Sp's, Close's, and intervening Extend|Format,
+		// is there an SATerm?
+		if buffer.SeekPrevious(p, ignore, _SATerm) {
 			return false
 		}
 	}
 
-	// SB11
+	// https://unicode.org/reports/tr29/#SB11
 	{
-		pos := pos
+		p := pos
 
-		ps := buffer.SeekPreviousIndex(pos, ignore, _SpǀParaSep)
+		// Zero or one Sp|ParaSep
+		ps := buffer.SeekPreviousIndex(p, ignore, _SpǀParaSep)
 		if ps >= 0 {
-			pos = ps
+			p = ps
 		}
 
-		sp := pos
+		// Zero or more Sp's
+		sp := p
 		for {
 			sp = buffer.SeekPreviousIndex(sp, ignore, Sp)
 			if sp < 0 {
 				break
 			}
-			pos = sp
+			p = sp
 		}
 
-		close := pos
+		// Zero or more Close's
+		close := p
 		for {
 			close = buffer.SeekPreviousIndex(close, ignore, Close)
 			if close < 0 {
 				break
 			}
-			pos = close
+			p = close
 		}
 
-		if buffer.SeekPrevious(pos, ignore, _SATerm) {
+		// Having looked back past Sp|ParaSep, Sp's, Close's, and intervening Extend|Format,
+		// is there an SATerm?
+		if buffer.SeekPrevious(p, ignore, _SATerm) {
 			return true
 		}
 	}
 
-	// SB998
+	// https://unicode.org/reports/tr29/#SB998
 	if pos > 0 {
 		return false
 	}
