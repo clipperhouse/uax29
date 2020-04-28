@@ -2,7 +2,6 @@ package uax29
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"io"
 	"sync"
@@ -39,8 +38,6 @@ type Scanner struct {
 
 	// a buffer of runes to evaluate
 	buffer Runes
-	// a cursor for runes in the buffer
-	pos Pos
 
 	// outputs
 	bytes []byte
@@ -50,11 +47,16 @@ type Scanner struct {
 // Scan advances to the next token, returning true if successful. Returns false on error or EOF.
 // Use Bytes or Text to retrieve the token value, or Err to retrieve the current error.
 func (sc *Scanner) Scan() bool {
-	sc.reset()
+	// Reset state
+	sc.bytes = nil
+	sc.err = nil
+
+	// A cursor for runes in the buffer
+	var pos Pos
 
 	for {
 		// Fill the buffer with enough runes for lookahead
-		for len(sc.buffer) < int(sc.pos)+lookahead {
+		for len(sc.buffer) < int(pos)+lookahead {
 			r, eof, err := sc.readRune()
 			if err != nil {
 				sc.err = err
@@ -66,16 +68,24 @@ func (sc *Scanner) Scan() bool {
 			sc.buffer = append(sc.buffer, r)
 		}
 
-		if sc.breakFunc(sc.buffer, sc.pos) == Break {
+		if sc.breakFunc(sc.buffer, pos) == Break {
 			// The current rune represents a new token
 			break
 		}
 
 		// Otherwise, accept the current rune and continue
-		sc.pos++
+		pos++
 	}
 
-	return sc.token()
+	// Create the token
+	token := sc.buffer[:pos]
+	sc.bytes = token.Bytes()
+
+	// Drop the emitted runes (with optimization to avoid growing array)
+	copy(sc.buffer, sc.buffer[pos:])
+	sc.buffer = sc.buffer[:len(sc.buffer)-int(pos)]
+
+	return len(sc.bytes) > 0
 }
 
 // Bytes returns the current token as a byte slice, after a successful call to Scan
@@ -91,27 +101,6 @@ func (sc *Scanner) Text() string {
 // Err returns the current error, after an unsuccessful call to Scan
 func (sc *Scanner) Err() error {
 	return sc.err
-}
-
-// reset sets the Scanner to evaluate a new token
-func (sc *Scanner) reset() {
-	// Drop the emitted runes (optimization to avoid growing array)
-	copy(sc.buffer, sc.buffer[sc.pos:])
-	sc.buffer = sc.buffer[:len(sc.buffer)-int(sc.pos)]
-
-	sc.pos = 0
-
-	sc.bytes = nil
-	sc.err = nil
-}
-
-func (sc *Scanner) token() bool {
-	var bb bytes.Buffer
-	for _, r := range sc.buffer[:sc.pos] {
-		bb.WriteRune(r)
-	}
-	sc.bytes = bb.Bytes()
-	return len(sc.bytes) > 0
 }
 
 // readRune gets the next rune, advancing the reader
