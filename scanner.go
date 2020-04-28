@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"sync"
 	"unicode/utf8"
 )
 
@@ -127,6 +128,13 @@ func (sc *Scanner) readRune() (r rune, eof bool, err error) {
 	return r, false, nil
 }
 
+var runesPool = sync.Pool{
+	New: func() interface{} {
+		var runes Runes
+		return runes
+	},
+}
+
 // NewSplitFunc creates a new bufio.SplitFunc, based on a uax29.BreakFunc
 func NewSplitFunc(breakFunc BreakFunc) bufio.SplitFunc {
 	return func(data []byte, atEOF bool) (advance int, token []byte, err error) {
@@ -134,7 +142,7 @@ func NewSplitFunc(breakFunc BreakFunc) bufio.SplitFunc {
 			return 0, nil, nil
 		}
 
-		var buffer Runes
+		buffer := runesPool.Get().(Runes)[:0]
 		var pos Pos
 
 		i := 0
@@ -171,6 +179,9 @@ func NewSplitFunc(breakFunc BreakFunc) bufio.SplitFunc {
 		for _, r := range buffer[:pos] {
 			n += utf8.RuneLen(r)
 		}
+
+		runesPool.Put(buffer)
+
 		return n, data[:n], nil
 	}
 }
