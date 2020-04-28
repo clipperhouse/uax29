@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"bufio"
 	"bytes"
 	"io/ioutil"
 	"reflect"
@@ -188,7 +189,8 @@ func BenchmarkScanner(b *testing.B) {
 		var bb bytes.Buffer
 
 		r := bytes.NewReader(file)
-		sc := words.NewScanner(r)
+		sc := bufio.NewScanner(r)
+		sc.Split(words.SplitFunc)
 
 		c := 0
 		for sc.Scan() {

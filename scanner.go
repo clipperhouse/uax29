@@ -3,7 +3,9 @@ package uax29
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
+	"unicode/utf8"
 )
 
 // BreakFunc defines a func that indicates when to break tokens.
@@ -25,6 +27,8 @@ const Break = true
 
 // Accept is the result of a BreakFunc, signaling to accept the current rune and continue
 const Accept = false
+
+const lookahead = 8
 
 // Scanner is a structure for scanning an input Reader. Use NewScanner to instantiate.
 // Loop over scanner.Scan while true.
@@ -49,7 +53,7 @@ func (sc *Scanner) Scan() bool {
 
 	for {
 		// Fill the buffer with enough runes for lookahead
-		for len(sc.buffer) < int(sc.pos)+8 {
+		for len(sc.buffer) < int(sc.pos)+lookahead {
 			r, eof, err := sc.readRune()
 			if err != nil {
 				sc.err = err
@@ -121,4 +125,52 @@ func (sc *Scanner) readRune() (r rune, eof bool, err error) {
 	}
 
 	return r, false, nil
+}
+
+// NewSplitFunc creates a new bufio.SplitFunc, based on a uax29.BreakFunc
+func NewSplitFunc(breakFunc BreakFunc) bufio.SplitFunc {
+	return func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+		if atEOF && len(data) == 0 {
+			return 0, nil, nil
+		}
+
+		var buffer Runes
+		var pos Pos
+
+		i := 0
+
+		for {
+			// Fill the buffer with enough runes for lookahead
+			for i < len(data) && len(buffer) < lookahead {
+				r, w := utf8.DecodeRune(data[i:])
+				if r == utf8.RuneError {
+					return 0, nil, fmt.Errorf("error decoding rune")
+				}
+				i += w
+				buffer = append(buffer, r)
+			}
+
+			if len(buffer) < lookahead {
+				if !atEOF {
+					// Need to request more data
+					return 0, nil, nil
+				}
+			}
+
+			if breakFunc(buffer, pos) == Break {
+				// The current rune represents a new token
+				break
+			}
+
+			// Otherwise, accept the current rune and continue
+			pos++
+		}
+
+		// Count the bytes
+		n := 0
+		for _, r := range buffer[:pos] {
+			n += utf8.RuneLen(r)
+		}
+		return n, data[:n], nil
+	}
 }

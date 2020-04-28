@@ -260,3 +260,6 @@ func BreakFunc(buffer uax29.Runes, pos uax29.Pos) bool {
 	// If we fall through all the above rules, it's a sentence break
 	return uax29.Break
 }
+
+// SplitFunc is a bufio.SplitFunc implementation of sentence segmentation, for use with bufio.Scanner
+var SplitFunc = uax29.NewSplitFunc(BreakFunc)
