@@ -29,7 +29,7 @@ var is = unicode.Is
 
 // BreakFunc implements word boundaries according to https://unicode.org/reports/tr29/#Word_Boundaries.
 // It is intended for use with uax29.Scanner.
-var BreakFunc uax29.BreakFunc = func(buffer uax29.Runes, pos uax29.Pos) bool {
+func BreakFunc(buffer uax29.Runes, pos uax29.Pos) bool {
 	// Rules: https://unicode.org/reports/tr29/#Word_Boundary_Rules
 
 	sot := pos == 0 // "start of text"

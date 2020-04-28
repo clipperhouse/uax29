@@ -4,15 +4,15 @@ import "unicode"
 
 var is = unicode.Is
 
-// Runes is a slice of runes, handy to use as a buffer
+// Runes is a slice of runes, for use as a buffer
 type Runes []rune
 
-// Pos is a cursor for Runes
+// Pos is a cursor for a Runes buffer
 type Pos int
 
-// SeekPreviousIndex works backward until it hits a rune satisfying one of the range tables,
-// ignoring Extend, and returns the index of the rune in the buffer
-// See: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by SB5)
+// SeekPreviousIndex works backward until it hits a rune in the `seek` category,
+// ignoring runes in the `ignore` category, and returns the index of the rune in the buffer.
+// It returns -1 if `seek` rune is not found.
 func (buffer Runes) SeekPreviousIndex(pos Pos, ignore, seek *unicode.RangeTable) Pos {
 	// Start at the end of the buffer and move backwards
 	for i := pos - 1; i >= 0; i-- {
@@ -33,16 +33,14 @@ func (buffer Runes) SeekPreviousIndex(pos Pos, ignore, seek *unicode.RangeTable)
 	return -1
 }
 
-// SeekPrevious works backward ahead until it hits a rune satisfying one of the range tables,
-// ignoring the ignore, reporting success
-// Logic is here: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by SB5)
+// SeekPrevious works backward in the buffer until it hits a rune in the `seek` category,
+// ignoring runes in the `ignore` category. It returns true if `seek` is found.
 func (buffer Runes) SeekPrevious(pos Pos, ignore, seek *unicode.RangeTable) bool {
 	return buffer.SeekPreviousIndex(pos, ignore, seek) >= 0
 }
 
-// SeekForward looks ahead until it hits a rune satisfying one of the range tables,
-// ignoring ignore
-// See: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules (driven by SB5)
+// SeekForward looks ahead in the buffer until it hits a rune in the `seek` category,
+// ignoring runes in the `ignore` category. It returns true if `seek` is found.
 func (buffer Runes) SeekForward(pos Pos, ignore, seek *unicode.RangeTable) bool {
 	for i := int(pos) + 1; i < len(buffer); i++ {
 		r := buffer[i]
