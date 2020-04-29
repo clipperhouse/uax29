@@ -2,7 +2,6 @@
 package words
 
 import (
-	"bufio"
 	"io"
 	"unicode"
 
@@ -219,8 +218,8 @@ func BreakFunc(buffer uax29.Runes, pos uax29.Pos) bool {
 }
 
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner
-var SplitFunc bufio.SplitFunc
-
-func init() {
-	SplitFunc = uax29.NewSplitFunc(BreakFunc)
+func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	return splitFunc(data, atEOF)
 }
+
+var splitFunc = uax29.NewSplitFunc(BreakFunc)
