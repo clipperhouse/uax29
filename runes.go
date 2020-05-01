@@ -1,8 +1,8 @@
 package uax29
 
 import (
-	"bytes"
 	"unicode"
+	"unicode/utf8"
 )
 
 var is = unicode.Is
@@ -65,9 +65,18 @@ func (buffer Runes) SeekForward(pos Pos, ignore, seek *unicode.RangeTable) bool 
 
 // Bytes returns a byte slice of the runes in the buffer
 func (buffer Runes) Bytes() []byte {
-	var bb bytes.Buffer
+	len := 0
 	for _, r := range buffer {
-		bb.WriteRune(r)
+		len += utf8.RuneLen(r)
 	}
-	return bb.Bytes()
+
+	b := make([]byte, len, len)
+
+	i := 0
+	for _, r := range buffer {
+		w := utf8.EncodeRune(b[i:], r)
+		i += w
+	}
+
+	return b
 }
