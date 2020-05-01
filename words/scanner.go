@@ -9,7 +9,7 @@ import (
 	"github.com/clipperhouse/uax29/emoji"
 )
 
-// NewScanner tokenizes a reader into a stream of tokens according to Unicode Text Segmentation word boundaries https://unicode.org/reports/tr29/#Word_Boundaries
+// NewScanner tokenizes a reader into a stream of tokens according to Unicode Text Segmentation word boundaries https://unicode.org/reports/tr29/#Word_Boundaries.
 // Iterate through the stream by calling Scan() until false.
 //	text := "This is an example."
 //	reader := strings.NewReader(text)
