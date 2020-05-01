@@ -5,7 +5,7 @@ This package tokenizes text based on [Unicode text segmentation](https://unicode
 ```go
 import "github.com/clipperhouse/uax29/words"
 
-text := "Good dog! 👍🏼🐶"
+text := "It’s not “obvious” (IMHO) what comprises a word, a sentence, or a grapheme. 👍🏼🐶!"
 reader := strings.NewReader(text)
 
 scanner := words.NewScanner(reader)
