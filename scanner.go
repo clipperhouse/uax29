@@ -39,6 +39,9 @@ type Scanner struct {
 	// a buffer of runes to evaluate
 	buffer Runes
 
+	// underlying store for outgoing tokens; an optimization to avoid allocation; see token()
+	results []byte
+
 	// outputs
 	bytes []byte
 	err   error
@@ -78,14 +81,53 @@ func (sc *Scanner) Scan() bool {
 	}
 
 	// Create the token
-	token := sc.buffer[:pos]
-	sc.bytes = token.Bytes()
+	sc.bytes = sc.token(pos)
 
 	// Drop the emitted runes (with optimization to avoid growing array)
 	copy(sc.buffer, sc.buffer[pos:])
 	sc.buffer = sc.buffer[:len(sc.buffer)-int(pos)]
 
 	return len(sc.bytes) > 0
+}
+
+const arena = 1024 // 1k underlying store by default
+
+// token returns the current token runes as bytes
+func (sc *Scanner) token(pos Pos) []byte {
+	// This might be an arena allocator?
+	// Use a shared underlying store for tokens, at a fixed size.
+	// Allocate a new one when we run out of space.
+	// "Immutable" in that we don't resize or mutate any bytes after writing.
+
+	// Count the bytes
+	n := 0
+	for _, r := range sc.buffer[:pos] {
+		n += utf8.RuneLen(r)
+	}
+
+	// Ensure underlying store is big enough; don't resize
+	if len(sc.results) < n {
+		// At least as big as the current token
+		size := arena
+		if size < n {
+			size = n
+		}
+		sc.results = make([]byte, size, size)
+	}
+
+	// Write runes into the store
+	i := 0
+	for _, r := range sc.buffer[:pos] {
+		w := utf8.EncodeRune(sc.results[i:], r)
+		i += w
+	}
+
+	// Grab the bytes
+	token := sc.results[:n]
+	// Reset the store
+	sc.results = sc.results[n:]
+
+	return token
 }
 
 // Bytes returns the current token as a byte slice, after a successful call to Scan
