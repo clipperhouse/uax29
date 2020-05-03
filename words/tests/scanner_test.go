@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"bufio"
 	"bytes"
 	"io/ioutil"
 	"reflect"
@@ -186,23 +185,18 @@ func BenchmarkScanner(b *testing.B) {
 
 	count := 0
 	for i := 0; i < b.N; i++ {
-		var bb bytes.Buffer
-
 		r := bytes.NewReader(file)
-		sc := bufio.NewScanner(r)
-		sc.Split(words.SplitFunc)
+		sc := words.NewScanner(r)
 
 		c := 0
 		for sc.Scan() {
 			c++
-			bb.WriteString(sc.Text())
 		}
 		if err := sc.Err(); err != nil {
 			b.Error(err)
 		}
 
 		count = c
-		bb.Reset()
 	}
 	b.Logf("%d tokens\n", count)
 }
