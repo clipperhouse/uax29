@@ -174,7 +174,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 		}
 
-		// If we fall through all the above rules, it's a sentence break
+		// If we fall through all the above rules, it's a grapheme cluster break
 		break
 	}
 

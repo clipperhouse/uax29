@@ -25,9 +25,9 @@ if err := scanner.Err(); err != nil {
 
 ### Performance
 
-`uax29` is designed to work in constant memory, regardless of input size. It buffers input and streams tokens.
+`uax29` is designed to work in constant memory, regardless of input size. It buffers input and streams tokens. (For example, I am showing a maximum resident size of 8MB when processing a 300MB file, on my laptop.)
 
-Execution time is designed to be `O(n)` on input size. It is I/O-bound. In your code, you control I/O and performance implications by the `io.Reader` you pass to `graphemes.NewScanner`.
+Execution time is `O(n)` on input size. It can be I/O bound; you can control I/O and performance implications by the `io.Reader` you pass to `NewScanner`.
 
 ### Conformance
 

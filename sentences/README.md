@@ -27,7 +27,9 @@ if err := scanner.Err(); err != nil {
 
 `uax29` is designed to work in constant memory, regardless of input size. It buffers input and streams tokens.
 
-Execution time is designed to be `O(n)` on input size. It is I/O-bound. In your code, you control I/O and performance implications by the `Reader` you pass to `sentences.NewScanner`.
+Execution time is `O(n)` on input size. It can be I/O bound; you can control I/O and performance implications by the `io.Reader` you pass to `NewScanner`.
+
+In my local testing (Mac laptop), `uax29/words` processes around 2MM tokens per second of English wiki text.
 
 ### Conformance
 
