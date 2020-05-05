@@ -6,7 +6,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/clipperhouse/uax29"
 	"github.com/clipperhouse/uax29/words"
 )
 
@@ -14,7 +13,7 @@ func TestSplitFunc(t *testing.T) {
 	original := "This is a test."
 
 	r1 := strings.NewReader(original)
-	scanner1 := uax29.NewScanner(r1, words.BreakFunc)
+	scanner1 := words.NewScanner(r1)
 
 	var got1 []string
 	for scanner1.Scan() {
