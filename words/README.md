@@ -25,11 +25,11 @@ if err := scanner.Err(); err != nil {
 
 ### Performance
 
-`uax29` is designed to work in constant memory, regardless of input size. It buffers input and streams tokens.
+`uax29` is designed to work in constant memory, regardless of input size. It buffers input and streams tokens. (For example, I am showing a maximum resident size of 8MB when processing a 300MB file, on my laptop.)
 
-Execution time is designed to be `O(n)` on input size. It is I/O-bound. In your code, you control I/O and performance implications by the `Reader` you pass to `words.NewScanner`.
+Execution time is `O(n)` on input size. It can be I/O bound; you can control I/O and performance implications by the `io.Reader` you pass to `NewScanner`.
 
-If I am reading my benchmarks correctly, `uax29/words` processes around 2MM tokens per second on my laptop, when the input is preloaded into memory. By default, it buffers 64K of input at a time.
+In my local testing (Mac laptop), `uax29/words` processes around 2MM tokens per second of English wiki text.
 
 ### Conformance
 

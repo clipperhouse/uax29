@@ -250,10 +250,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 		}
 
+		// https://unicode.org/reports/tr29/#WB999
+		// If we fall through all the above rules, it's a word break
 		break
 	}
 
-	// https://unicode.org/reports/tr29/#WB999
-	// If we fall through all the above rules, it's a word break
 	return pos, data[:pos], nil
 }
