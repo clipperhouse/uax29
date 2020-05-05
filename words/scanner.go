@@ -40,8 +40,13 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	pos := 0
 
 	for {
+		if pos == len(data) && !atEOF {
+			// Request more data
+			return 0, nil, nil
+		}
+
 		sot := pos == 0 // "start of text"
-		eof := len(data) == pos && atEOF
+		eof := len(data) == pos
 
 		// https://unicode.org/reports/tr29/#WB1
 		if sot && !eof {
