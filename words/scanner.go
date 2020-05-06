@@ -3,6 +3,7 @@ package words
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"unicode"
 	"unicode/utf8"
@@ -61,6 +62,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		current, w := utf8.DecodeRune(data[pos:])
+		if current == utf8.RuneError {
+			return 0, nil, fmt.Errorf("error decoding rune")
+		}
+
 		previous, _ := utf8.DecodeLastRune(data[:pos])
 
 		// https://unicode.org/reports/tr29/#WB3
