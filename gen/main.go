@@ -151,6 +151,8 @@ func generate(prop prop) error {
 			rangeTables["Katakana"],
 			rangeTables["ExtendNumLet"],
 		)
+
+		rangeTables["AHLetterǀNumeric"] = rangetable.Merge(rangeTables["AHLetter"], rangeTables["Numeric"])
 	}
 
 	if prop.packagename == "sentences" {

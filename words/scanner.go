@@ -93,6 +93,17 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// https://unicode.org/reports/tr29/#WB3d
 		if is(WSegSpace, current) && is(WSegSpace, previous) {
 			pos += w
+
+			// Optimization: there's a likelihood of a run of WSegSpace
+			for {
+				current, w := utf8.DecodeRune(data[pos:])
+				if is(WSegSpace, current) {
+					pos += w
+					continue
+				}
+				break
+			}
+
 			continue
 		}
 
@@ -111,6 +122,17 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// https://unicode.org/reports/tr29/#WB5
 		if is(AHLetter, current) && seek.Previous(data[:pos], ignore, AHLetter) {
 			pos += w
+
+			// Optimization: there's a likelihood of a run of AHLetter
+			for {
+				current, w := utf8.DecodeRune(data[pos:])
+				if is(AHLetter, current) || is(ignore, current) {
+					pos += w
+					continue
+				}
+				break
+			}
+
 			continue
 		}
 
@@ -153,18 +175,51 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// https://unicode.org/reports/tr29/#WB8
 		if is(Numeric, current) && seek.Previous(data[:pos], ignore, Numeric) {
 			pos += w
+
+			// Optimization: there's a likelihood of a run of Numeric
+			for {
+				current, w := utf8.DecodeRune(data[pos:])
+				if is(Numeric, current) || is(ignore, current) {
+					pos += w
+					continue
+				}
+				break
+			}
+
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB9
 		if is(Numeric, current) && seek.Previous(data[:pos], ignore, AHLetter) {
 			pos += w
+
+			// Optimization: there's a likelihood of a run of Numeric|AHLetter
+			for {
+				current, w := utf8.DecodeRune(data[pos:])
+				if is(_AHLetterǀNumeric, current) || is(ignore, current) {
+					pos += w
+					continue
+				}
+				break
+			}
+
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB10
 		if is(AHLetter, current) && seek.Previous(data[:pos], ignore, Numeric) {
 			pos += w
+
+			// Optimization: there's a likelihood of a run of Numeric|AHLetter
+			for {
+				current, w := utf8.DecodeRune(data[pos:])
+				if is(_AHLetterǀNumeric, current) || is(ignore, current) {
+					pos += w
+					continue
+				}
+				break
+			}
+
 			continue
 		}
 
@@ -186,6 +241,17 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// https://unicode.org/reports/tr29/#WB13
 		if is(Katakana, current) && seek.Previous(data[:pos], ignore, Katakana) {
 			pos += w
+
+			// Optimization: there's a likelihood of a run of Katakana
+			for {
+				current, w := utf8.DecodeRune(data[pos:])
+				if is(Katakana, current) || is(ignore, current) {
+					pos += w
+					continue
+				}
+				break
+			}
+
 			continue
 		}
 
