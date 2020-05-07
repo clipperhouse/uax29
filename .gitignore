@@ -1,3 +1,4 @@
 *.prof
 *.test
 temp/main.go
+.DS_Store
