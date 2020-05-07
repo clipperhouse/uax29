@@ -23,14 +23,6 @@ if err := scanner.Err(); err != nil {
 
 [GoDoc](https://godoc.org/github.com/clipperhouse/uax29/words)
 
-### Performance
-
-`uax29` is designed to work in constant memory, regardless of input size. It buffers input and streams tokens. (For example, I am showing a maximum resident size of 8MB when processing a 300MB file, on my laptop.)
-
-Execution time is `O(n)` on input size. It can be I/O bound; you can control I/O and performance implications by the `io.Reader` you pass to `NewScanner`.
-
-In my local testing (Mac laptop), `uax29/words` processes around 2MM tokens per second of English wiki text.
-
 ### Conformance
 
 We use the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29), thanks to [bleve](https://github.com/blevesearch/segment/blob/master/tables_test.go). Status:
@@ -38,3 +30,11 @@ We use the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#T
 ![Go](https://github.com/clipperhouse/uax29/workflows/Go/badge.svg)
 
 The [spec](https://unicode.org/reports/tr29/#Word_Boundaries) has many nods to practicality and judgment for the implementer. One place where we vary from the strict spec is to consider underscore `_` a valid mid-word/mid-number character, helpful for things like user_names.
+
+### Performance
+
+`uax29` is designed to work in constant memory, regardless of input size. It buffers input and streams tokens. (For example, I am showing a maximum resident size of 8MB when processing a 300MB file.)
+
+Execution time is `O(n)` on input size. It can be I/O bound; you can control I/O and performance implications by the `io.Reader` you pass to `NewScanner`.
+
+In my local testing (Mac laptop), `uax29/words` processes around 3MM tokens per second of English wiki text.
