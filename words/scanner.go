@@ -126,7 +126,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// Optimization: there's a likelihood of a run of AHLetter
 			for {
 				current, w := utf8.DecodeRune(data[pos:])
-				if is(AHLetter, current) || is(ignore, current) {
+				if is(AHLetter, current) {
 					pos += w
 					continue
 				}
@@ -179,7 +179,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// Optimization: there's a likelihood of a run of Numeric
 			for {
 				current, w := utf8.DecodeRune(data[pos:])
-				if is(Numeric, current) || is(ignore, current) {
+				if is(Numeric, current) {
 					pos += w
 					continue
 				}
@@ -196,7 +196,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// Optimization: there's a likelihood of a run of Numeric|AHLetter
 			for {
 				current, w := utf8.DecodeRune(data[pos:])
-				if is(_AHLetterǀNumeric, current) || is(ignore, current) {
+				if is(_AHLetterǀNumeric, current) {
 					pos += w
 					continue
 				}
@@ -213,7 +213,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// Optimization: there's a likelihood of a run of Numeric|AHLetter
 			for {
 				current, w := utf8.DecodeRune(data[pos:])
-				if is(_AHLetterǀNumeric, current) || is(ignore, current) {
+				if is(_AHLetterǀNumeric, current) {
 					pos += w
 					continue
 				}
@@ -245,7 +245,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// Optimization: there's a likelihood of a run of Katakana
 			for {
 				current, w := utf8.DecodeRune(data[pos:])
-				if is(Katakana, current) || is(ignore, current) {
+				if is(Katakana, current) {
 					pos += w
 					continue
 				}
