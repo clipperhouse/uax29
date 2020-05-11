@@ -5,10 +5,8 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"unicode"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/emoji"
 	"github.com/clipperhouse/uax29/seeker"
 )
 
@@ -29,8 +27,6 @@ func NewScanner(r io.Reader) *bufio.Scanner {
 	scanner.Split(SplitFunc)
 	return scanner
 }
-
-var is = unicode.Is
 
 var trie = newWordsTrie(0)
 var seek = seeker.New(trie.lookup, bIgnore)
@@ -99,7 +95,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB3c
-		if is(emoji.Extended_Pictographic, current) && Is(bZWJ, previous) {
+		if Is(bExtended_Pictographic, data[pos:]) && Is(bZWJ, previous) {
 			pos += w
 			continue
 		}
