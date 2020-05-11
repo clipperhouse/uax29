@@ -180,8 +180,8 @@ func write(prop prop, trie *triegen.Trie, iotasByCategory map[string]uint64) err
 	sort.Strings(categories)
 
 	fmt.Fprintln(&buf, "var(")
-	for _, category := range categories {
-		fmt.Fprintf(&buf, "_%s uint32 = %d\n", category, iotasByCategory[category])
+	for i, category := range categories {
+		fmt.Fprintf(&buf, "_%s uint32 = 1 << %d\n", category, i)
 	}
 	fmt.Fprintln(&buf, ")")
 

@@ -4,21 +4,21 @@ package sentences
 // from https://www.unicode.org/Public/12.0.0/ucd/auxiliary/SentenceBreakProperty.txt
 
 var (
-	_ATerm                 uint32 = 1
-	_CR                    uint32 = 2
-	_Close                 uint32 = 4
-	_Extend                uint32 = 8
-	_Extended_Pictographic uint32 = 16
-	_Format                uint32 = 32
-	_LF                    uint32 = 64
-	_Lower                 uint32 = 128
-	_Numeric               uint32 = 256
-	_OLetter               uint32 = 512
-	_SContinue             uint32 = 1024
-	_STerm                 uint32 = 2048
-	_Sep                   uint32 = 4096
-	_Sp                    uint32 = 8192
-	_Upper                 uint32 = 16384
+	_ATerm                 uint32 = 1 << 0
+	_CR                    uint32 = 1 << 1
+	_Close                 uint32 = 1 << 2
+	_Extend                uint32 = 1 << 3
+	_Extended_Pictographic uint32 = 1 << 4
+	_Format                uint32 = 1 << 5
+	_LF                    uint32 = 1 << 6
+	_Lower                 uint32 = 1 << 7
+	_Numeric               uint32 = 1 << 8
+	_OLetter               uint32 = 1 << 9
+	_SContinue             uint32 = 1 << 10
+	_STerm                 uint32 = 1 << 11
+	_Sep                   uint32 = 1 << 12
+	_Sp                    uint32 = 1 << 13
+	_Upper                 uint32 = 1 << 14
 )
 
 // lookup returns the trie value for the first UTF-8 encoding in s and
