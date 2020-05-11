@@ -13,7 +13,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/clipperhouse/uax29/gen2/triegen"
+	"github.com/clipperhouse/uax29/gen/triegen"
 )
 
 type prop struct {
@@ -108,7 +108,6 @@ func generate(prop prop) error {
 
 	iotasByCategory := map[string]uint64{}
 	for i, category := range categories {
-		fmt.Printf("%s: %d\n", category, 1<<i)
 		iotasByCategory[category] = 1 << i
 	}
 
