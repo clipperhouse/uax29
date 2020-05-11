@@ -181,7 +181,7 @@ func write(prop prop, trie *triegen.Trie, iotasByCategory map[string]uint64) err
 
 	fmt.Fprintln(&buf, "var(")
 	for _, category := range categories {
-		fmt.Fprintf(&buf, "b%s uint32 = %d\n", category, iotasByCategory[category])
+		fmt.Fprintf(&buf, "_%s uint32 = %d\n", category, iotasByCategory[category])
 	}
 	fmt.Fprintln(&buf, ")")
 

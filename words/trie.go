@@ -4,25 +4,25 @@ package words
 // from https://www.unicode.org/Public/12.0.0/ucd/auxiliary/WordBreakProperty.txt
 
 var (
-	bALetter               uint32 = 1
-	bCR                    uint32 = 2
-	bDouble_Quote          uint32 = 4
-	bExtend                uint32 = 8
-	bExtendNumLet          uint32 = 16
-	bExtended_Pictographic uint32 = 32
-	bFormat                uint32 = 64
-	bHebrew_Letter         uint32 = 128
-	bKatakana              uint32 = 256
-	bLF                    uint32 = 512
-	bMidLetter             uint32 = 1024
-	bMidNum                uint32 = 2048
-	bMidNumLet             uint32 = 4096
-	bNewline               uint32 = 8192
-	bNumeric               uint32 = 16384
-	bRegional_Indicator    uint32 = 32768
-	bSingle_Quote          uint32 = 65536
-	bWSegSpace             uint32 = 131072
-	bZWJ                   uint32 = 262144
+	_ALetter               uint32 = 1
+	_CR                    uint32 = 2
+	_Double_Quote          uint32 = 4
+	_Extend                uint32 = 8
+	_ExtendNumLet          uint32 = 16
+	_Extended_Pictographic uint32 = 32
+	_Format                uint32 = 64
+	_Hebrew_Letter         uint32 = 128
+	_Katakana              uint32 = 256
+	_LF                    uint32 = 512
+	_MidLetter             uint32 = 1024
+	_MidNum                uint32 = 2048
+	_MidNumLet             uint32 = 4096
+	_Newline               uint32 = 8192
+	_Numeric               uint32 = 16384
+	_Regional_Indicator    uint32 = 32768
+	_Single_Quote          uint32 = 65536
+	_WSegSpace             uint32 = 131072
+	_ZWJ                   uint32 = 262144
 )
 
 // lookup returns the trie value for the first UTF-8 encoding in s and
