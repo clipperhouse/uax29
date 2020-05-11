@@ -13,7 +13,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/clipperhouse/uax29/triegen"
+	"github.com/clipperhouse/uax29/gen2/triegen"
 )
 
 type prop struct {

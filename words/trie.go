@@ -193,7 +193,7 @@ func (t *wordsTrie) lookupStringUnsafe(s string) uint32 {
 	return 0
 }
 
-// wordsTrie. Total size: 75904 bytes (74.12 KiB). Checksum: 86bb31d6af18c978.
+// wordsTrie. Total size: 79104 bytes (77.25 KiB). Checksum: 86bb31d6af18c978.
 type wordsTrie struct{}
 
 func newWordsTrie(i int) *wordsTrie {
@@ -2844,9 +2844,9 @@ var wordsValues = [18176]uint32{
 	0x46ea: 0x0008, 0x46eb: 0x0008, 0x46ec: 0x0008, 0x46ed: 0x0008, 0x46ee: 0x0008, 0x46ef: 0x0008,
 }
 
-// wordsIndex: 25 blocks, 1600 entries, 3200 bytes
+// wordsIndex: 25 blocks, 1600 entries, 6400 bytes
 // Block 0 is the zero block.
-var wordsIndex = [1600]uint16{
+var wordsIndex = [1600]uint32{
 	// Block 0x0, offset 0x0
 	// Block 0x1, offset 0x40
 	// Block 0x2, offset 0x80
