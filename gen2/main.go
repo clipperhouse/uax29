@@ -94,6 +94,8 @@ func generate(prop prop) error {
 	const key = "Extended_Pictographic"
 	if prop.packagename == "emoji" {
 		extendedPictographic = runesByCategory[key]
+		// We don't need to generate emoji package
+		return nil
 	}
 	runesByCategory[key] = extendedPictographic
 
