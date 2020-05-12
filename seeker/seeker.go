@@ -18,8 +18,8 @@ func New(lookup func([]byte) (uint32, int), ignore uint32) *Seeker {
 	}
 }
 
-// Is determines if the current rune matches categories
-func (sk *Seeker) Is(categories uint32, s []byte) bool {
+// is determines if the current rune matches categories
+func (sk *Seeker) is(categories uint32, s []byte) bool {
 	lookup, _ := sk.lookup(s)
 	return (lookup & categories) != 0
 }
@@ -36,11 +36,11 @@ func (sk *Seeker) PreviousIndex(seek uint32, data []byte) int {
 
 		_ = r
 
-		if sk.Is(sk.ignore, data[i:]) {
+		if sk.is(sk.ignore, data[i:]) {
 			continue
 		}
 
-		if sk.Is(seek, data[i:]) {
+		if sk.is(seek, data[i:]) {
 			return i
 		}
 
@@ -64,12 +64,12 @@ func (sk *Seeker) Forward(seek uint32, data []byte) bool {
 	for i < len(data) {
 		_, w := utf8.DecodeRune(data[i:])
 
-		if sk.Is(sk.ignore, data[i:]) {
+		if sk.is(sk.ignore, data[i:]) {
 			i += w
 			continue
 		}
 
-		if sk.Is(seek, data[i:]) {
+		if sk.is(seek, data[i:]) {
 			return true
 		}
 

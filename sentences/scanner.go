@@ -35,8 +35,8 @@ var _Ignore = _Extend | _Format
 var trie = newSentencesTrie(0)
 var seek = seeker.New(trie.lookup, _Ignore)
 
-// Is tests if the first rune of s is in categories
-func Is(categories uint32, s []byte) bool {
+// is tests if the first rune of s is in categories
+func is(categories uint32, s []byte) bool {
 	lookup, _ := trie.lookup(s)
 	return (lookup & categories) != 0
 }
@@ -82,18 +82,18 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		previous := data[pos-pw:]
 
 		// https://unicode.org/reports/tr29/#SB3
-		if Is(_LF, data[pos:]) && Is(_CR, previous) {
+		if is(_LF, data[pos:]) && is(_CR, previous) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#SB4
-		if Is(_ParaSep, previous) {
+		if is(_ParaSep, previous) {
 			break
 		}
 
 		// https://unicode.org/reports/tr29/#SB5
-		if Is(_Extend|_Format, data[pos:]) {
+		if is(_Extend|_Format, data[pos:]) {
 			pos += w
 			continue
 		}
@@ -103,13 +103,13 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// The Seek* methods are shorthand for "seek a category but skip over Extend & Format on the way"
 
 		// https://unicode.org/reports/tr29/#SB6
-		if Is(_Numeric, data[pos:]) && seek.Previous(_ATerm, data[:pos]) {
+		if is(_Numeric, data[pos:]) && seek.Previous(_ATerm, data[:pos]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#SB7
-		if Is(_Upper, data[pos:]) {
+		if is(_Upper, data[pos:]) {
 			previousIndex := seek.PreviousIndex(_ATerm, data[:pos])
 			if previousIndex >= 0 && seek.Previous(_Upper|_Lower, data[:previousIndex]) {
 				pos += w
@@ -125,7 +125,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// Zero or more of not-the-above categories
 			for p < len(data) {
 				_, w := utf8.DecodeRune(data[p:])
-				if !Is(_OLetter|_Upper|_Lower|_ParaSep|_SATerm, data[p:]) {
+				if !is(_OLetter|_Upper|_Lower|_ParaSep|_SATerm, data[p:]) {
 					p += w
 					continue
 				}
@@ -165,7 +165,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#SB8a
-		if Is(_SContinue|_SATerm, data[pos:]) {
+		if is(_SContinue|_SATerm, data[pos:]) {
 			p := pos
 
 			// Zero or more Sp
@@ -197,7 +197,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#SB9
-		if Is(_Close|_Sp|_ParaSep, data[pos:]) {
+		if is(_Close|_Sp|_ParaSep, data[pos:]) {
 			p := pos
 
 			// Zero or more Close's
@@ -219,7 +219,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#SB10
-		if Is(_Sp|_ParaSep, data[pos:]) {
+		if is(_Sp|_ParaSep, data[pos:]) {
 			p := pos
 
 			// Zero or more Sp's

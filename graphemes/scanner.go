@@ -31,8 +31,8 @@ func NewScanner(r io.Reader) *bufio.Scanner {
 var trie = newGraphemesTrie(0)
 var seek = seeker.New(trie.lookup, _Extend)
 
-// Is tests if the first rune of s is in categories
-func Is(categories uint32, s []byte) bool {
+// is tests if the first rune of s is in categories
+func is(categories uint32, s []byte) bool {
 	lookup, _ := trie.lookup(s)
 	return (lookup & categories) != 0
 }
@@ -75,66 +75,66 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		previous := data[pos-pw:]
 
 		// https://unicode.org/reports/tr29/#GB3
-		if Is(_LF, data[pos:]) && Is(_CR, previous) {
+		if is(_LF, data[pos:]) && is(_CR, previous) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB4
-		if Is(_Control|_CR|_LF, previous) {
+		if is(_Control|_CR|_LF, previous) {
 			break
 		}
 
 		// https://unicode.org/reports/tr29/#GB5
-		if Is(_Control|_CR|_LF, data[pos:]) {
+		if is(_Control|_CR|_LF, data[pos:]) {
 			break
 		}
 
 		// https://unicode.org/reports/tr29/#GB6
-		if Is(_L|_V|_LV|_LVT, data[pos:]) && Is(_L, previous) {
+		if is(_L|_V|_LV|_LVT, data[pos:]) && is(_L, previous) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB7
-		if Is(_V|_T, data[pos:]) && Is(_LV|_V, previous) {
+		if is(_V|_T, data[pos:]) && is(_LV|_V, previous) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB8
-		if Is(_T, data[pos:]) && Is(_LVT|_T, previous) {
+		if is(_T, data[pos:]) && is(_LVT|_T, previous) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB9
-		if Is(_Extend|_ZWJ, data[pos:]) {
+		if is(_Extend|_ZWJ, data[pos:]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB9a
-		if Is(_SpacingMark, data[pos:]) {
+		if is(_SpacingMark, data[pos:]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB9b
-		if Is(_Prepend, previous) {
+		if is(_Prepend, previous) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB11
-		if Is(_Extended_Pictographic, data[pos:]) && Is(_ZWJ, previous) &&
+		if is(_Extended_Pictographic, data[pos:]) && is(_ZWJ, previous) &&
 			seek.Previous(_Extended_Pictographic, data[:pos-pw]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB12
-		if Is(_Regional_Indicator, data[pos:]) {
+		if is(_Regional_Indicator, data[pos:]) {
 			allRI := true
 
 			// Buffer comprised entirely of an odd number of RI, ignoring Extend|Format|ZWJ
@@ -143,7 +143,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			for i > 0 {
 				_, w := utf8.DecodeLastRune(data[:i])
 				i -= w
-				if !Is(_Regional_Indicator, data[i:]) {
+				if !is(_Regional_Indicator, data[i:]) {
 					allRI = false
 					break
 				}
@@ -160,7 +160,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#GB13
-		if Is(_Regional_Indicator, data[pos:]) {
+		if is(_Regional_Indicator, data[pos:]) {
 			odd := false
 			// Last n runes represent an odd number of RI, ignoring Extend|Format|ZWJ
 			i := pos
@@ -168,7 +168,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			for i > 0 {
 				_, w := utf8.DecodeLastRune(data[:i])
 				i -= w
-				if !Is(_Regional_Indicator, data[i:]) {
+				if !is(_Regional_Indicator, data[i:]) {
 					odd = count > 0 && count%2 == 1
 					break
 				}
