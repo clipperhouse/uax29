@@ -39,11 +39,6 @@ func (b *builder) print(w io.Writer) error {
 		return err
 	}
 
-	b.SourceType = "string"
-	if err := lookupGen.Execute(w, b); err != nil {
-		return err
-	}
-
 	if err := trieGen.Execute(w, b); err != nil {
 		return err
 	}
@@ -225,27 +220,5 @@ func (t *{{.Name}}Trie) lookup{{if eq .SourceType "string"}}String{{end}}(s {{.S
 	}
 	// Illegal rune
 	return 0, 1
-}
-
-// lookup{{if eq .SourceType "string"}}String{{end}}Unsafe returns the trie value for the first UTF-8 encoding in s.
-// s must start with a full and valid UTF-8 encoded rune.
-func (t *{{.Name}}Trie) lookup{{if eq .SourceType "string"}}String{{end}}Unsafe(s {{.SourceType}}) {{.ValueType}} {
-	c0 := s[0]
-	if c0 < 0x80 { // is ASCII
-		return {{.ASCIIBlock}}[c0]
-	}
-	i := {{.StarterBlock}}[c0]
-	if c0 < 0xE0 { // 2-byte UTF-8
-		return t.lookupValue(uint32(i), s[1])
-	}
-	i = {{.Name}}Index[uint32(i)<<6+uint32(s[1])]
-	if c0 < 0xF0 { // 3-byte UTF-8
-		return t.lookupValue(uint32(i), s[2])
-	}
-	i = {{.Name}}Index[uint32(i)<<6+uint32(s[2])]
-	if c0 < 0xF8 { // 4-byte UTF-8
-		return t.lookupValue(uint32(i), s[3])
-	}
-	return 0
 }
 `
