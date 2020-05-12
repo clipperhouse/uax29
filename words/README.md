@@ -29,8 +29,6 @@ We use the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#T
 
 ![Go](https://github.com/clipperhouse/uax29/workflows/Go/badge.svg)
 
-The [spec](https://unicode.org/reports/tr29/#Word_Boundaries) has many nods to practicality and judgment for the implementer. One place where we vary from the strict spec is to consider underscore `_` a valid mid-word/mid-number character, helpful for things like user_names.
-
 ### Performance
 
 `uax29` is designed to work in constant memory, regardless of input size. It buffers input and streams tokens. (For example, I am showing a maximum resident size of 8MB when processing a 300MB file.)
