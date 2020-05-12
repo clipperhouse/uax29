@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"io"
 	"unicode/utf8"
-
-	"github.com/clipperhouse/uax29/seeker"
 )
 
 // NewScanner tokenizes a reader into a stream of grapheme clusters according to Unicode Text Segmentation boundaries https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries
@@ -29,13 +27,14 @@ func NewScanner(r io.Reader) *bufio.Scanner {
 }
 
 var trie = newGraphemesTrie(0)
-var seek = seeker.New(trie.lookup, _Extend)
 
 // is tests if the first rune of s is in categories
 func is(categories uint32, s []byte) bool {
 	lookup, _ := trie.lookup(s)
 	return (lookup & categories) != 0
 }
+
+var _Ignore = _Extend
 
 // SplitFunc is a bufio.SplitFunc implementation of grapheme cluster segmentation, for use with bufio.Scanner
 func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
@@ -128,7 +127,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		// https://unicode.org/reports/tr29/#GB11
 		if is(_Extended_Pictographic, data[pos:]) && is(_ZWJ, previous) &&
-			seek.Previous(_Extended_Pictographic, data[:pos-pw]) {
+			seekPrevious(_Extended_Pictographic, data[:pos-pw]) {
 			pos += w
 			continue
 		}
