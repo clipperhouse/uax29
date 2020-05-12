@@ -179,9 +179,22 @@ func write(prop prop, trie *triegen.Trie, iotasByCategory map[string]uint64) err
 	}
 	sort.Strings(categories)
 
+	inttype := ""
+	len := len(categories)
+	switch {
+	case len < 8:
+		inttype = "uint8"
+	case len < 16:
+		inttype = "uint16"
+	case len < 32:
+		inttype = "uint32"
+	default:
+		inttype = "uint64"
+	}
+
 	fmt.Fprintln(&buf, "var(")
 	for i, category := range categories {
-		fmt.Fprintf(&buf, "_%s uint32 = 1 << %d\n", category, i)
+		fmt.Fprintf(&buf, "_%s %s = 1 << %d\n", category, inttype, i)
 	}
 	fmt.Fprintln(&buf, ")")
 

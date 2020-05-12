@@ -376,17 +376,15 @@ func maxValue(n *node, max uint64) uint64 {
 }
 
 func getIntType(v uint64) (string, int) {
-	return "uint32", 4
-
-	// switch {
-	// case v < 1<<8:
-	// 	return "uint8", 1
-	// case v < 1<<16:
-	// 	return "uint16", 2
-	// case v < 1<<32:
-	// 	return "uint32", 4
-	// }
-	// return "uint64", 8
+	switch {
+	case v < 1<<8:
+		return "uint8", 1
+	case v < 1<<16:
+		return "uint16", 2
+	case v < 1<<32:
+		return "uint32", 4
+	}
+	return "uint64", 8
 }
 
 const (

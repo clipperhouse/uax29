@@ -4,26 +4,26 @@ package graphemes
 // from https://www.unicode.org/Public/12.0.0/ucd/auxiliary/GraphemeBreakProperty.txt
 
 var (
-	_CR                    uint32 = 1 << 0
-	_Control               uint32 = 1 << 1
-	_Extend                uint32 = 1 << 2
-	_Extended_Pictographic uint32 = 1 << 3
-	_L                     uint32 = 1 << 4
-	_LF                    uint32 = 1 << 5
-	_LV                    uint32 = 1 << 6
-	_LVT                   uint32 = 1 << 7
-	_Prepend               uint32 = 1 << 8
-	_Regional_Indicator    uint32 = 1 << 9
-	_SpacingMark           uint32 = 1 << 10
-	_T                     uint32 = 1 << 11
-	_V                     uint32 = 1 << 12
-	_ZWJ                   uint32 = 1 << 13
+	_CR                    uint16 = 1 << 0
+	_Control               uint16 = 1 << 1
+	_Extend                uint16 = 1 << 2
+	_Extended_Pictographic uint16 = 1 << 3
+	_L                     uint16 = 1 << 4
+	_LF                    uint16 = 1 << 5
+	_LV                    uint16 = 1 << 6
+	_LVT                   uint16 = 1 << 7
+	_Prepend               uint16 = 1 << 8
+	_Regional_Indicator    uint16 = 1 << 9
+	_SpacingMark           uint16 = 1 << 10
+	_T                     uint16 = 1 << 11
+	_V                     uint16 = 1 << 12
+	_ZWJ                   uint16 = 1 << 13
 )
 
 // lookup returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
-func (t *graphemesTrie) lookup(s []byte) (v uint32, sz int) {
+func (t *graphemesTrie) lookup(s []byte) (v uint16, sz int) {
 	c0 := s[0]
 	switch {
 	case c0 < 0x80: // is ASCII
@@ -83,7 +83,7 @@ func (t *graphemesTrie) lookup(s []byte) (v uint32, sz int) {
 	return 0, 1
 }
 
-// graphemesTrie. Total size: 57344 bytes (56.00 KiB). Checksum: b28946212b0bb073.
+// graphemesTrie. Total size: 27136 bytes (26.50 KiB). Checksum: b28946212b0bb073.
 type graphemesTrie struct{}
 
 func newGraphemesTrie(i int) *graphemesTrie {
@@ -91,16 +91,16 @@ func newGraphemesTrie(i int) *graphemesTrie {
 }
 
 // lookupValue determines the type of block n and looks up the value for b.
-func (t *graphemesTrie) lookupValue(n uint32, b byte) uint32 {
+func (t *graphemesTrie) lookupValue(n uint32, b byte) uint16 {
 	switch {
 	default:
-		return uint32(graphemesValues[n<<6+uint32(b)])
+		return uint16(graphemesValues[n<<6+uint32(b)])
 	}
 }
 
-// graphemesValues: 200 blocks, 12800 entries, 51200 bytes
+// graphemesValues: 200 blocks, 12800 entries, 25600 bytes
 // The third block is the zero block.
-var graphemesValues = [12800]uint32{
+var graphemesValues = [12800]uint16{
 	// Block 0x0, offset 0x0
 	0x00: 0x0002, 0x01: 0x0002, 0x02: 0x0002, 0x03: 0x0002, 0x04: 0x0002, 0x05: 0x0002,
 	0x06: 0x0002, 0x07: 0x0002, 0x08: 0x0002, 0x09: 0x0002, 0x0a: 0x0020, 0x0b: 0x0002,
@@ -1226,9 +1226,9 @@ var graphemesValues = [12800]uint32{
 	0x31fc: 0x0002, 0x31fd: 0x0002, 0x31fe: 0x0002, 0x31ff: 0x0002,
 }
 
-// graphemesIndex: 24 blocks, 1536 entries, 6144 bytes
+// graphemesIndex: 24 blocks, 1536 entries, 1536 bytes
 // Block 0 is the zero block.
-var graphemesIndex = [1536]uint32{
+var graphemesIndex = [1536]uint8{
 	// Block 0x0, offset 0x0
 	// Block 0x1, offset 0x40
 	// Block 0x2, offset 0x80

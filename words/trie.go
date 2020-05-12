@@ -88,7 +88,7 @@ func (t *wordsTrie) lookup(s []byte) (v uint32, sz int) {
 	return 0, 1
 }
 
-// wordsTrie. Total size: 86272 bytes (84.25 KiB). Checksum: 6658f3c8a61da947.
+// wordsTrie. Total size: 83072 bytes (81.12 KiB). Checksum: 6658f3c8a61da947.
 type wordsTrie struct{}
 
 func newWordsTrie(i int) *wordsTrie {
@@ -2956,9 +2956,9 @@ var wordsValues = [19968]uint32{
 	0x4dea: 0x0008, 0x4deb: 0x0008, 0x4dec: 0x0008, 0x4ded: 0x0008, 0x4dee: 0x0008, 0x4def: 0x0008,
 }
 
-// wordsIndex: 25 blocks, 1600 entries, 6400 bytes
+// wordsIndex: 25 blocks, 1600 entries, 3200 bytes
 // Block 0 is the zero block.
-var wordsIndex = [1600]uint32{
+var wordsIndex = [1600]uint16{
 	// Block 0x0, offset 0x0
 	// Block 0x1, offset 0x40
 	// Block 0x2, offset 0x80

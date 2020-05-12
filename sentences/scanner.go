@@ -29,7 +29,7 @@ func NewScanner(r io.Reader) *bufio.Scanner {
 var trie = newSentencesTrie(0)
 
 // is tests if the first rune of s is in categories
-func is(categories uint32, s []byte) bool {
+func is(categories uint16, s []byte) bool {
 	lookup, _ := trie.lookup(s)
 	return (lookup & categories) != 0
 }

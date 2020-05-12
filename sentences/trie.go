@@ -4,27 +4,27 @@ package sentences
 // from https://www.unicode.org/Public/12.0.0/ucd/auxiliary/SentenceBreakProperty.txt
 
 var (
-	_ATerm                 uint32 = 1 << 0
-	_CR                    uint32 = 1 << 1
-	_Close                 uint32 = 1 << 2
-	_Extend                uint32 = 1 << 3
-	_Extended_Pictographic uint32 = 1 << 4
-	_Format                uint32 = 1 << 5
-	_LF                    uint32 = 1 << 6
-	_Lower                 uint32 = 1 << 7
-	_Numeric               uint32 = 1 << 8
-	_OLetter               uint32 = 1 << 9
-	_SContinue             uint32 = 1 << 10
-	_STerm                 uint32 = 1 << 11
-	_Sep                   uint32 = 1 << 12
-	_Sp                    uint32 = 1 << 13
-	_Upper                 uint32 = 1 << 14
+	_ATerm                 uint16 = 1 << 0
+	_CR                    uint16 = 1 << 1
+	_Close                 uint16 = 1 << 2
+	_Extend                uint16 = 1 << 3
+	_Extended_Pictographic uint16 = 1 << 4
+	_Format                uint16 = 1 << 5
+	_LF                    uint16 = 1 << 6
+	_Lower                 uint16 = 1 << 7
+	_Numeric               uint16 = 1 << 8
+	_OLetter               uint16 = 1 << 9
+	_SContinue             uint16 = 1 << 10
+	_STerm                 uint16 = 1 << 11
+	_Sep                   uint16 = 1 << 12
+	_Sp                    uint16 = 1 << 13
+	_Upper                 uint16 = 1 << 14
 )
 
 // lookup returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
-func (t *sentencesTrie) lookup(s []byte) (v uint32, sz int) {
+func (t *sentencesTrie) lookup(s []byte) (v uint16, sz int) {
 	c0 := s[0]
 	switch {
 	case c0 < 0x80: // is ASCII
@@ -84,7 +84,7 @@ func (t *sentencesTrie) lookup(s []byte) (v uint32, sz int) {
 	return 0, 1
 }
 
-// sentencesTrie. Total size: 97792 bytes (95.50 KiB). Checksum: ef00bae275467431.
+// sentencesTrie. Total size: 48896 bytes (47.75 KiB). Checksum: ef00bae275467431.
 type sentencesTrie struct{}
 
 func newSentencesTrie(i int) *sentencesTrie {
@@ -92,16 +92,16 @@ func newSentencesTrie(i int) *sentencesTrie {
 }
 
 // lookupValue determines the type of block n and looks up the value for b.
-func (t *sentencesTrie) lookupValue(n uint32, b byte) uint32 {
+func (t *sentencesTrie) lookupValue(n uint32, b byte) uint16 {
 	switch {
 	default:
-		return uint32(sentencesValues[n<<6+uint32(b)])
+		return uint16(sentencesValues[n<<6+uint32(b)])
 	}
 }
 
-// sentencesValues: 349 blocks, 22336 entries, 89344 bytes
+// sentencesValues: 349 blocks, 22336 entries, 44672 bytes
 // The third block is the zero block.
-var sentencesValues = [22336]uint32{
+var sentencesValues = [22336]uint16{
 	// Block 0x0, offset 0x0
 	0x09: 0x2000, 0x0a: 0x0040, 0x0b: 0x2000,
 	0x0c: 0x2000, 0x0d: 0x0002,
@@ -3476,9 +3476,9 @@ var sentencesValues = [22336]uint32{
 	0x572a: 0x0008, 0x572b: 0x0008, 0x572c: 0x0008, 0x572d: 0x0008, 0x572e: 0x0008, 0x572f: 0x0008,
 }
 
-// sentencesIndex: 33 blocks, 2112 entries, 8448 bytes
+// sentencesIndex: 33 blocks, 2112 entries, 4224 bytes
 // Block 0 is the zero block.
-var sentencesIndex = [2112]uint32{
+var sentencesIndex = [2112]uint16{
 	// Block 0x0, offset 0x0
 	// Block 0x1, offset 0x40
 	// Block 0x2, offset 0x80
