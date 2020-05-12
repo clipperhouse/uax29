@@ -9,10 +9,8 @@ func seekPreviousIndex(seek uint32, data []byte) int {
 	// Start at the end of the buffer and move backwards
 	i := len(data)
 	for i > 0 {
-		r, w := utf8.DecodeLastRune(data[:i])
+		_, w := utf8.DecodeLastRune(data[:i])
 		i -= w
-
-		_ = r
 
 		if is(_Ignore, data[i:]) {
 			continue
