@@ -5,11 +5,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"unicode"
 	"unicode/utf8"
-
-	"github.com/clipperhouse/uax29/emoji"
-	"github.com/clipperhouse/uax29/seek"
 )
 
 // NewScanner tokenizes a reader into a stream of grapheme clusters according to Unicode Text Segmentation boundaries https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries
@@ -30,7 +26,15 @@ func NewScanner(r io.Reader) *bufio.Scanner {
 	return scanner
 }
 
-var is = unicode.Is
+var trie = newGraphemesTrie(0)
+
+// is tests if the first rune of s is in categories
+func is(categories uint16, s []byte) bool {
+	lookup, _ := trie.lookup(s)
+	return (lookup & categories) != 0
+}
+
+var _Ignore = _Extend
 
 // SplitFunc is a bufio.SplitFunc implementation of grapheme cluster segmentation, for use with bufio.Scanner
 func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
@@ -66,77 +70,79 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			return 0, nil, fmt.Errorf("error decoding rune")
 		}
 
-		previous, wp := utf8.DecodeLastRune(data[:pos])
+		_, pw := utf8.DecodeLastRune(data[:pos])
+		previous := data[pos-pw:]
 
 		// https://unicode.org/reports/tr29/#GB3
-		if is(LF, current) && is(CR, previous) {
+		if is(_LF, data[pos:]) && is(_CR, previous) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB4
-		if is(_ControlǀCRǀLF, previous) {
+		if is(_Control|_CR|_LF, previous) {
 			break
 		}
 
 		// https://unicode.org/reports/tr29/#GB5
-		if is(_ControlǀCRǀLF, current) {
+		if is(_Control|_CR|_LF, data[pos:]) {
 			break
 		}
 
 		// https://unicode.org/reports/tr29/#GB6
-		if is(_LǀVǀLVǀLVT, current) && is(L, previous) {
+		if is(_L|_V|_LV|_LVT, data[pos:]) && is(_L, previous) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB7
-		if is(_VǀT, current) && is(_LVǀV, previous) {
+		if is(_V|_T, data[pos:]) && is(_LV|_V, previous) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB8
-		if is(T, current) && is(_LVTǀT, previous) {
+		if is(_T, data[pos:]) && is(_LVT|_T, previous) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB9
-		if is(_ExtendǀZWJ, current) {
+		if is(_Extend|_ZWJ, data[pos:]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB9a
-		if is(SpacingMark, current) {
+		if is(_SpacingMark, data[pos:]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB9b
-		if is(Prepend, previous) {
+		if is(_Prepend, previous) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB11
-		if is(emoji.Extended_Pictographic, current) && is(ZWJ, previous) && seek.Previous(data[:pos-wp], Extend, emoji.Extended_Pictographic) {
+		if is(_Extended_Pictographic, data[pos:]) && is(_ZWJ, previous) &&
+			seekPrevious(_Extended_Pictographic, data[:pos-pw]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB12
-		if is(Regional_Indicator, current) {
+		if is(_Regional_Indicator, data[pos:]) {
 			allRI := true
 
 			// Buffer comprised entirely of an odd number of RI, ignoring Extend|Format|ZWJ
 			i := pos
 			count := 0
-			for i >= 0 {
-				r, w := utf8.DecodeLastRune(data[:i])
+			for i > 0 {
+				_, w := utf8.DecodeLastRune(data[:i])
 				i -= w
-				if !is(Regional_Indicator, r) {
+				if !is(_Regional_Indicator, data[i:]) {
 					allRI = false
 					break
 				}
@@ -153,15 +159,15 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#GB13
-		if is(Regional_Indicator, current) {
+		if is(_Regional_Indicator, data[pos:]) {
 			odd := false
 			// Last n runes represent an odd number of RI, ignoring Extend|Format|ZWJ
 			i := pos
 			count := 0
-			for i >= 0 {
-				r, w := utf8.DecodeLastRune(data[:i])
+			for i > 0 {
+				_, w := utf8.DecodeLastRune(data[:i])
 				i -= w
-				if !is(Regional_Indicator, r) {
+				if !is(_Regional_Indicator, data[i:]) {
 					odd = count > 0 && count%2 == 1
 					break
 				}

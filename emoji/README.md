@@ -1,1 +1,0 @@
-This package offers Unicode category range tables, used by other packages in the uax29 module.

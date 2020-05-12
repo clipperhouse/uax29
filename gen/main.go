@@ -13,7 +13,7 @@ import (
 	"strings"
 	"unicode"
 
-	"golang.org/x/text/unicode/rangetable"
+	"github.com/clipperhouse/uax29/gen/triegen"
 )
 
 type prop struct {
@@ -23,6 +23,10 @@ type prop struct {
 
 func main() {
 	props := []prop{
+		{
+			url:         "https://unicode.org/Public/emoji/12.0/emoji-data.txt",
+			packagename: "emoji",
+		},
 		{
 			url:         "https://www.unicode.org/Public/" + unicode.Version + "/ucd/auxiliary/WordBreakProperty.txt",
 			packagename: "words",
@@ -35,10 +39,6 @@ func main() {
 			url:         "https://www.unicode.org/Public/" + unicode.Version + "/ucd/auxiliary/SentenceBreakProperty.txt",
 			packagename: "sentences",
 		},
-		{
-			url:         "https://unicode.org/Public/emoji/12.0/emoji-data.txt",
-			packagename: "emoji",
-		},
 	}
 
 	for _, prop := range props {
@@ -48,6 +48,8 @@ func main() {
 		}
 	}
 }
+
+var extendedPictographic []rune
 
 func generate(prop prop) error {
 	fmt.Println(prop.url)
@@ -88,156 +90,41 @@ func generate(prop prop) error {
 		runesByCategory[category] = append(runesByCategory[category], runes...)
 	}
 
-	rangeTables := map[string]*unicode.RangeTable{}
+	// Words and graphemes need Extended_Pictographic category
+	const key = "Extended_Pictographic"
+	if prop.packagename == "emoji" {
+		extendedPictographic = runesByCategory[key]
+		// We don't need to generate emoji package
+		return nil
+	}
+	runesByCategory[key] = extendedPictographic
+
+	// Keep the order stable
+	categories := make([]string, 0, len(runesByCategory))
+	for category := range runesByCategory {
+		categories = append(categories, category)
+	}
+	sort.Strings(categories)
+
+	iotasByCategory := map[string]uint64{}
+	for i, category := range categories {
+		iotasByCategory[category] = 1 << i
+	}
+
+	iotasByRune := map[rune]uint64{}
 	for category, runes := range runesByCategory {
-		rangeTables[category] = rangetable.New(runes...)
+		for _, r := range runes {
+			iotasByRune[r] = iotasByRune[r] | iotasByCategory[category]
+		}
 	}
 
-	if prop.packagename == "words" {
-		// Special case for underscore; it's not in the spec but we allow it mid-word
-		// It's commonly used in handles and usernames, we choose to interpret as a single token
-		// Some programming languages allow it for formatting numbers
-		rangeTables["MidNumLet"] = rangetable.Merge(rangeTables["MidNumLet"], rangetable.New('_'))
+	trie := triegen.NewTrie(prop.packagename)
 
-		// "Macro" tables defined here: https://unicode.org/reports/tr29/#WB_Rule_Macros
-		rangeTables["AHLetter"] = rangetable.Merge(rangeTables["ALetter"], rangeTables["Hebrew_Letter"])
-		rangeTables["MidNumLetQ"] = rangetable.Merge(rangeTables["MidNumLet"], rangetable.New('\''))
-
-		// an optimization for wb3a
-		rangeTables["CRǀLFǀNewline"] = rangetable.Merge(
-			rangeTables["CR"],
-			rangeTables["LF"],
-			rangeTables["Newline"],
-		)
-
-		// an optimization for wb4 and subsequent
-		rangeTables["ExtendǀFormatǀZWJ"] = rangetable.Merge(
-			rangeTables["Extend"],
-			rangeTables["Format"],
-			rangeTables["ZWJ"],
-		)
-
-		// an optimization for wb6
-		rangeTables["MidLetterǀMidNumLetQ"] = rangetable.Merge(
-			rangeTables["MidLetter"],
-			rangeTables["MidNumLetQ"],
-		)
-
-		// an optimization for wb7
-		rangeTables["AHLetterǀExtendǀFormatǀZWJ"] = rangetable.Merge(
-			rangeTables["AHLetter"],
-			rangeTables["Extend"],
-			rangeTables["Format"],
-			rangeTables["ZWJ"],
-		)
-
-		// an optimization for wb11
-		rangeTables["MidNumǀMidNumLetQ"] = rangetable.Merge(
-			rangeTables["MidNum"],
-			rangeTables["MidNumLetQ"],
-		)
-
-		// an optimization for wb13b
-		rangeTables["AHLetterǀNumericǀKatakana"] = rangetable.Merge(
-			rangeTables["AHLetter"],
-			rangeTables["Numeric"],
-			rangeTables["Katakana"],
-		)
-
-		// an optimization for wb13a
-		rangeTables["AHLetterǀNumericǀKatakanaǀExtendNumLet"] = rangetable.Merge(
-			rangeTables["AHLetter"],
-			rangeTables["Numeric"],
-			rangeTables["Katakana"],
-			rangeTables["ExtendNumLet"],
-		)
-
-		rangeTables["AHLetterǀNumeric"] = rangetable.Merge(rangeTables["AHLetter"], rangeTables["Numeric"])
+	for r, iotas := range iotasByRune {
+		trie.Insert(r, iotas)
 	}
 
-	if prop.packagename == "sentences" {
-		rangeTables["SATerm"] = rangetable.Merge(
-			rangeTables["STerm"],
-			rangeTables["ATerm"],
-		)
-
-		rangeTables["ParaSep"] = rangetable.Merge(
-			rangeTables["Sep"],
-			rangeTables["CR"],
-			rangeTables["LF"],
-		)
-
-		rangeTables["OLetterǀUpperǀLowerǀParaSepǀSATerm"] = rangetable.Merge(
-			rangeTables["OLetter"],
-			rangeTables["Upper"],
-			rangeTables["Lower"],
-			rangeTables["ParaSep"],
-			rangeTables["SATerm"],
-		)
-
-		rangeTables["ExtendǀFormat"] = rangetable.Merge(
-			rangeTables["Extend"],
-			rangeTables["Format"],
-		)
-
-		rangeTables["UpperǀLower"] = rangetable.Merge(
-			rangeTables["Upper"],
-			rangeTables["Lower"],
-		)
-
-		rangeTables["SContinueǀSATerm"] = rangetable.Merge(
-			rangeTables["SContinue"],
-			rangeTables["SATerm"],
-		)
-
-		rangeTables["CloseǀSpǀParaSep"] = rangetable.Merge(
-			rangeTables["Close"],
-			rangeTables["Sp"],
-			rangeTables["ParaSep"],
-		)
-
-		rangeTables["SpǀParaSep"] = rangetable.Merge(
-			rangeTables["Sp"],
-			rangeTables["ParaSep"],
-		)
-	}
-
-	if prop.packagename == "graphemes" {
-		rangeTables["ControlǀCRǀLF"] = rangetable.Merge(
-			rangeTables["Control"],
-			rangeTables["CR"],
-			rangeTables["LF"],
-		)
-
-		rangeTables["LǀVǀLVǀLVT"] = rangetable.Merge(
-			rangeTables["L"],
-			rangeTables["V"],
-			rangeTables["LV"],
-			rangeTables["LVT"],
-		)
-
-		rangeTables["VǀT"] = rangetable.Merge(
-			rangeTables["V"],
-			rangeTables["T"],
-		)
-
-		rangeTables["LVǀV"] = rangetable.Merge(
-			rangeTables["LV"],
-			rangeTables["V"],
-		)
-
-		rangeTables["LVTǀT"] = rangetable.Merge(
-			rangeTables["LVT"],
-			rangeTables["T"],
-		)
-
-		rangeTables["ExtendǀZWJ"] = rangetable.Merge(
-			rangeTables["Extend"],
-			rangeTables["ZWJ"],
-		)
-	}
-
-	err = write(prop, rangeTables)
+	err = write(prop, trie, iotasByCategory)
 	if err != nil {
 		return err
 	}
@@ -278,46 +165,47 @@ func getRuneRange(s string) ([]rune, error) {
 	return runes, nil
 }
 
-func write(prop prop, rts map[string]*unicode.RangeTable) error {
+func write(prop prop, trie *triegen.Trie, iotasByCategory map[string]uint64) error {
 	buf := bytes.Buffer{}
 
 	fmt.Fprintln(&buf, "package "+prop.packagename)
 	fmt.Fprintln(&buf, "\n// generated by github.com/clipperhouse/uax29\n// from "+prop.url)
-	fmt.Fprintln(&buf, "\nimport \"unicode\"")
+	fmt.Fprintln(&buf)
 
-	// Keep the write order stable
-	categories := make([]string, 0, len(rts))
-	for category := range rts {
+	// Keep the order stable
+	categories := make([]string, 0, len(iotasByCategory))
+	for category := range iotasByCategory {
 		categories = append(categories, category)
 	}
 	sort.Strings(categories)
 
-	fmt.Fprintf(&buf, "var (\n")
-	fmt.Fprintf(&buf, "\t// See https://unicode.org/reports/tr29/\n")
-	for _, category := range categories {
-		if strings.Contains(category, "ǀ") {
-			// Skip the merged cateogries
-			continue
-		}
-		fmt.Fprintf(&buf, "%s = _%s\n", category, category)
+	inttype := ""
+	len := len(categories)
+	switch {
+	case len < 8:
+		inttype = "uint8"
+	case len < 16:
+		inttype = "uint16"
+	case len < 32:
+		inttype = "uint32"
+	default:
+		inttype = "uint64"
 	}
-	fmt.Fprintf(&buf, ")\n\n")
 
-	for _, category := range categories {
-		rt := rts[category]
-		if strings.Contains(category, "ǀ") {
-			fmt.Fprintf(&buf, "// _%s is a merged (denormalized) range table for perf and readability\n", category)
-		}
-		fmt.Fprintf(&buf, "var _%s = ", category)
-		print(&buf, rt)
+	fmt.Fprintln(&buf, "var(")
+	for i, category := range categories {
+		fmt.Fprintf(&buf, "_%s %s = 1 << %d\n", category, inttype, i)
 	}
+	fmt.Fprintln(&buf, ")")
+
+	triegen.Gen(&buf, prop.packagename, []*triegen.Trie{trie})
 
 	formatted, err := format.Source(buf.Bytes())
 	if err != nil {
 		return err
 	}
 
-	dst, err := os.Create(prop.packagename + "/tables.go")
+	dst, err := os.Create(prop.packagename + "/trie.go")
 	if err != nil {
 		return err
 	}

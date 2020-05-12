@@ -5,11 +5,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"unicode"
 	"unicode/utf8"
-
-	"github.com/clipperhouse/uax29/emoji"
-	"github.com/clipperhouse/uax29/seek"
 )
 
 // NewScanner tokenizes a reader into a stream of tokens according to Unicode Text Segmentation word boundaries https://unicode.org/reports/tr29/#Word_Boundaries.
@@ -30,7 +26,17 @@ func NewScanner(r io.Reader) *bufio.Scanner {
 	return scanner
 }
 
-var is = unicode.Is
+var trie = newWordsTrie(0)
+
+// is tests if the first rune of s is in categories
+func is(categories uint32, s []byte) bool {
+	lookup, _ := trie.lookup(s)
+	return (lookup & categories) != 0
+}
+
+var _AHLetter = _ALetter | _Hebrew_Letter
+var _MidNumLetQ = _MidNumLet | _Single_Quote
+var _Ignore = _Extend | _Format | _ZWJ
 
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner
 func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
@@ -66,49 +72,39 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			return 0, nil, fmt.Errorf("error decoding rune")
 		}
 
-		previous, _ := utf8.DecodeLastRune(data[:pos])
+		_, pw := utf8.DecodeLastRune(data[:pos])
+		previous := data[pos-pw:]
 
 		// https://unicode.org/reports/tr29/#WB3
-		if is(LF, current) && is(CR, previous) {
+		if is(_LF, data[pos:]) && is(_CR, previous) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB3a
-		if is(_CRǀLFǀNewline, previous) {
+		if is(_CR|_LF|_Newline, previous) {
 			break
 		}
 
 		// https://unicode.org/reports/tr29/#WB3b
-		if is(_CRǀLFǀNewline, current) {
+		if is(_CR|_LF|_Newline, data[pos:]) {
 			break
 		}
 
 		// https://unicode.org/reports/tr29/#WB3c
-		if is(emoji.Extended_Pictographic, current) && is(ZWJ, previous) {
+		if is(_Extended_Pictographic, data[pos:]) && is(_ZWJ, previous) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB3d
-		if is(WSegSpace, current) && is(WSegSpace, previous) {
+		if is(_WSegSpace, data[pos:]) && is(_WSegSpace, previous) {
 			pos += w
-
-			// Optimization: there's a likelihood of a run of WSegSpace
-			for {
-				current, w := utf8.DecodeRune(data[pos:])
-				if is(WSegSpace, current) {
-					pos += w
-					continue
-				}
-				break
-			}
-
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB4
-		if is(_ExtendǀFormatǀZWJ, current) {
+		if is(_Extend|_Format|_ZWJ, data[pos:]) {
 			pos += w
 			continue
 		}
@@ -117,16 +113,14 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
 		// The Seek* methods are shorthand for "seek a category but skip over Extend|Format|ZWJ on the way"
 
-		ignore := _ExtendǀFormatǀZWJ
-
 		// https://unicode.org/reports/tr29/#WB5
-		if is(AHLetter, current) && seek.Previous(data[:pos], ignore, AHLetter) {
+		if is(_AHLetter, data[pos:]) && seekPrevious(_AHLetter, data[:pos]) {
 			pos += w
 
 			// Optimization: there's a likelihood of a run of AHLetter
-			for {
-				current, w := utf8.DecodeRune(data[pos:])
-				if is(AHLetter, current) {
+			for pos < len(data) {
+				_, w := utf8.DecodeRune(data[pos:])
+				if is(_AHLetter, data[pos:]) {
 					pos += w
 					continue
 				}
@@ -137,49 +131,49 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB6
-		if is(_MidLetterǀMidNumLetQ, current) && seek.Forward(data[pos+w:], ignore, AHLetter) && seek.Previous(data[:pos], ignore, AHLetter) {
+		if is(_MidLetter|_MidNumLetQ, data[pos:]) && seekForward(_AHLetter, data[pos+w:]) && seekPrevious(_AHLetter, data[:pos]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB7
-		if is(AHLetter, current) {
-			previousIndex := seek.PreviousIndex(data[:pos], ignore, _MidLetterǀMidNumLetQ)
-			if previousIndex >= 0 && seek.Previous(data[:previousIndex], ignore, AHLetter) {
+		if is(_AHLetter, data[pos:]) {
+			previousIndex := seekPreviousIndex(_MidLetter|_MidNumLetQ, data[:pos])
+			if previousIndex >= 0 && seekPrevious(_AHLetter, data[:previousIndex]) {
 				pos += w
 				continue
 			}
 		}
 
 		// https://unicode.org/reports/tr29/#WB7a
-		if is(Single_Quote, current) && seek.Previous(data[:pos], ignore, Hebrew_Letter) {
+		if is(_Single_Quote, data[pos:]) && seekPrevious(_Hebrew_Letter, data[:pos]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB7b
-		if is(Double_Quote, current) && seek.Forward(data[pos+w:], ignore, Hebrew_Letter) && seek.Previous(data[:pos], ignore, Hebrew_Letter) {
+		if is(_Double_Quote, data[pos:]) && seekForward(_Hebrew_Letter, data[pos+w:]) && seekPrevious(_Hebrew_Letter, data[:pos]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB7c
-		if is(Hebrew_Letter, current) {
-			previousIndex := seek.PreviousIndex(data[:pos], ignore, Double_Quote)
-			if previousIndex >= 0 && seek.Previous(data[:previousIndex], ignore, Hebrew_Letter) {
+		if is(_Hebrew_Letter, data[pos:]) {
+			previousIndex := seekPreviousIndex(_Double_Quote, data[:pos])
+			if previousIndex >= 0 && seekPrevious(_Hebrew_Letter, data[:previousIndex]) {
 				pos += w
 				continue
 			}
 		}
 
 		// https://unicode.org/reports/tr29/#WB8
-		if is(Numeric, current) && seek.Previous(data[:pos], ignore, Numeric) {
+		if is(_Numeric, data[pos:]) && seekPrevious(_Numeric, data[:pos]) {
 			pos += w
 
 			// Optimization: there's a likelihood of a run of Numeric
-			for {
-				current, w := utf8.DecodeRune(data[pos:])
-				if is(Numeric, current) {
+			for pos < len(data) {
+				_, w := utf8.DecodeRune(data[pos:])
+				if is(_Numeric, data[pos:]) {
 					pos += w
 					continue
 				}
@@ -190,62 +184,40 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB9
-		if is(Numeric, current) && seek.Previous(data[:pos], ignore, AHLetter) {
+		if is(_Numeric, data[pos:]) && seekPrevious(_AHLetter, data[:pos]) {
 			pos += w
-
-			// Optimization: there's a likelihood of a run of Numeric|AHLetter
-			for {
-				current, w := utf8.DecodeRune(data[pos:])
-				if is(_AHLetterǀNumeric, current) {
-					pos += w
-					continue
-				}
-				break
-			}
-
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB10
-		if is(AHLetter, current) && seek.Previous(data[:pos], ignore, Numeric) {
+		if is(_AHLetter, data[pos:]) && seekPrevious(_Numeric, data[:pos]) {
 			pos += w
-
-			// Optimization: there's a likelihood of a run of Numeric|AHLetter
-			for {
-				current, w := utf8.DecodeRune(data[pos:])
-				if is(_AHLetterǀNumeric, current) {
-					pos += w
-					continue
-				}
-				break
-			}
-
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB11
-		if is(Numeric, current) {
-			previousIndex := seek.PreviousIndex(data[:pos], ignore, _MidNumǀMidNumLetQ)
-			if previousIndex >= 0 && seek.Previous(data[:previousIndex], ignore, Numeric) {
+		if is(_Numeric, data[pos:]) {
+			previousIndex := seekPreviousIndex(_MidNum|_MidNumLetQ, data[:pos])
+			if previousIndex >= 0 && seekPrevious(_Numeric, data[:previousIndex]) {
 				pos += w
 				continue
 			}
 		}
 
 		// https://unicode.org/reports/tr29/#WB12
-		if is(_MidNumǀMidNumLetQ, current) && seek.Forward(data[pos+w:], ignore, Numeric) && seek.Previous(data[:pos], ignore, Numeric) {
+		if is(_MidNum|_MidNumLet|_Single_Quote, data[pos:]) && seekForward(_Numeric, data[pos+w:]) && seekPrevious(_Numeric, data[:pos]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB13
-		if is(Katakana, current) && seek.Previous(data[:pos], ignore, Katakana) {
+		if is(_Katakana, data[pos:]) && seekPrevious(_Katakana, data[:pos]) {
 			pos += w
 
 			// Optimization: there's a likelihood of a run of Katakana
-			for {
-				current, w := utf8.DecodeRune(data[pos:])
-				if is(Katakana, current) {
+			for pos < len(data) {
+				_, w := utf8.DecodeRune(data[pos:])
+				if is(_Katakana, data[pos:]) {
 					pos += w
 					continue
 				}
@@ -256,31 +228,31 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB13a
-		if is(ExtendNumLet, current) && seek.Previous(data[:pos], ignore, _AHLetterǀNumericǀKatakanaǀExtendNumLet) {
+		if is(_ExtendNumLet, data[pos:]) && seekPrevious(_ALetter|_Hebrew_Letter|_Numeric|_Katakana|_ExtendNumLet, data[:pos]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB13b
-		if is(_AHLetterǀNumericǀKatakana, current) && seek.Previous(data[:pos], ignore, ExtendNumLet) {
+		if is(_ALetter|_Hebrew_Letter|_Numeric|_Katakana, data[pos:]) && seekPrevious(_ExtendNumLet, data[:pos]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB15
-		if is(Regional_Indicator, current) {
+		if is(_Regional_Indicator, data[pos:]) {
 			allRI := true
 
 			// Buffer comprised entirely of an odd number of RI, ignoring Extend|Format|ZWJ
 			i := pos
 			count := 0
-			for i >= 0 {
-				r, w := utf8.DecodeLastRune(data[:i])
+			for i > 0 {
+				_, w := utf8.DecodeLastRune(data[:i])
 				i -= w
-				if is(ignore, r) {
+				if is(_Ignore, data[i:]) {
 					continue
 				}
-				if !is(Regional_Indicator, r) {
+				if !is(_Regional_Indicator, data[i:]) {
 					allRI = false
 					break
 				}
@@ -297,18 +269,18 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB16
-		if is(Regional_Indicator, current) {
+		if is(_Regional_Indicator, data[pos:]) {
 			odd := false
 			// Last n runes represent an odd number of RI, ignoring Extend|Format|ZWJ
 			i := pos
 			count := 0
-			for i >= 0 {
-				r, w := utf8.DecodeLastRune(data[:i])
+			for i > 0 {
+				_, w := utf8.DecodeLastRune(data[:i])
 				i -= w
-				if is(ignore, r) {
+				if is(_Ignore, data[i:]) {
 					continue
 				}
-				if !is(Regional_Indicator, r) {
+				if !is(_Regional_Indicator, data[i:]) {
 					odd = count > 0 && count%2 == 1
 					break
 				}
