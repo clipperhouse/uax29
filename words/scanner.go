@@ -114,8 +114,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// The Seek* methods are shorthand for "seek a category but skip over Extend|Format|ZWJ on the way"
 
 		// https://unicode.org/reports/tr29/#WB5
-		if is(_AHLetter, data[pos:]) &&
-			seekPrevious(_AHLetter, data[:pos]) {
+		if is(_AHLetter, data[pos:]) && seekPrevious(_AHLetter, data[:pos]) {
 			pos += w
 
 			// Optimization: there's a likelihood of a run of AHLetter
@@ -132,9 +131,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB6
-		if is(_MidLetter|_MidNumLetQ, data[pos:]) &&
-			seekForward(_AHLetter, data[pos+w:]) &&
-			seekPrevious(_AHLetter, data[:pos]) {
+		if is(_MidLetter|_MidNumLetQ, data[pos:]) && seekForward(_AHLetter, data[pos+w:]) && seekPrevious(_AHLetter, data[:pos]) {
 			pos += w
 			continue
 		}
@@ -149,16 +146,13 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB7a
-		if is(_Single_Quote, data[pos:]) &&
-			seekPrevious(_Hebrew_Letter, data[:pos]) {
+		if is(_Single_Quote, data[pos:]) && seekPrevious(_Hebrew_Letter, data[:pos]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB7b
-		if is(_Double_Quote, data[pos:]) &&
-			seekForward(_Hebrew_Letter, data[pos+w:]) &&
-			seekPrevious(_Hebrew_Letter, data[:pos]) {
+		if is(_Double_Quote, data[pos:]) && seekForward(_Hebrew_Letter, data[pos+w:]) && seekPrevious(_Hebrew_Letter, data[:pos]) {
 			pos += w
 			continue
 		}
@@ -211,16 +205,13 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB12
-		if is(_MidNum|_MidNumLet|_Single_Quote, data[pos:]) &&
-			seekForward(_Numeric, data[pos+w:]) &&
-			seekPrevious(_Numeric, data[:pos]) {
+		if is(_MidNum|_MidNumLet|_Single_Quote, data[pos:]) && seekForward(_Numeric, data[pos+w:]) && seekPrevious(_Numeric, data[:pos]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB13
-		if is(_Katakana, data[pos:]) &&
-			seekPrevious(_Katakana, data[:pos]) {
+		if is(_Katakana, data[pos:]) && seekPrevious(_Katakana, data[:pos]) {
 			pos += w
 
 			// Optimization: there's a likelihood of a run of Katakana
@@ -237,15 +228,13 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB13a
-		if is(_ExtendNumLet, data[pos:]) &&
-			seekPrevious(_ALetter|_Hebrew_Letter|_Numeric|_Katakana|_ExtendNumLet, data[:pos]) {
+		if is(_ExtendNumLet, data[pos:]) && seekPrevious(_ALetter|_Hebrew_Letter|_Numeric|_Katakana|_ExtendNumLet, data[:pos]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB13b
-		if is(_ALetter|_Hebrew_Letter|_Numeric|_Katakana, data[pos:]) &&
-			seekPrevious(_ExtendNumLet, data[:pos]) {
+		if is(_ALetter|_Hebrew_Letter|_Numeric|_Katakana, data[pos:]) && seekPrevious(_ExtendNumLet, data[:pos]) {
 			pos += w
 			continue
 		}
