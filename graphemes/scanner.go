@@ -141,7 +141,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		if is(_Regional_Indicator, data[current:]) {
 			allRI := true
 
-			// Buffer comprised entirely of an odd number of RI, ignoring Extend|Format|ZWJ
+			// Buffer comprised entirely of an odd number of RI
 			i := current
 			count := 0
 			for i > 0 {
@@ -166,7 +166,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// https://unicode.org/reports/tr29/#GB13
 		if is(_Regional_Indicator, data[current:]) {
 			odd := false
-			// Last n runes represent an odd number of RI, ignoring Extend|Format|ZWJ
+			// Last n runes represent an odd number of RI
 			i := current
 			count := 0
 			for i > 0 {
