@@ -44,21 +44,21 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		return 0, nil, nil
 	}
 
-	pos := 0
+	current := 0
 
 	for {
-		if pos == len(data) && !atEOF {
+		if current == len(data) && !atEOF {
 			// Request more data
 			return 0, nil, nil
 		}
 
-		sot := pos == 0 // "start of text"
-		eof := len(data) == pos
+		sot := current == 0 // "start of text"
+		eof := len(data) == current
 
 		// https://unicode.org/reports/tr29/#SB1
 		if sot && !eof {
-			_, w := utf8.DecodeRune(data[pos:])
-			pos += w
+			_, w := utf8.DecodeRune(data[current:])
+			current += w
 			continue
 		}
 
@@ -70,28 +70,31 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first category
 		// to the right of the ×, from which we look back or forward
 
-		current, w := utf8.DecodeRune(data[pos:])
-		if current == utf8.RuneError {
-			return 0, nil, fmt.Errorf("error decoding rune")
+		// Decoding runes is a bit redundant, it happens in other places too
+		// We do it here for clarity and to pick up errors early
+
+		r, w := utf8.DecodeRune(data[current:])
+		if r == utf8.RuneError {
+			return 0, nil, fmt.Errorf("error decoding rune at byte 0x%x", data[current])
 		}
 
-		_, pw := utf8.DecodeLastRune(data[:pos])
-		previous := data[pos-pw:]
+		_, pw := utf8.DecodeLastRune(data[:current])
+		last := current - pw
 
 		// https://unicode.org/reports/tr29/#SB3
-		if is(_LF, data[pos:]) && is(_CR, previous) {
-			pos += w
+		if is(_LF, data[current:]) && is(_CR, data[last:]) {
+			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#SB4
-		if is(_ParaSep, previous) {
+		if is(_ParaSep, data[last:]) {
 			break
 		}
 
 		// https://unicode.org/reports/tr29/#SB5
-		if is(_Extend|_Format, data[pos:]) {
-			pos += w
+		if is(_Extend|_Format, data[current:]) {
+			current += w
 			continue
 		}
 
@@ -100,23 +103,23 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// The Seek* methods are shorthand for "seek a category but skip over Extend & Format on the way"
 
 		// https://unicode.org/reports/tr29/#SB6
-		if is(_Numeric, data[pos:]) && seekPrevious(_ATerm, data[:pos]) {
-			pos += w
+		if is(_Numeric, data[current:]) && previous(_ATerm, data[:current]) {
+			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#SB7
-		if is(_Upper, data[pos:]) {
-			previousIndex := seekPreviousIndex(_ATerm, data[:pos])
-			if previousIndex >= 0 && seekPrevious(_Upper|_Lower, data[:previousIndex]) {
-				pos += w
+		if is(_Upper, data[current:]) {
+			pi := previousIndex(_ATerm, data[:current])
+			if pi >= 0 && previous(_Upper|_Lower, data[:pi]) {
+				current += w
 				continue
 			}
 		}
 
 		// https://unicode.org/reports/tr29/#SB8
 		{
-			p := pos
+			p := current
 
 			// ( ¬(OLetter | Upper | Lower | ParaSep | SATerm) )*
 			// Zero or more of not-the-above categories
@@ -129,13 +132,13 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 				break
 			}
 
-			if seekForward(_Lower, data[p:]) {
-				p2 := pos
+			if forward(_Lower, data[p:]) {
+				p2 := current
 
 				// Zero or more Sp
-				sp := pos
+				sp := current
 				for {
-					sp = seekPreviousIndex(_Sp, data[:sp])
+					sp = previousIndex(_Sp, data[:sp])
 					if sp < 0 {
 						break
 					}
@@ -145,7 +148,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 				// Zero or more Close
 				close := p2
 				for {
-					close = seekPreviousIndex(_Close, data[:close])
+					close = previousIndex(_Close, data[:close])
 					if close < 0 {
 						break
 					}
@@ -154,21 +157,21 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 				// Having looked back past Sp's, Close's, and intervening Extend|Format,
 				// is there an ATerm?
-				if seekPrevious(_ATerm, data[:p2]) {
-					pos += w
+				if previous(_ATerm, data[:p2]) {
+					current += w
 					continue
 				}
 			}
 		}
 
 		// https://unicode.org/reports/tr29/#SB8a
-		if is(_SContinue|_SATerm, data[pos:]) {
-			p := pos
+		if is(_SContinue|_SATerm, data[current:]) {
+			p := current
 
 			// Zero or more Sp
 			sp := p
 			for {
-				sp = seekPreviousIndex(_Sp, data[:sp])
+				sp = previousIndex(_Sp, data[:sp])
 				if sp < 0 {
 					break
 				}
@@ -178,7 +181,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// Zero or more Close
 			close := p
 			for {
-				close = seekPreviousIndex(_Close, data[:close])
+				close = previousIndex(_Close, data[:close])
 				if close < 0 {
 					break
 				}
@@ -187,20 +190,20 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 			// Having looked back past Sp, Close, and intervening Extend|Format,
 			// is there an SATerm?
-			if seekPrevious(_SATerm, data[:p]) {
-				pos += w
+			if previous(_SATerm, data[:p]) {
+				current += w
 				continue
 			}
 		}
 
 		// https://unicode.org/reports/tr29/#SB9
-		if is(_Close|_Sp|_ParaSep, data[pos:]) {
-			p := pos
+		if is(_Close|_Sp|_ParaSep, data[current:]) {
+			p := current
 
 			// Zero or more Close's
 			close := p
 			for {
-				close = seekPreviousIndex(_Close, data[:close])
+				close = previousIndex(_Close, data[:close])
 				if close < 0 {
 					break
 				}
@@ -209,20 +212,20 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 			// Having looked back past Close's and intervening Extend|Format,
 			// is there an SATerm?
-			if seekPrevious(_SATerm, data[:p]) {
-				pos += w
+			if previous(_SATerm, data[:p]) {
+				current += w
 				continue
 			}
 		}
 
 		// https://unicode.org/reports/tr29/#SB10
-		if is(_Sp|_ParaSep, data[pos:]) {
-			p := pos
+		if is(_Sp|_ParaSep, data[current:]) {
+			p := current
 
 			// Zero or more Sp's
 			sp := p
 			for {
-				sp = seekPreviousIndex(_Sp, data[:sp])
+				sp = previousIndex(_Sp, data[:sp])
 				if sp < 0 {
 					break
 				}
@@ -232,7 +235,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// Zero or more Close's
 			close := p
 			for {
-				close = seekPreviousIndex(_Close, data[:close])
+				close = previousIndex(_Close, data[:close])
 				if close < 0 {
 					break
 				}
@@ -241,18 +244,18 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 			// Having looked back past Sp's, Close's, and intervening Extend|Format,
 			// is there an SATerm?
-			if seekPrevious(_SATerm, data[:p]) {
-				pos += w
+			if previous(_SATerm, data[:p]) {
+				current += w
 				continue
 			}
 		}
 
 		// https://unicode.org/reports/tr29/#SB11
 		{
-			p := pos
+			p := current
 
 			// Zero or one Sp|ParaSep
-			ps := seekPreviousIndex(_Sp|_ParaSep, data[:p])
+			ps := previousIndex(_Sp|_ParaSep, data[:p])
 			if ps >= 0 {
 				p = ps
 			}
@@ -260,7 +263,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// Zero or more Sp's
 			sp := p
 			for {
-				sp = seekPreviousIndex(_Sp, data[:sp])
+				sp = previousIndex(_Sp, data[:sp])
 				if sp < 0 {
 					break
 				}
@@ -270,7 +273,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// Zero or more Close's
 			close := p
 			for {
-				close = seekPreviousIndex(_Close, data[:close])
+				close = previousIndex(_Close, data[:close])
 				if close < 0 {
 					break
 				}
@@ -279,14 +282,14 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 			// Having looked back past Sp|ParaSep, Sp's, Close's, and intervening Extend|Format,
 			// is there an SATerm?
-			if seekPrevious(_SATerm, data[:p]) {
+			if previous(_SATerm, data[:p]) {
 				break
 			}
 		}
 
 		// https://unicode.org/reports/tr29/#SB998
-		if pos > 0 {
-			pos += w
+		if current > 0 {
+			current += w
 			continue
 		}
 
@@ -295,5 +298,5 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	}
 
 	// Return token
-	return pos, data[:pos], nil
+	return current, data[:current], nil
 }

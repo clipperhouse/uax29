@@ -42,21 +42,21 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		return 0, nil, nil
 	}
 
-	pos := 0
+	current := 0
 
 	for {
-		if pos == len(data) && !atEOF {
+		if current == len(data) && !atEOF {
 			// Request more data
 			return 0, nil, nil
 		}
 
-		sot := pos == 0 // "start of text"
-		eof := len(data) == pos
+		sot := current == 0 // "start of text"
+		eof := len(data) == current
 
 		// https://unicode.org/reports/tr29/#SB1
 		if sot && !eof {
-			_, w := utf8.DecodeRune(data[pos:])
-			pos += w
+			_, w := utf8.DecodeRune(data[current:])
+			current += w
 			continue
 		}
 
@@ -65,79 +65,84 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			break
 		}
 
-		current, w := utf8.DecodeRune(data[pos:])
-		if current == utf8.RuneError {
-			return 0, nil, fmt.Errorf("error decoding rune")
+		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first category
+		// to the right of the ×, from which we look back or forward
+
+		// Decoding runes is a bit redundant, it happens in other places too
+		// We do it here for clarity and to pick up errors early
+
+		r, w := utf8.DecodeRune(data[current:])
+		if r == utf8.RuneError {
+			return 0, nil, fmt.Errorf("error decoding rune at byte 0x%x", data[current])
 		}
 
-		_, pw := utf8.DecodeLastRune(data[:pos])
-		previous := data[pos-pw:]
+		_, pw := utf8.DecodeLastRune(data[:current])
+		last := current - pw
 
 		// https://unicode.org/reports/tr29/#GB3
-		if is(_LF, data[pos:]) && is(_CR, previous) {
-			pos += w
+		if is(_LF, data[current:]) && is(_CR, data[last:]) {
+			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB4
-		if is(_Control|_CR|_LF, previous) {
+		if is(_Control|_CR|_LF, data[last:]) {
 			break
 		}
 
 		// https://unicode.org/reports/tr29/#GB5
-		if is(_Control|_CR|_LF, data[pos:]) {
+		if is(_Control|_CR|_LF, data[current:]) {
 			break
 		}
 
 		// https://unicode.org/reports/tr29/#GB6
-		if is(_L|_V|_LV|_LVT, data[pos:]) && is(_L, previous) {
-			pos += w
+		if is(_L|_V|_LV|_LVT, data[current:]) && is(_L, data[last:]) {
+			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB7
-		if is(_V|_T, data[pos:]) && is(_LV|_V, previous) {
-			pos += w
+		if is(_V|_T, data[current:]) && is(_LV|_V, data[last:]) {
+			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB8
-		if is(_T, data[pos:]) && is(_LVT|_T, previous) {
-			pos += w
+		if is(_T, data[current:]) && is(_LVT|_T, data[last:]) {
+			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB9
-		if is(_Extend|_ZWJ, data[pos:]) {
-			pos += w
+		if is(_Extend|_ZWJ, data[current:]) {
+			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB9a
-		if is(_SpacingMark, data[pos:]) {
-			pos += w
+		if is(_SpacingMark, data[current:]) {
+			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB9b
-		if is(_Prepend, previous) {
-			pos += w
+		if is(_Prepend, data[last:]) {
+			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB11
-		if is(_Extended_Pictographic, data[pos:]) && is(_ZWJ, previous) &&
-			seekPrevious(_Extended_Pictographic, data[:pos-pw]) {
-			pos += w
+		if is(_Extended_Pictographic, data[current:]) && is(_ZWJ, data[last:]) && previous(_Extended_Pictographic, data[:last]) {
+			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB12
-		if is(_Regional_Indicator, data[pos:]) {
+		if is(_Regional_Indicator, data[current:]) {
 			allRI := true
 
 			// Buffer comprised entirely of an odd number of RI, ignoring Extend|Format|ZWJ
-			i := pos
+			i := current
 			count := 0
 			for i > 0 {
 				_, w := utf8.DecodeLastRune(data[:i])
@@ -152,17 +157,17 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			if allRI {
 				odd := count > 0 && count%2 == 1
 				if odd {
-					pos += w
+					current += w
 					continue
 				}
 			}
 		}
 
 		// https://unicode.org/reports/tr29/#GB13
-		if is(_Regional_Indicator, data[pos:]) {
+		if is(_Regional_Indicator, data[current:]) {
 			odd := false
 			// Last n runes represent an odd number of RI, ignoring Extend|Format|ZWJ
-			i := pos
+			i := current
 			count := 0
 			for i > 0 {
 				_, w := utf8.DecodeLastRune(data[:i])
@@ -175,7 +180,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 
 			if odd {
-				pos += w
+				current += w
 				continue
 			}
 		}
@@ -185,5 +190,5 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	}
 
 	// Return token
-	return pos, data[:pos], nil
+	return current, data[:current], nil
 }

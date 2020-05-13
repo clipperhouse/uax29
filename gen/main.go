@@ -1,3 +1,4 @@
+// Package main generates tries of Unicode categories by calling go generate as the repository root
 package main
 
 import (

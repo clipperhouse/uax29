@@ -4,7 +4,7 @@ import "unicode/utf8"
 
 // seekPrevious works backward in the buffer until it hits a rune in the `seek` category,
 // ignoring runes in the `ignore` category. It returns true if `seek` is found.
-func seekPrevious(seek uint16, data []byte) bool {
+func previous(seek uint16, data []byte) bool {
 	// Start at the end of the buffer and move backwards
 	i := len(data)
 	for i > 0 {
