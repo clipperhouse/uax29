@@ -2,9 +2,9 @@ package graphemes
 
 import "unicode/utf8"
 
-// seekPrevious works backward in the buffer until it hits a rune in the `seek` category,
-// ignoring runes in the `ignore` category. It returns true if `seek` is found.
-func previous(seek uint16, data []byte) bool {
+// previous works backward in the buffer until it hits a rune in categories,
+// ignoring runes in the _Ignore category.
+func previous(categories uint16, data []byte) bool {
 	// Start at the end of the buffer and move backwards
 	i := len(data)
 	for i > 0 {
@@ -15,7 +15,7 @@ func previous(seek uint16, data []byte) bool {
 			continue
 		}
 
-		if is(seek, data[i:]) {
+		if is(categories, data[i:]) {
 			return true
 		}
 

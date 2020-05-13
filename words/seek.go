@@ -2,10 +2,10 @@ package words
 
 import "unicode/utf8"
 
-// seekPreviousIndex works backward until it hits a rune in the `seek` category,
-// ignoring runes in the `ignore` category, and returns the index of the rune in the buffer.
-// It returns -1 if `seek` rune is not found.
-func previousIndex(seek uint32, data []byte) int {
+// previousIndex works backward until it hits a rune in categories,
+// ignoring runes in the _Ignore category, and returns the index of the rune in the buffer.
+// It returns -1 if a categories rune is not found.
+func previousIndex(categories uint32, data []byte) int {
 	// Start at the end of the buffer and move backwards
 	i := len(data)
 	for i > 0 {
@@ -16,7 +16,7 @@ func previousIndex(seek uint32, data []byte) int {
 			continue
 		}
 
-		if is(seek, data[i:]) {
+		if is(categories, data[i:]) {
 			return i
 		}
 
@@ -27,15 +27,15 @@ func previousIndex(seek uint32, data []byte) int {
 	return -1
 }
 
-// seekPrevious works backward in the buffer until it hits a rune in the `seek` category,
-// ignoring runes in the `ignore` category. It returns true if `seek` is found.
-func previous(seek uint32, data []byte) bool {
-	return previousIndex(seek, data) >= 0
+// previous works backward in the buffer until it hits a rune in categories,
+// ignoring runes in the _Ignore category.
+func previous(categories uint32, data []byte) bool {
+	return previousIndex(categories, data) >= 0
 }
 
-// seekForward looks ahead in the buffer until it hits a rune in the `seek` category,
-// ignoring runes in the `ignore` category. It returns true if `seek` is found.
-func forward(seek uint32, data []byte) bool {
+// forward looks ahead in the buffer until it hits a rune in categories,
+// ignoring runes in the _Ignore category.
+func forward(categories uint32, data []byte) bool {
 	i := 0
 	for i < len(data) {
 		_, w := utf8.DecodeRune(data[i:])
@@ -45,7 +45,7 @@ func forward(seek uint32, data []byte) bool {
 			continue
 		}
 
-		if is(seek, data[i:]) {
+		if is(categories, data[i:]) {
 			return true
 		}
 
