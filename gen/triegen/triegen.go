@@ -132,7 +132,6 @@ type nodeIndex struct {
 // compaction keeps track of stats used for the compaction.
 type compaction struct {
 	c         Compacter
-	blocks    []*node
 	maxHandle uint32
 	totalSize int
 
@@ -405,7 +404,7 @@ func (b *builder) buildTrie(t *Trie) uint64 {
 	// Get the ASCII offset. For the first trie, the ASCII block will be at
 	// position 0.
 	hasher := crc64.New(crcTable)
-	binary.Write(hasher, binary.BigEndian, n.values)
+	_ = binary.Write(hasher, binary.BigEndian, n.values)
 	hash := hasher.Sum64()
 
 	v, ok := b.asciiBlockIdx[hash]
@@ -451,9 +450,9 @@ func (b *builder) computeOffsets(n *node, root bool) uint64 {
 			if c != nil {
 				v = b.computeOffsets(c, false)
 			}
-			binary.Write(hasher, binary.BigEndian, v)
+			_ = binary.Write(hasher, binary.BigEndian, v)
 		}
-		binary.Write(hasher, binary.BigEndian, n.values)
+		_ = binary.Write(hasher, binary.BigEndian, n.values)
 		hash = hasher.Sum64()
 	}
 

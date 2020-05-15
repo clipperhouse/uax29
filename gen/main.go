@@ -98,7 +98,9 @@ func generate(prop prop) error {
 		// We don't need to generate emoji package
 		return nil
 	}
-	runesByCategory[key] = extendedPictographic
+	if prop.packagename == "words" || prop.packagename == "graphemes" {
+		runesByCategory[key] = extendedPictographic
+	}
 
 	// Keep the order stable
 	categories := make([]string, 0, len(runesByCategory))
@@ -195,11 +197,14 @@ func write(prop prop, trie *triegen.Trie, iotasByCategory map[string]uint64) err
 
 	fmt.Fprintln(&buf, "var(")
 	for i, category := range categories {
-		fmt.Fprintf(&buf, "_%s %s = 1 << %d\n", category, inttype, i)
+		fmt.Fprintf(&buf, "_%s %s = 1 << %d\n", strings.ReplaceAll(category, "_", ""), inttype, i)
 	}
 	fmt.Fprintln(&buf, ")")
 
-	triegen.Gen(&buf, prop.packagename, []*triegen.Trie{trie})
+	_, err := triegen.Gen(&buf, prop.packagename, []*triegen.Trie{trie})
+	if err != nil {
+		return err
+	}
 
 	formatted, err := format.Source(buf.Bytes())
 	if err != nil {

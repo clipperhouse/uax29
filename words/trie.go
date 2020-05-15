@@ -4,25 +4,25 @@ package words
 // from https://www.unicode.org/Public/12.0.0/ucd/auxiliary/WordBreakProperty.txt
 
 var (
-	_ALetter               uint32 = 1 << 0
-	_CR                    uint32 = 1 << 1
-	_Double_Quote          uint32 = 1 << 2
-	_Extend                uint32 = 1 << 3
-	_ExtendNumLet          uint32 = 1 << 4
-	_Extended_Pictographic uint32 = 1 << 5
-	_Format                uint32 = 1 << 6
-	_Hebrew_Letter         uint32 = 1 << 7
-	_Katakana              uint32 = 1 << 8
-	_LF                    uint32 = 1 << 9
-	_MidLetter             uint32 = 1 << 10
-	_MidNum                uint32 = 1 << 11
-	_MidNumLet             uint32 = 1 << 12
-	_Newline               uint32 = 1 << 13
-	_Numeric               uint32 = 1 << 14
-	_Regional_Indicator    uint32 = 1 << 15
-	_Single_Quote          uint32 = 1 << 16
-	_WSegSpace             uint32 = 1 << 17
-	_ZWJ                   uint32 = 1 << 18
+	_ALetter              uint32 = 1 << 0
+	_CR                   uint32 = 1 << 1
+	_DoubleQuote          uint32 = 1 << 2
+	_Extend               uint32 = 1 << 3
+	_ExtendNumLet         uint32 = 1 << 4
+	_ExtendedPictographic uint32 = 1 << 5
+	_Format               uint32 = 1 << 6
+	_HebrewLetter         uint32 = 1 << 7
+	_Katakana             uint32 = 1 << 8
+	_LF                   uint32 = 1 << 9
+	_MidLetter            uint32 = 1 << 10
+	_MidNum               uint32 = 1 << 11
+	_MidNumLet            uint32 = 1 << 12
+	_Newline              uint32 = 1 << 13
+	_Numeric              uint32 = 1 << 14
+	_RegionalIndicator    uint32 = 1 << 15
+	_SingleQuote          uint32 = 1 << 16
+	_WSegSpace            uint32 = 1 << 17
+	_ZWJ                  uint32 = 1 << 18
 )
 
 // lookup returns the trie value for the first UTF-8 encoding in s and

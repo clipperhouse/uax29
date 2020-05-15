@@ -34,8 +34,8 @@ func is(categories uint32, s []byte) bool {
 	return (lookup & categories) != 0
 }
 
-var _AHLetter = _ALetter | _Hebrew_Letter
-var _MidNumLetQ = _MidNumLet | _Single_Quote
+var _AHLetter = _ALetter | _HebrewLetter
+var _MidNumLetQ = _MidNumLet | _SingleQuote
 var _Ignore = _Extend | _Format | _ZWJ
 
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner
@@ -100,7 +100,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB3c
-		if is(_Extended_Pictographic, data[current:]) && is(_ZWJ, data[last:]) {
+		if is(_ExtendedPictographic, data[current:]) && is(_ZWJ, data[last:]) {
 			current += w
 			continue
 		}
@@ -154,21 +154,21 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB7a
-		if is(_Single_Quote, data[current:]) && previous(_Hebrew_Letter, data[:current]) {
+		if is(_SingleQuote, data[current:]) && previous(_HebrewLetter, data[:current]) {
 			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB7b
-		if is(_Double_Quote, data[current:]) && forward(_Hebrew_Letter, data[next:]) && previous(_Hebrew_Letter, data[:current]) {
+		if is(_DoubleQuote, data[current:]) && forward(_HebrewLetter, data[next:]) && previous(_HebrewLetter, data[:current]) {
 			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB7c
-		if is(_Hebrew_Letter, data[current:]) {
-			pi := previousIndex(_Double_Quote, data[:current])
-			if pi >= 0 && previous(_Hebrew_Letter, data[:pi]) {
+		if is(_HebrewLetter, data[current:]) {
+			pi := previousIndex(_DoubleQuote, data[:current])
+			if pi >= 0 && previous(_HebrewLetter, data[:pi]) {
 				current += w
 				continue
 			}
@@ -213,7 +213,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB12
-		if is(_MidNum|_MidNumLet|_Single_Quote, data[current:]) && forward(_Numeric, data[next:]) && previous(_Numeric, data[:current]) {
+		if is(_MidNum|_MidNumLet|_SingleQuote, data[current:]) && forward(_Numeric, data[next:]) && previous(_Numeric, data[:current]) {
 			current += w
 			continue
 		}
@@ -236,19 +236,19 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB13a
-		if is(_ExtendNumLet, data[current:]) && previous(_ALetter|_Hebrew_Letter|_Numeric|_Katakana|_ExtendNumLet, data[:current]) {
+		if is(_ExtendNumLet, data[current:]) && previous(_ALetter|_HebrewLetter|_Numeric|_Katakana|_ExtendNumLet, data[:current]) {
 			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB13b
-		if is(_ALetter|_Hebrew_Letter|_Numeric|_Katakana, data[current:]) && previous(_ExtendNumLet, data[:current]) {
+		if is(_ALetter|_HebrewLetter|_Numeric|_Katakana, data[current:]) && previous(_ExtendNumLet, data[:current]) {
 			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB15
-		if is(_Regional_Indicator, data[current:]) {
+		if is(_RegionalIndicator, data[current:]) {
 			allRI := true
 
 			// Buffer comprised entirely of an odd number of RI, ignoring Extend|Format|ZWJ
@@ -260,7 +260,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 				if is(_Ignore, data[i:]) {
 					continue
 				}
-				if !is(_Regional_Indicator, data[i:]) {
+				if !is(_RegionalIndicator, data[i:]) {
 					allRI = false
 					break
 				}
@@ -277,7 +277,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB16
-		if is(_Regional_Indicator, data[current:]) {
+		if is(_RegionalIndicator, data[current:]) {
 			odd := false
 			// Last n runes represent an odd number of RI, ignoring Extend|Format|ZWJ
 			i := current
@@ -288,7 +288,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 				if is(_Ignore, data[i:]) {
 					continue
 				}
-				if !is(_Regional_Indicator, data[i:]) {
+				if !is(_RegionalIndicator, data[i:]) {
 					odd = count > 0 && count%2 == 1
 					break
 				}

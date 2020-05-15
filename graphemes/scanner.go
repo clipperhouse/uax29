@@ -132,13 +132,13 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#GB11
-		if is(_Extended_Pictographic, data[current:]) && is(_ZWJ, data[last:]) && previous(_Extended_Pictographic, data[:last]) {
+		if is(_ExtendedPictographic, data[current:]) && is(_ZWJ, data[last:]) && previous(_ExtendedPictographic, data[:last]) {
 			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB12
-		if is(_Regional_Indicator, data[current:]) {
+		if is(_RegionalIndicator, data[current:]) {
 			allRI := true
 
 			// Buffer comprised entirely of an odd number of RI
@@ -147,7 +147,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			for i > 0 {
 				_, w := utf8.DecodeLastRune(data[:i])
 				i -= w
-				if !is(_Regional_Indicator, data[i:]) {
+				if !is(_RegionalIndicator, data[i:]) {
 					allRI = false
 					break
 				}
@@ -164,7 +164,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#GB13
-		if is(_Regional_Indicator, data[current:]) {
+		if is(_RegionalIndicator, data[current:]) {
 			odd := false
 			// Last n runes represent an odd number of RI
 			i := current
@@ -172,7 +172,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			for i > 0 {
 				_, w := utf8.DecodeLastRune(data[:i])
 				i -= w
-				if !is(_Regional_Indicator, data[i:]) {
+				if !is(_RegionalIndicator, data[i:]) {
 					odd = count > 0 && count%2 == 1
 					break
 				}

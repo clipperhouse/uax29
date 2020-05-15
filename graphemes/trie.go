@@ -4,20 +4,20 @@ package graphemes
 // from https://www.unicode.org/Public/12.0.0/ucd/auxiliary/GraphemeBreakProperty.txt
 
 var (
-	_CR                    uint16 = 1 << 0
-	_Control               uint16 = 1 << 1
-	_Extend                uint16 = 1 << 2
-	_Extended_Pictographic uint16 = 1 << 3
-	_L                     uint16 = 1 << 4
-	_LF                    uint16 = 1 << 5
-	_LV                    uint16 = 1 << 6
-	_LVT                   uint16 = 1 << 7
-	_Prepend               uint16 = 1 << 8
-	_Regional_Indicator    uint16 = 1 << 9
-	_SpacingMark           uint16 = 1 << 10
-	_T                     uint16 = 1 << 11
-	_V                     uint16 = 1 << 12
-	_ZWJ                   uint16 = 1 << 13
+	_CR                   uint16 = 1 << 0
+	_Control              uint16 = 1 << 1
+	_Extend               uint16 = 1 << 2
+	_ExtendedPictographic uint16 = 1 << 3
+	_L                    uint16 = 1 << 4
+	_LF                   uint16 = 1 << 5
+	_LV                   uint16 = 1 << 6
+	_LVT                  uint16 = 1 << 7
+	_Prepend              uint16 = 1 << 8
+	_RegionalIndicator    uint16 = 1 << 9
+	_SpacingMark          uint16 = 1 << 10
+	_T                    uint16 = 1 << 11
+	_V                    uint16 = 1 << 12
+	_ZWJ                  uint16 = 1 << 13
 )
 
 // lookup returns the trie value for the first UTF-8 encoding in s and
