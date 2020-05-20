@@ -26,23 +26,6 @@ func TestScanner(t *testing.T) {
 	original += "crlf is \r\n"
 
 	scanner := words.NewScanner(strings.NewReader(original))
-
-	// First, sanity check
-	roundtrip := ""
-	for scanner.Scan() {
-		roundtrip += scanner.Text()
-	}
-	if err := scanner.Err(); err != nil {
-		t.Error(err)
-	}
-
-	if roundtrip != original {
-		t.Error("roundtrip should equal the original")
-	}
-
-	// Got re-scan
-	scanner = words.NewScanner(strings.NewReader(original))
-
 	got := map[string]bool{}
 
 	for scanner.Scan() {
@@ -172,6 +155,29 @@ func TestUnicodeSegments(t *testing.T) {
 		}
 	}
 	t.Logf("passed %d, failed %d", passed, failed)
+}
+
+func TestRoundtrip(t *testing.T) {
+	file, err := ioutil.ReadFile("wikipedia.txt")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	r := bytes.NewReader(file)
+	sc := words.NewScanner(r)
+
+	var result []byte
+	for sc.Scan() {
+		result = append(result, sc.Bytes()...)
+	}
+	if err := sc.Err(); err != nil {
+		t.Error(err)
+	}
+
+	if !reflect.DeepEqual(result, file) {
+		t.Error("input bytes are not the same as scanned bytes")
+	}
 }
 
 func BenchmarkScanner(b *testing.B) {

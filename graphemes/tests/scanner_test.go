@@ -4,29 +4,11 @@ import (
 	"bytes"
 	"io/ioutil"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/clipperhouse/segment"
 	"github.com/clipperhouse/uax29/graphemes"
 )
-
-func TestGraphemes(t *testing.T) {
-	original := "Good dog! 👍🏼🐶"
-
-	// First, test roundtrip
-	scanner := graphemes.NewScanner(strings.NewReader(original))
-	roundtrip := ""
-	for scanner.Scan() {
-		roundtrip += scanner.Text()
-	}
-	if err := scanner.Err(); err != nil {
-		t.Error(err)
-	}
-	if roundtrip != original {
-		t.Error("expected roundtrip to equal original")
-	}
-}
 
 func TestUnicodeSegments(t *testing.T) {
 	var passed, failed int
@@ -47,6 +29,29 @@ func TestUnicodeSegments(t *testing.T) {
 		}
 	}
 	t.Logf("passed %d, failed %d", passed, failed)
+}
+
+func TestRoundtrip(t *testing.T) {
+	file, err := ioutil.ReadFile("wikipedia.txt")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	r := bytes.NewReader(file)
+	sc := graphemes.NewScanner(r)
+
+	var result []byte
+	for sc.Scan() {
+		result = append(result, sc.Bytes()...)
+	}
+	if err := sc.Err(); err != nil {
+		t.Error(err)
+	}
+
+	if !reflect.DeepEqual(result, file) {
+		t.Error("input bytes are not the same as scanned bytes")
+	}
 }
 
 func BenchmarkScanner(b *testing.B) {
