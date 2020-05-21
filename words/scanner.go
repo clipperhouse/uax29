@@ -236,13 +236,13 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB13a
-		if is(_ExtendNumLet, data[current:]) && previous(_ALetter|_HebrewLetter|_Numeric|_Katakana|_ExtendNumLet, data[:current]) {
+		if is(_ExtendNumLet, data[current:]) && previous(_AHLetter|_Numeric|_Katakana|_ExtendNumLet, data[:current]) {
 			current += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB13b
-		if is(_ALetter|_HebrewLetter|_Numeric|_Katakana, data[current:]) && previous(_ExtendNumLet, data[:current]) {
+		if is(_AHLetter|_Numeric|_Katakana, data[current:]) && previous(_ExtendNumLet, data[:current]) {
 			current += w
 			continue
 		}
