@@ -30,12 +30,12 @@ func previousIndex(categories uint32, data []byte) int {
 // previous works backward in the buffer until it hits a rune in categories,
 // ignoring runes in the _Ignore category.
 func previous(categories uint32, data []byte) bool {
-	return previousIndex(categories, data) >= 0
+	return previousIndex(categories, data) != -1
 }
 
-// forward looks ahead in the buffer until it hits a rune in categories,
+// subsequent looks ahead in the buffer until it hits a rune in categories,
 // ignoring runes in the _Ignore category.
-func forward(categories uint32, data []byte) bool {
+func subsequent(categories uint32, data []byte) bool {
 	i := 0
 	for i < len(data) {
 		_, w := utf8.DecodeRune(data[i:])

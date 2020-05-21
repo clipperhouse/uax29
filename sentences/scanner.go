@@ -100,7 +100,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		// SB5 applies to subsequent rules; there is an implied "ignoring Extend & Format"
 		// https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
-		// The Seek* methods are shorthand for "seek a category but skip over Extend & Format on the way"
+		// The previous/subsequent methods are shorthand for "seek a category but skip over Extend & Format on the way"
 
 		// https://unicode.org/reports/tr29/#SB6
 		if is(_Numeric, data[current:]) && previous(_ATerm, data[:current]) {
@@ -132,7 +132,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 				break
 			}
 
-			if forward(_Lower, data[p:]) {
+			if subsequent(_Lower, data[p:]) {
 				p2 := current
 
 				// Zero or more Sp

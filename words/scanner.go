@@ -119,7 +119,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		// WB4 applies to subsequent rules; there is an implied "ignoring Extend & Format & ZWJ"
 		// https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
-		// The Seek* methods are shorthand for "seek a category but skip over Extend|Format|ZWJ on the way"
+		// The previous/subsequent methods are shorthand for "seek a category but skip over Extend|Format|ZWJ on the way"
 
 		// https://unicode.org/reports/tr29/#WB5
 		if is(_AHLetter, data[current:]) && previous(_AHLetter, data[:current]) {
@@ -139,7 +139,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB6
-		if is(_MidLetter|_MidNumLetQ, data[current:]) && forward(_AHLetter, data[next:]) && previous(_AHLetter, data[:current]) {
+		if is(_MidLetter|_MidNumLetQ, data[current:]) && subsequent(_AHLetter, data[next:]) && previous(_AHLetter, data[:current]) {
 			current += w
 			continue
 		}
@@ -160,7 +160,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB7b
-		if is(_DoubleQuote, data[current:]) && forward(_HebrewLetter, data[next:]) && previous(_HebrewLetter, data[:current]) {
+		if is(_DoubleQuote, data[current:]) && subsequent(_HebrewLetter, data[next:]) && previous(_HebrewLetter, data[:current]) {
 			current += w
 			continue
 		}
@@ -213,7 +213,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB12
-		if is(_MidNum|_MidNumLet|_SingleQuote, data[current:]) && forward(_Numeric, data[next:]) && previous(_Numeric, data[:current]) {
+		if is(_MidNum|_MidNumLet|_SingleQuote, data[current:]) && subsequent(_Numeric, data[next:]) && previous(_Numeric, data[:current]) {
 			current += w
 			continue
 		}
