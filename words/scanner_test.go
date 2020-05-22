@@ -1,4 +1,4 @@
-package tests
+package words_test
 
 import (
 	"bytes"
@@ -158,7 +158,7 @@ func TestUnicodeSegments(t *testing.T) {
 }
 
 func TestRoundtrip(t *testing.T) {
-	file, err := ioutil.ReadFile("wikipedia.txt")
+	file, err := ioutil.ReadFile("testdata/wikipedia.txt")
 
 	if err != nil {
 		t.Error(err)
@@ -181,7 +181,7 @@ func TestRoundtrip(t *testing.T) {
 }
 
 func BenchmarkScanner(b *testing.B) {
-	file, err := ioutil.ReadFile("wikipedia.txt")
+	file, err := ioutil.ReadFile("testdata/wikipedia.txt")
 
 	if err != nil {
 		b.Error(err)
