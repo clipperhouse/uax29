@@ -12,11 +12,13 @@ func previousIndex(categories uint32, data []byte) int {
 		_, w := utf8.DecodeLastRune(data[:i])
 		i -= w
 
-		if is(_Ignore, data[i:]) {
+		lookup, _ := trie.lookup(data[i:])
+
+		if is(_Ignore, lookup) {
 			continue
 		}
 
-		if is(categories, data[i:]) {
+		if is(categories, lookup) {
 			return i
 		}
 
@@ -38,14 +40,14 @@ func previous(categories uint32, data []byte) bool {
 func subsequent(categories uint32, data []byte) bool {
 	i := 0
 	for i < len(data) {
-		_, w := utf8.DecodeRune(data[i:])
+		lookup, w := trie.lookup(data[i:])
 
-		if is(_Ignore, data[i:]) {
+		if is(_Ignore, lookup) {
 			i += w
 			continue
 		}
 
-		if is(categories, data[i:]) {
+		if is(categories, lookup) {
 			return true
 		}
 

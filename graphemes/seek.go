@@ -11,11 +11,13 @@ func previous(categories uint16, data []byte) bool {
 		_, w := utf8.DecodeLastRune(data[:i])
 		i -= w
 
-		if is(_Ignore, data[i:]) {
+		lookup, _ := trie.lookup(data[i:])
+
+		if is(_Ignore, lookup) {
 			continue
 		}
 
-		if is(categories, data[i:]) {
+		if is(categories, lookup) {
 			return true
 		}
 
