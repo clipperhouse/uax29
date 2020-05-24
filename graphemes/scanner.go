@@ -3,6 +3,7 @@ package graphemes
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"unicode/utf8"
 )
@@ -67,6 +68,9 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// to the right of the ×, from which we look back or forward
 
 		current, w := trie.lookup(data[pos:])
+		if w == 0 {
+			return 0, nil, fmt.Errorf("error decoding rune at byte 0x%x", data[pos])
+		}
 
 		_, lw := utf8.DecodeLastRune(data[:pos])
 		last, _ := trie.lookup(data[pos-lw:])
