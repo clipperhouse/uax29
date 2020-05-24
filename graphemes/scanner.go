@@ -66,12 +66,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first category
 		// to the right of the ×, from which we look back or forward
 
-		// Decoding runes is a bit redundant, it happens in other places too
-		// We do it here for clarity and to pick up errors early
 		current, w := trie.lookup(data[pos:])
 
-		_, pw := utf8.DecodeLastRune(data[:pos])
-		last, _ := trie.lookup(data[pos-pw:])
+		_, lw := utf8.DecodeLastRune(data[:pos])
+		last, _ := trie.lookup(data[pos-lw:])
 
 		// https://unicode.org/reports/tr29/#GB3
 		if is(_LF, current) && is(_CR, last) {
@@ -126,7 +124,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#GB11
-		if is(_ExtendedPictographic, current) && is(_ZWJ, last) && previous(_ExtendedPictographic, data[:pos-pw]) {
+		if is(_ExtendedPictographic, current) && is(_ZWJ, last) && previous(_ExtendedPictographic, data[:pos-lw]) {
 			pos += w
 			continue
 		}

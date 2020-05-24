@@ -39,7 +39,7 @@ We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#
 
 Execution time is `O(n)` on input size. It can be I/O bound; you can control I/O and performance implications by the `io.Reader` you pass to `NewScanner`.
 
-In my local testing (Mac laptop), `uax29/words` processes around 5MM tokens per second of English wiki text.
+In my local testing (Mac laptop), `uax29/words` processes around 12MM tokens per second of English wiki text.
 
 ### Status
 
