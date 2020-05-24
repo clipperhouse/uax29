@@ -3,7 +3,6 @@ package sentences
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"unicode/utf8"
 )
@@ -28,10 +27,9 @@ func NewScanner(r io.Reader) *bufio.Scanner {
 
 var trie = newSentencesTrie(0)
 
-// is tests if the first rune of s is in categories
-func is(categories uint16, s []byte) bool {
-	lookup, _ := trie.lookup(s)
-	return (lookup & categories) != 0
+// is tests if lookup intersects categories
+func is(categories, lookup uint16) bool {
+	return (categories & lookup) != 0
 }
 
 var _SATerm = _STerm | _ATerm
@@ -44,21 +42,21 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		return 0, nil, nil
 	}
 
-	current := 0
+	pos := 0
 
 	for {
-		if current == len(data) && !atEOF {
+		if pos == len(data) && !atEOF {
 			// Request more data
 			return 0, nil, nil
 		}
 
-		sot := current == 0 // "start of text"
-		eof := len(data) == current
+		sot := pos == 0 // "start of text"
+		eof := len(data) == pos
 
 		// https://unicode.org/reports/tr29/#SB1
 		if sot && !eof {
-			_, w := utf8.DecodeRune(data[current:])
-			current += w
+			_, w := utf8.DecodeRune(data[pos:])
+			pos += w
 			continue
 		}
 
@@ -73,28 +71,25 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// Decoding runes is a bit redundant, it happens in other places too
 		// We do it here for clarity and to pick up errors early
 
-		r, w := utf8.DecodeRune(data[current:])
-		if r == utf8.RuneError {
-			return 0, nil, fmt.Errorf("error decoding rune at byte 0x%x", data[current])
-		}
+		current, w := trie.lookup(data[pos:])
 
-		_, pw := utf8.DecodeLastRune(data[:current])
-		last := current - pw
+		_, pw := utf8.DecodeLastRune(data[:pos])
+		last, _ := trie.lookup(data[pos-pw:])
 
 		// https://unicode.org/reports/tr29/#SB3
-		if is(_LF, data[current:]) && is(_CR, data[last:]) {
-			current += w
+		if is(_LF, current) && is(_CR, last) {
+			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#SB4
-		if is(_ParaSep, data[last:]) {
+		if is(_ParaSep, last) {
 			break
 		}
 
 		// https://unicode.org/reports/tr29/#SB5
-		if is(_Extend|_Format, data[current:]) {
-			current += w
+		if is(_Extend|_Format, current) {
+			pos += w
 			continue
 		}
 
@@ -103,29 +98,30 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// The previous/subsequent methods are shorthand for "seek a category but skip over Extend & Format on the way"
 
 		// https://unicode.org/reports/tr29/#SB6
-		if is(_Numeric, data[current:]) && previous(_ATerm, data[:current]) {
-			current += w
+		if is(_Numeric, current) && previous(_ATerm, data[:pos]) {
+			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#SB7
-		if is(_Upper, data[current:]) {
-			pi := previousIndex(_ATerm, data[:current])
+		if is(_Upper, current) {
+			pi := previousIndex(_ATerm, data[:pos])
 			if pi >= 0 && previous(_Upper|_Lower, data[:pi]) {
-				current += w
+				pos += w
 				continue
 			}
 		}
 
 		// https://unicode.org/reports/tr29/#SB8
 		{
-			p := current
+			p := pos
 
 			// ( ¬(OLetter | Upper | Lower | ParaSep | SATerm) )*
 			// Zero or more of not-the-above categories
 			for p < len(data) {
-				_, w := utf8.DecodeRune(data[p:])
-				if !is(_OLetter|_Upper|_Lower|_ParaSep|_SATerm, data[p:]) {
+				lookup, w := trie.lookup(data[p:])
+
+				if !is(_OLetter|_Upper|_Lower|_ParaSep|_SATerm, lookup) {
 					p += w
 					continue
 				}
@@ -133,10 +129,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 
 			if subsequent(_Lower, data[p:]) {
-				p2 := current
+				p2 := pos
 
 				// Zero or more Sp
-				sp := current
+				sp := pos
 				for {
 					sp = previousIndex(_Sp, data[:sp])
 					if sp < 0 {
@@ -158,15 +154,15 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 				// Having looked back past Sp's, Close's, and intervening Extend|Format,
 				// is there an ATerm?
 				if previous(_ATerm, data[:p2]) {
-					current += w
+					pos += w
 					continue
 				}
 			}
 		}
 
 		// https://unicode.org/reports/tr29/#SB8a
-		if is(_SContinue|_SATerm, data[current:]) {
-			p := current
+		if is(_SContinue|_SATerm, current) {
+			p := pos
 
 			// Zero or more Sp
 			sp := p
@@ -191,14 +187,14 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// Having looked back past Sp, Close, and intervening Extend|Format,
 			// is there an SATerm?
 			if previous(_SATerm, data[:p]) {
-				current += w
+				pos += w
 				continue
 			}
 		}
 
 		// https://unicode.org/reports/tr29/#SB9
-		if is(_Close|_Sp|_ParaSep, data[current:]) {
-			p := current
+		if is(_Close|_Sp|_ParaSep, current) {
+			p := pos
 
 			// Zero or more Close's
 			close := p
@@ -213,14 +209,14 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// Having looked back past Close's and intervening Extend|Format,
 			// is there an SATerm?
 			if previous(_SATerm, data[:p]) {
-				current += w
+				pos += w
 				continue
 			}
 		}
 
 		// https://unicode.org/reports/tr29/#SB10
-		if is(_Sp|_ParaSep, data[current:]) {
-			p := current
+		if is(_Sp|_ParaSep, current) {
+			p := pos
 
 			// Zero or more Sp's
 			sp := p
@@ -245,14 +241,14 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// Having looked back past Sp's, Close's, and intervening Extend|Format,
 			// is there an SATerm?
 			if previous(_SATerm, data[:p]) {
-				current += w
+				pos += w
 				continue
 			}
 		}
 
 		// https://unicode.org/reports/tr29/#SB11
 		{
-			p := current
+			p := pos
 
 			// Zero or one Sp|ParaSep
 			ps := previousIndex(_Sp|_ParaSep, data[:p])
@@ -288,8 +284,8 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#SB998
-		if current > 0 {
-			current += w
+		if pos > 0 {
+			pos += w
 			continue
 		}
 
@@ -298,5 +294,5 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	}
 
 	// Return token
-	return current, data[:current], nil
+	return pos, data[:pos], nil
 }
