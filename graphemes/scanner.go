@@ -28,9 +28,9 @@ func NewScanner(r io.Reader) *bufio.Scanner {
 
 var trie = newGraphemesTrie(0)
 
-// is tests if lookup intersects categories
-func is(categories, lookup uint16) bool {
-	return (categories & lookup) != 0
+// is tests if lookup intersects properties
+func is(properties, lookup property) bool {
+	return (properties & lookup) != 0
 }
 
 var _Ignore = _Extend
@@ -42,7 +42,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	}
 
 	var pos, w, lastw int
-	var current, last uint16
+	var current, last property
 
 	for {
 		if pos == len(data) && !atEOF {
@@ -65,7 +65,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			break
 		}
 
-		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first category
+		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 		// to the right of the ×, from which we look back or forward
 
 		last = current

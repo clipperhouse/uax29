@@ -1,4 +1,4 @@
-// Package main generates tries of Unicode categories by calling go generate as the repository root
+// Package main generates tries of Unicode properties by calling go generate as the repository root
 package main
 
 import (
@@ -61,7 +61,7 @@ func generate(prop prop) error {
 
 	b := bufio.NewReader(resp.Body)
 
-	runesByCategory := map[string][]rune{}
+	runesByProperty := map[string][]rune{}
 	for {
 		s, err := b.ReadString('\n')
 		if err != nil {
@@ -86,38 +86,38 @@ func generate(prop prop) error {
 		}
 
 		split2 := strings.Split(parts[1], "#")
-		category := strings.TrimSpace(split2[0])
+		property := strings.TrimSpace(split2[0])
 
-		runesByCategory[category] = append(runesByCategory[category], runes...)
+		runesByProperty[property] = append(runesByProperty[property], runes...)
 	}
 
-	// Words and graphemes need Extended_Pictographic category
+	// Words and graphemes need Extended_Pictographic property
 	const key = "Extended_Pictographic"
 	if prop.packagename == "emoji" {
-		extendedPictographic = runesByCategory[key]
+		extendedPictographic = runesByProperty[key]
 		// We don't need to generate emoji package
 		return nil
 	}
 	if prop.packagename == "words" || prop.packagename == "graphemes" {
-		runesByCategory[key] = extendedPictographic
+		runesByProperty[key] = extendedPictographic
 	}
 
 	// Keep the order stable
-	categories := make([]string, 0, len(runesByCategory))
-	for category := range runesByCategory {
-		categories = append(categories, category)
+	properties := make([]string, 0, len(runesByProperty))
+	for property := range runesByProperty {
+		properties = append(properties, property)
 	}
-	sort.Strings(categories)
+	sort.Strings(properties)
 
-	iotasByCategory := map[string]uint64{}
-	for i, category := range categories {
-		iotasByCategory[category] = 1 << i
+	iotasByProperty := map[string]uint64{}
+	for i, property := range properties {
+		iotasByProperty[property] = 1 << i
 	}
 
 	iotasByRune := map[rune]uint64{}
-	for category, runes := range runesByCategory {
+	for property, runes := range runesByProperty {
 		for _, r := range runes {
-			iotasByRune[r] = iotasByRune[r] | iotasByCategory[category]
+			iotasByRune[r] = iotasByRune[r] | iotasByProperty[property]
 		}
 	}
 
@@ -127,7 +127,7 @@ func generate(prop prop) error {
 		trie.Insert(r, iotas)
 	}
 
-	err = write(prop, trie, iotasByCategory)
+	err = write(prop, trie, iotasByProperty)
 	if err != nil {
 		return err
 	}
@@ -168,7 +168,7 @@ func getRuneRange(s string) ([]rune, error) {
 	return runes, nil
 }
 
-func write(prop prop, trie *triegen.Trie, iotasByCategory map[string]uint64) error {
+func write(prop prop, trie *triegen.Trie, iotasByProperty map[string]uint64) error {
 	buf := bytes.Buffer{}
 
 	fmt.Fprintln(&buf, "package "+prop.packagename)
@@ -176,14 +176,14 @@ func write(prop prop, trie *triegen.Trie, iotasByCategory map[string]uint64) err
 	fmt.Fprintln(&buf)
 
 	// Keep the order stable
-	categories := make([]string, 0, len(iotasByCategory))
-	for category := range iotasByCategory {
-		categories = append(categories, category)
+	properties := make([]string, 0, len(iotasByProperty))
+	for property := range iotasByProperty {
+		properties = append(properties, property)
 	}
-	sort.Strings(categories)
+	sort.Strings(properties)
 
 	inttype := ""
-	len := len(categories)
+	len := len(properties)
 	switch {
 	case len < 8:
 		inttype = "uint8"
@@ -195,9 +195,11 @@ func write(prop prop, trie *triegen.Trie, iotasByCategory map[string]uint64) err
 		inttype = "uint64"
 	}
 
-	fmt.Fprintln(&buf, "var(")
-	for i, category := range categories {
-		fmt.Fprintf(&buf, "_%s %s = 1 << %d\n", strings.ReplaceAll(category, "_", ""), inttype, i)
+	fmt.Fprintf(&buf, "type property %s\n\n", inttype)
+
+	fmt.Fprintln(&buf, "var (")
+	for i, property := range properties {
+		fmt.Fprintf(&buf, "_%s property = 1 << %d\n", strings.ReplaceAll(property, "_", ""), i)
 	}
 	fmt.Fprintln(&buf, ")")
 

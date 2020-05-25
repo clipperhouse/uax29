@@ -28,9 +28,9 @@ func NewScanner(r io.Reader) *bufio.Scanner {
 
 var trie = newWordsTrie(0)
 
-// is tests if lookup intersects categories
-func is(categories, lookup uint32) bool {
-	return (categories & lookup) != 0
+// is tests if lookup intersects properties
+func is(properties, lookup property) bool {
+	return (properties & lookup) != 0
 }
 
 var _AHLetter = _ALetter | _HebrewLetter
@@ -44,7 +44,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	}
 
 	var pos, w int
-	var current, last uint32
+	var current, last property
 
 	for {
 		if pos == len(data) && !atEOF {
@@ -67,7 +67,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			break
 		}
 
-		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first category
+		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 		// to the right of the ×, from which we look back or forward
 
 		last = current
@@ -115,7 +115,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		// WB4 applies to subsequent rules; there is an implied "ignoring Extend & Format & ZWJ"
 		// https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
-		// The previous/subsequent methods are shorthand for "seek a category but skip over Extend|Format|ZWJ on the way"
+		// The previous/subsequent methods are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
 
 		// https://unicode.org/reports/tr29/#WB5
 		if is(_AHLetter, current) && previous(_AHLetter, data[:pos]) {

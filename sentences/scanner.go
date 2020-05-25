@@ -27,9 +27,9 @@ func NewScanner(r io.Reader) *bufio.Scanner {
 
 var trie = newSentencesTrie(0)
 
-// is tests if lookup intersects categories
-func is(categories, lookup uint16) bool {
-	return (categories & lookup) != 0
+// is tests if lookup intersects properties
+func is(properties, lookup property) bool {
+	return (properties & lookup) != 0
 }
 
 var _SATerm = _STerm | _ATerm
@@ -43,7 +43,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	}
 
 	var pos, w int
-	var current, last uint16
+	var current, last property
 
 	for {
 		if pos == len(data) && !atEOF {
@@ -66,7 +66,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			break
 		}
 
-		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first category
+		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 		// to the right of the ×, from which we look back or forward
 
 		last = current
@@ -95,7 +95,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		// SB5 applies to subsequent rules; there is an implied "ignoring Extend & Format"
 		// https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
-		// The previous/subsequent methods are shorthand for "seek a category but skip over Extend & Format on the way"
+		// The previous/subsequent methods are shorthand for "seek a property but skip over Extend & Format on the way"
 
 		// https://unicode.org/reports/tr29/#SB6
 		if is(_Numeric, current) && previous(_ATerm, data[:pos]) {
@@ -117,7 +117,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			p := pos
 
 			// ( ¬(OLetter | Upper | Lower | ParaSep | SATerm) )*
-			// Zero or more of not-the-above categories
+			// Zero or more of not-the-above properties
 			for p < len(data) {
 				lookup, w := trie.lookup(data[p:])
 

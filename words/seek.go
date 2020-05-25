@@ -2,10 +2,10 @@ package words
 
 import "unicode/utf8"
 
-// previousIndex works backward until it hits a rune in categories,
-// ignoring runes in the _Ignore category, and returns the index of the rune in the buffer.
-// It returns -1 if a categories rune is not found.
-func previousIndex(categories uint32, data []byte) int {
+// previousIndex works backward until it hits a rune in properties,
+// ignoring runes in the _Ignore property, and returns the index of the rune in the buffer.
+// It returns -1 if a properties rune is not found.
+func previousIndex(properties property, data []byte) int {
 	// Start at the end of the buffer and move backwards
 	i := len(data)
 	for i > 0 {
@@ -18,7 +18,7 @@ func previousIndex(categories uint32, data []byte) int {
 			continue
 		}
 
-		if is(categories, lookup) {
+		if is(properties, lookup) {
 			return i
 		}
 
@@ -29,15 +29,15 @@ func previousIndex(categories uint32, data []byte) int {
 	return -1
 }
 
-// previous works backward in the buffer until it hits a rune in categories,
-// ignoring runes in the _Ignore category.
-func previous(categories uint32, data []byte) bool {
-	return previousIndex(categories, data) != -1
+// previous works backward in the buffer until it hits a rune in properties,
+// ignoring runes in the _Ignore property.
+func previous(properties property, data []byte) bool {
+	return previousIndex(properties, data) != -1
 }
 
-// subsequent looks ahead in the buffer until it hits a rune in categories,
-// ignoring runes in the _Ignore category.
-func subsequent(categories uint32, data []byte) bool {
+// subsequent looks ahead in the buffer until it hits a rune in properties,
+// ignoring runes in the _Ignore property.
+func subsequent(properties property, data []byte) bool {
 	i := 0
 	for i < len(data) {
 		lookup, w := trie.lookup(data[i:])
@@ -47,7 +47,7 @@ func subsequent(categories uint32, data []byte) bool {
 			continue
 		}
 
-		if is(categories, lookup) {
+		if is(properties, lookup) {
 			return true
 		}
 

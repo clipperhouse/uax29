@@ -2,9 +2,9 @@ package graphemes
 
 import "unicode/utf8"
 
-// previous works backward in the buffer until it hits a rune in categories,
-// ignoring runes in the _Ignore category.
-func previous(categories uint16, data []byte) bool {
+// previous works backward in the buffer until it hits a rune in properties,
+// ignoring runes in the _Ignore property.
+func previous(properties property, data []byte) bool {
 	// Start at the end of the buffer and move backwards
 	i := len(data)
 	for i > 0 {
@@ -17,7 +17,7 @@ func previous(categories uint16, data []byte) bool {
 			continue
 		}
 
-		if is(categories, lookup) {
+		if is(properties, lookup) {
 			return true
 		}
 
