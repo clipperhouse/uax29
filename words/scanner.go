@@ -43,7 +43,8 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		return 0, nil, nil
 	}
 
-	pos := 0
+	var pos, w int
+	var current, last uint32
 
 	for {
 		if pos == len(data) && !atEOF {
@@ -56,7 +57,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		// https://unicode.org/reports/tr29/#WB1
 		if sot && !eof {
-			_, w := utf8.DecodeRune(data[pos:])
+			current, w = trie.lookup(data[pos:])
 			pos += w
 			continue
 		}
@@ -69,15 +70,14 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first category
 		// to the right of the ×, from which we look back or forward
 
-		current, w := trie.lookup(data[pos:])
+		last = current
+
+		current, w = trie.lookup(data[pos:])
 		if w == 0 {
 			return 0, nil, fmt.Errorf("error decoding rune at byte 0x%x", data[pos])
 		}
 
 		next := pos + w
-
-		_, lw := utf8.DecodeLastRune(data[:pos])
-		last, _ := trie.lookup(data[pos-lw:])
 
 		// https://unicode.org/reports/tr29/#WB3
 		if is(_LF, current) && is(_CR, last) {
