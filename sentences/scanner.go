@@ -27,9 +27,9 @@ func NewScanner(r io.Reader) *bufio.Scanner {
 
 var trie = newSentencesTrie(0)
 
-// is tests if lookup intersects properties
-func is(properties, lookup property) bool {
-	return (properties & lookup) != 0
+// is determines if lookup intersects propert(ies)
+func (lookup property) is(properties property) bool {
+	return (lookup & properties) != 0
 }
 
 var _SATerm = _STerm | _ATerm
@@ -77,18 +77,18 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#SB3
-		if is(_LF, current) && is(_CR, last) {
+		if current.is(_LF) && last.is(_CR) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#SB4
-		if is(_ParaSep, last) {
+		if last.is(_ParaSep) {
 			break
 		}
 
 		// https://unicode.org/reports/tr29/#SB5
-		if is(_Extend|_Format, current) {
+		if current.is(_Extend | _Format) {
 			pos += w
 			continue
 		}
@@ -98,13 +98,13 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// The previous/subsequent methods are shorthand for "seek a property but skip over Extend & Format on the way"
 
 		// https://unicode.org/reports/tr29/#SB6
-		if is(_Numeric, current) && previous(_ATerm, data[:pos]) {
+		if current.is(_Numeric) && previous(_ATerm, data[:pos]) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#SB7
-		if is(_Upper, current) {
+		if current.is(_Upper) {
 			pi := previousIndex(_ATerm, data[:pos])
 			if pi >= 0 && previous(_Upper|_Lower, data[:pi]) {
 				pos += w
@@ -121,7 +121,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			for p < len(data) {
 				lookup, w := trie.lookup(data[p:])
 
-				if !is(_OLetter|_Upper|_Lower|_ParaSep|_SATerm, lookup) {
+				if !lookup.is(_OLetter | _Upper | _Lower | _ParaSep | _SATerm) {
 					p += w
 					continue
 				}
@@ -161,7 +161,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#SB8a
-		if is(_SContinue|_SATerm, current) {
+		if current.is(_SContinue | _SATerm) {
 			p := pos
 
 			// Zero or more Sp
@@ -193,7 +193,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#SB9
-		if is(_Close|_Sp|_ParaSep, current) {
+		if current.is(_Close | _Sp | _ParaSep) {
 			p := pos
 
 			// Zero or more Close's
@@ -215,7 +215,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#SB10
-		if is(_Sp|_ParaSep, current) {
+		if current.is(_Sp | _ParaSep) {
 			p := pos
 
 			// Zero or more Sp's

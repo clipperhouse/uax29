@@ -13,11 +13,11 @@ func previous(properties property, data []byte) bool {
 
 		lookup, _ := trie.lookup(data[i:])
 
-		if is(_Ignore, lookup) {
+		if lookup.is(_Ignore) {
 			continue
 		}
 
-		if is(properties, lookup) {
+		if lookup.is(properties) {
 			return true
 		}
 

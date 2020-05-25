@@ -14,11 +14,11 @@ func previousIndex(properties property, data []byte) int {
 
 		lookup, _ := trie.lookup(data[i:])
 
-		if is(_Ignore, lookup) {
+		if lookup.is(_Ignore) {
 			continue
 		}
 
-		if is(properties, lookup) {
+		if lookup.is(properties) {
 			return i
 		}
 
@@ -42,12 +42,12 @@ func subsequent(properties property, data []byte) bool {
 	for i < len(data) {
 		lookup, w := trie.lookup(data[i:])
 
-		if is(_Ignore, lookup) {
+		if lookup.is(_Ignore) {
 			i += w
 			continue
 		}
 
-		if is(properties, lookup) {
+		if lookup.is(properties) {
 			return true
 		}
 
