@@ -41,8 +41,9 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		return 0, nil, nil
 	}
 
-	var pos, w, lastw int
-	var current, last property
+	// These vars are stateful across loop iterations
+	var pos, w int
+	var current property
 
 	for {
 		if pos == len(data) && !atEOF {
@@ -68,8 +69,8 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 		// to the right of the ×, from which we look back or forward
 
-		last = current
-		lastw = w
+		last := current
+		lastw := w
 
 		current, w = trie.lookup(data[pos:])
 		if w == 0 {
