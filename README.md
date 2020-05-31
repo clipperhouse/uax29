@@ -37,9 +37,9 @@ We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#
 
 `uax29` is designed to work in constant memory, regardless of input size. It buffers input and streams tokens. (For example, I am showing a maximum resident size of 8MB when processing a 300MB file.)
 
-Execution time is `O(n)` on input size. It can be I/O bound; you can control I/O and performance implications by the `io.Reader` you pass to `NewScanner`.
+Execution time is `O(n)` on input size. It can be I/O bound; I/O performance is determined by the `io.Reader` you pass to `NewScanner`.
 
-In my local testing (Mac laptop), `uax29/words` processes around 12MM tokens per second of English wiki text.
+In my local testing (Mac laptop), `uax29/words` processes around 14MM tokens per second of [wiki text](https://en.wikipedia.org/w/index.php?title=New_York_City&action=edit).
 
 ### Status
 
