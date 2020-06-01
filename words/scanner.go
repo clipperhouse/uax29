@@ -124,9 +124,12 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 			// Optimization: there's a likelihood of a run of AHLetter
 			for pos < len(data) {
-				lookup, w := trie.lookup(data[pos:])
+				lookup, w2 := trie.lookup(data[pos:])
 				if lookup.is(_AHLetter) {
+					// Update stateful vars
 					current = lookup
+					w = w2
+
 					pos += w
 					continue
 				}
@@ -178,9 +181,12 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 			// Optimization: there's a likelihood of a run of Numeric
 			for pos < len(data) {
-				lookup, w := trie.lookup(data[pos:])
+				lookup, w2 := trie.lookup(data[pos:])
 				if lookup.is(_Numeric) {
+					// Update stateful vars
 					current = lookup
+					w = w2
+
 					pos += w
 					continue
 				}
@@ -223,9 +229,12 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 			// Optimization: there's a likelihood of a run of Katakana
 			for pos < len(data) {
-				lookup, w := trie.lookup(data[pos:])
+				lookup, w2 := trie.lookup(data[pos:])
 				if lookup.is(_Katakana) {
+					// Update stateful vars
 					current = lookup
+					w = w2
+
 					pos += w
 					continue
 				}
