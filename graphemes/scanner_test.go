@@ -62,8 +62,8 @@ func BenchmarkScanner(b *testing.B) {
 	}
 
 	b.ResetTimer()
+	b.SetBytes(int64(len(file)))
 
-	count := 0
 	r := bytes.NewReader(file)
 
 	for i := 0; i < b.N; i++ {
@@ -78,7 +78,6 @@ func BenchmarkScanner(b *testing.B) {
 			b.Error(err)
 		}
 
-		count = c
+		b.ReportMetric(float64(c), "tokens")
 	}
-	b.Logf("%d tokens\n", count)
 }
