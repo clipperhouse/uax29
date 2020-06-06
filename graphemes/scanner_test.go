@@ -64,8 +64,10 @@ func BenchmarkScanner(b *testing.B) {
 	b.ResetTimer()
 
 	count := 0
+	r := bytes.NewReader(file)
+
 	for i := 0; i < b.N; i++ {
-		r := bytes.NewReader(file)
+		r.Reset(file)
 		sc := graphemes.NewScanner(r)
 
 		c := 0
