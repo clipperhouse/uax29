@@ -285,13 +285,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#SB998
-		if pos > 0 {
-			pos += w
-			continue
-		}
-
-		// If we fall through all the above rules, it's a sentence break
-		break
+		pos += w
 	}
 
 	// Return token
