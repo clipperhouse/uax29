@@ -251,8 +251,8 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		{
 			p := pos
 
-			// Zero or one Sp|ParaSep
-			ps := previousIndex(_Sp|_ParaSep, data[:p])
+			// Zero or one ParaSep
+			ps := previousIndex(_ParaSep, data[:p])
 			if ps >= 0 {
 				p = ps
 			}
@@ -277,7 +277,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 				p = close
 			}
 
-			// Having looked back past Sp|ParaSep, Sp's, Close's, and intervening Extend|Format,
+			// Having looked back past ParaSep, Sp's, Close's, and intervening Extend|Format,
 			// is there an SATerm?
 			if previous(_SATerm, data[:p]) {
 				break
