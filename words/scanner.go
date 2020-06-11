@@ -258,11 +258,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		// https://unicode.org/reports/tr29/#WB15
 		if current.is(_RegionalIndicator) {
-			allRI := true
-
 			// Buffer comprised entirely of an odd number of RI, ignoring Extend|Format|ZWJ
+
 			i := pos
 			count := 0
+
 			for i > 0 {
 				_, w := utf8.DecodeLastRune(data[:i])
 				i -= w
@@ -274,28 +274,35 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 				}
 
 				if !lookup.is(_RegionalIndicator) {
-					allRI = false
-					break
+					goto WB16
 				}
 
 				count++
 			}
 
-			if allRI {
-				odd := count > 0 && count%2 == 1
-				if odd {
-					pos += w
-					continue
-				}
+			oddRI := count%2 == 1
+			if oddRI {
+				pos += w
+				continue
 			}
 		}
 
+		// TODO: It appears WB16 never applies?
+		// Discovered via test coverage: oddRI (below) is never true
+
+		// The combination of WB15 + WB999 imply that WB16 can never obtain,
+		// because the leading [^RI] of WB16 will previously have broken by
+		// falling through in the previous pass.
+		// Might be a flaw in current logic; tests pass, however
+
+	WB16:
 		// https://unicode.org/reports/tr29/#WB16
 		if current.is(_RegionalIndicator) {
-			odd := false
 			// Last n runes represent an odd number of RI, ignoring Extend|Format|ZWJ
+
 			i := pos
 			count := 0
+
 			for i > 0 {
 				_, w := utf8.DecodeLastRune(data[:i])
 				i -= w
@@ -307,14 +314,14 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 				}
 
 				if !lookup.is(_RegionalIndicator) {
-					odd = count > 0 && count%2 == 1
 					break
 				}
 
 				count++
 			}
 
-			if odd {
+			oddRI := count%2 == 1
+			if oddRI {
 				pos += w
 				continue
 			}
