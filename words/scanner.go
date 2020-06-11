@@ -256,49 +256,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			continue
 		}
 
-		// https://unicode.org/reports/tr29/#WB15
-		if current.is(_RegionalIndicator) {
-			// Buffer comprised entirely of an odd number of RI, ignoring Extend|Format|ZWJ
-
-			i := pos
-			count := 0
-
-			for i > 0 {
-				_, w := utf8.DecodeLastRune(data[:i])
-				i -= w
-
-				lookup, _ := trie.lookup(data[i:])
-
-				if lookup.is(_Ignore) {
-					continue
-				}
-
-				if !lookup.is(_RegionalIndicator) {
-					goto WB16
-				}
-
-				count++
-			}
-
-			oddRI := count%2 == 1
-			if oddRI {
-				pos += w
-				continue
-			}
-		}
-
-		// TODO: It appears WB16 never applies?
-		// Discovered via test coverage: oddRI (below) is never true
-
-		// The combination of WB15 + WB999 imply that WB16 can never obtain,
-		// because the leading [^RI] of WB16 will previously have broken by
-		// falling through in the previous pass.
-		// Might be a flaw in current logic; tests pass, however
-
-	WB16:
+		// https://unicode.org/reports/tr29/#WB15 and
 		// https://unicode.org/reports/tr29/#WB16
 		if current.is(_RegionalIndicator) {
-			// Last n runes represent an odd number of RI, ignoring Extend|Format|ZWJ
+			// WB15: Odd number of RI before hitting start of text
+			// WB16: Odd number of RI before hitting [^RI], aka "not RI"
 
 			i := pos
 			count := 0
@@ -314,11 +276,24 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 				}
 
 				if !lookup.is(_RegionalIndicator) {
+					// It's WB16
 					break
 				}
 
 				count++
 			}
+
+			// If i == 0, we fell through and hit sot (start of text), so WB15 applies
+			// If i > 0, we hit a non-RI, so WB16 applies
+
+			// Note: I believe WB16 is unreachable with the current logic.
+			// A non-RI will have caused a word break on a previous pass,
+			// by falling through to the break below (WB999). Therefore,
+			// the non-RI will not be present in the current pass, so we will
+			// always hit start-of-text, i.e., WB15.
+
+			// The tests pass, however. This means there is an untested logical
+			// flaw above, or WB16 is in fact a redundant rule.
 
 			oddRI := count%2 == 1
 			if oddRI {
