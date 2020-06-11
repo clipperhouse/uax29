@@ -256,9 +256,12 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			continue
 		}
 
+		// Optimization: if no previous RI, can skip WB15 and WB16
+		considerRI := current.is(_RegionalIndicator) && last.is(_RegionalIndicator|_Ignore)
+
 		// https://unicode.org/reports/tr29/#WB15 and
 		// https://unicode.org/reports/tr29/#WB16
-		if current.is(_RegionalIndicator) {
+		if considerRI {
 			// WB15: Odd number of RI before hitting start of text
 			// WB16: Odd number of RI before hitting [^RI], aka "not RI"
 
