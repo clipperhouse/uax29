@@ -98,14 +98,22 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
 		// The previous/subsequent methods are shorthand for "seek a property but skip over Extend & Format on the way"
 
+		// Optimization: determine if SB6 can possibly apply
+		considerSB6 := current.is(_Numeric) && last.is(_ATerm|_Ignore)
+
 		// https://unicode.org/reports/tr29/#SB6
-		if current.is(_Numeric) && previous(_ATerm, data[:pos]) {
-			pos += w
-			continue
+		if considerSB6 {
+			if previous(_ATerm, data[:pos]) {
+				pos += w
+				continue
+			}
 		}
 
+		// Optimization: determine if SB7 can possibly apply
+		considerSB7 := current.is(_Upper) && last.is(_ATerm|_Ignore)
+
 		// https://unicode.org/reports/tr29/#SB7
-		if current.is(_Upper) {
+		if considerSB7 {
 			pi := previousIndex(_ATerm, data[:pos])
 			if pi >= 0 && previous(_Upper|_Lower, data[:pi]) {
 				pos += w
@@ -113,8 +121,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 		}
 
+		// Optimization: determine if SB8 can possibly apply
+		considerSB8 := last.is(_ATerm | _Close | _Sp | _Ignore)
+
 		// https://unicode.org/reports/tr29/#SB8
-		{
+		if considerSB8 {
 			p := pos
 
 			// ( ¬(OLetter | Upper | Lower | ParaSep | SATerm) )*
@@ -122,11 +133,12 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			for p < len(data) {
 				lookup, w := trie.lookup(data[p:])
 
-				if !lookup.is(_OLetter | _Upper | _Lower | _ParaSep | _SATerm) {
-					p += w
-					continue
+				if lookup.is(_OLetter | _Upper | _Lower | _ParaSep | _SATerm) {
+					break
 				}
-				break
+
+				p += w
+				continue
 			}
 
 			if subsequent(_Lower, data[p:]) {
@@ -161,8 +173,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 		}
 
+		// Optimization: determine if SB8a can possibly apply
+		considerSB8a := current.is(_SContinue|_SATerm) && last.is(_SATerm|_Close|_Sp|_Ignore)
+
 		// https://unicode.org/reports/tr29/#SB8a
-		if current.is(_SContinue | _SATerm) {
+		if considerSB8a {
 			p := pos
 
 			// Zero or more Sp
@@ -193,8 +208,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 		}
 
+		// Optimization: determine if SB9 can possibly apply
+		considerSB9 := current.is(_Close|_Sp|_ParaSep) && last.is(_SATerm|_Close|_Ignore)
+
 		// https://unicode.org/reports/tr29/#SB9
-		if current.is(_Close | _Sp | _ParaSep) {
+		if considerSB9 {
 			p := pos
 
 			// Zero or more Close's
@@ -215,8 +233,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 		}
 
+		// Optimization: determine if SB10 can possibly apply
+		considerSB10 := current.is(_Sp|_ParaSep) && last.is(_SATerm|_Close|_Sp|_Ignore)
+
 		// https://unicode.org/reports/tr29/#SB10
-		if current.is(_Sp | _ParaSep) {
+		if considerSB10 {
 			p := pos
 
 			// Zero or more Sp's
@@ -247,8 +268,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 		}
 
+		// Optimization: determine if SB11 can possibly apply
+		considerSB11 := last.is(_SATerm | _Close | _Sp | _ParaSep | _Ignore)
+
 		// https://unicode.org/reports/tr29/#SB11
-		{
+		if considerSB11 {
 			p := pos
 
 			// Zero or one ParaSep
