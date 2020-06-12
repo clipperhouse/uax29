@@ -322,7 +322,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 		}
 
-		// Optimization determine if WB15 or WB16 can possibly apply
+		// Optimization: determine if WB15 or WB16 can possibly apply
 		considerWB1516 := current.is(_RegionalIndicator) && last.is(_RegionalIndicator|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB15 and
