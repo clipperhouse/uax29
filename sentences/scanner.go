@@ -32,9 +32,11 @@ func (lookup property) is(properties property) bool {
 	return (lookup & properties) != 0
 }
 
-var _SATerm = _STerm | _ATerm
-var _ParaSep = _Sep | _CR | _LF
-var _Ignore = _Extend | _Format
+var (
+	_SATerm  = _STerm | _ATerm
+	_ParaSep = _Sep | _CR | _LF
+	_Ignore  = _Extend | _Format
+)
 
 // SplitFunc is a bufio.SplitFunc implementation of sentence segmentation, for use with bufio.Scanner
 func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
