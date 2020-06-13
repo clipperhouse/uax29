@@ -139,13 +139,6 @@ func TestScanner(t *testing.T) {
 func TestUnicodeSegments(t *testing.T) {
 	var passed, failed int
 	for _, test := range segment.UnicodeWordTests {
-		// if strings.Contains(test.Comment, "15") {
-		// 	t.Logf("15: %d", i)
-		// }
-		// if strings.Contains(test.Comment, "16") {
-		// 	t.Logf("16: %d", i)
-		// }
-
 		rv := make([][]byte, 0)
 		scanner := words.NewScanner(bytes.NewReader(test.Input))
 		for scanner.Scan() {
