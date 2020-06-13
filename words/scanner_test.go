@@ -139,6 +139,13 @@ func TestScanner(t *testing.T) {
 func TestUnicodeSegments(t *testing.T) {
 	var passed, failed int
 	for _, test := range segment.UnicodeWordTests {
+		// if strings.Contains(test.Comment, "15") {
+		// 	t.Logf("15: %d", i)
+		// }
+		// if strings.Contains(test.Comment, "16") {
+		// 	t.Logf("16: %d", i)
+		// }
+
 		rv := make([][]byte, 0)
 		scanner := words.NewScanner(bytes.NewReader(test.Input))
 		for scanner.Scan() {
@@ -158,25 +165,31 @@ func TestUnicodeSegments(t *testing.T) {
 }
 
 func TestRoundtrip(t *testing.T) {
-	file, err := ioutil.ReadFile("testdata/wikipedia.txt")
+	input, err := ioutil.ReadFile("testdata/wikipedia.txt")
+	inlen := len(input)
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	r := bytes.NewReader(file)
+	r := bytes.NewReader(input)
 	sc := words.NewScanner(r)
 
-	var result []byte
+	var output []byte
 	for sc.Scan() {
-		result = append(result, sc.Bytes()...)
+		output = append(output, sc.Bytes()...)
 	}
 	if err := sc.Err(); err != nil {
 		t.Error(err)
 	}
+	outlen := len(output)
 
-	if !reflect.DeepEqual(result, file) {
-		t.Error("input bytes are not the same as scanned bytes")
+	if inlen != outlen {
+		t.Fatalf("input: %d bytes, output: %d bytes", inlen, outlen)
+	}
+
+	if !reflect.DeepEqual(output, input) {
+		t.Fatalf("input bytes are not the same as scanned bytes")
 	}
 }
 

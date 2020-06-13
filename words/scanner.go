@@ -33,9 +33,11 @@ func (lookup property) is(properties property) bool {
 	return (lookup & properties) != 0
 }
 
-var _AHLetter = _ALetter | _HebrewLetter
-var _MidNumLetQ = _MidNumLet | _SingleQuote
-var _Ignore = _Extend | _Format | _ZWJ
+var (
+	_AHLetter   = _ALetter | _HebrewLetter
+	_MidNumLetQ = _MidNumLet | _SingleQuote
+	_Ignore     = _Extend | _Format | _ZWJ
+)
 
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner
 func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
@@ -118,150 +120,216 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
 		// The previous/subsequent methods are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
 
-		// https://unicode.org/reports/tr29/#WB5
-		if current.is(_AHLetter) && previous(_AHLetter, data[:pos]) {
-			pos += w
+		// Optimization: determine if WB5 can possibly apply
+		considerWB5 := current.is(_AHLetter) && last.is(_AHLetter|_Ignore)
 
-			// Optimization: there's a likelihood of a run of AHLetter
-			for pos < len(data) {
-				lookup, w2 := trie.lookup(data[pos:])
-				if lookup.is(_AHLetter) {
+		// https://unicode.org/reports/tr29/#WB5
+		if considerWB5 {
+			if previous(_AHLetter, data[:pos]) {
+				pos += w
+
+				// Optimization: there's a likelihood of a run of AHLetter
+				for pos < len(data) {
+					lookup, w2 := trie.lookup(data[pos:])
+
+					if !lookup.is(_AHLetter) {
+						break
+					}
+
 					// Update stateful vars
 					current = lookup
 					w = w2
 
 					pos += w
-					continue
 				}
-				break
-			}
 
-			continue
+				continue
+			}
 		}
+
+		// Optimization: determine if WB6 can possibly apply
+		considerWB6 := current.is(_MidLetter|_MidNumLetQ) && last.is(_AHLetter|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB6
-		if current.is(_MidLetter|_MidNumLetQ) && subsequent(_AHLetter, data[next:]) && previous(_AHLetter, data[:pos]) {
-			pos += w
-			continue
+		if considerWB6 {
+			if subsequent(_AHLetter, data[next:]) && previous(_AHLetter, data[:pos]) {
+				pos += w
+				continue
+			}
 		}
+
+		// Optimization: determine if WB7 can possibly apply
+		considerWB7 := current.is(_AHLetter) && last.is(_MidLetter|_MidNumLetQ|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB7
-		if current.is(_AHLetter) {
-			pi := previousIndex(_MidLetter|_MidNumLetQ, data[:pos])
-			if pi >= 0 && previous(_AHLetter, data[:pi]) {
+		if considerWB7 {
+			i := previousIndex(_MidLetter|_MidNumLetQ, data[:pos])
+			if i > 0 && previous(_AHLetter, data[:i]) {
 				pos += w
 				continue
 			}
 		}
+
+		// Optimization: determine if WB7a can possibly apply
+		considerWB7a := current.is(_SingleQuote) && last.is(_HebrewLetter|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB7a
-		if current.is(_SingleQuote) && previous(_HebrewLetter, data[:pos]) {
-			pos += w
-			continue
+		if considerWB7a {
+			if previous(_HebrewLetter, data[:pos]) {
+				pos += w
+				continue
+			}
 		}
+
+		// Optimization: determine if WB7b can possibly apply
+		considerWB7b := current.is(_DoubleQuote) && last.is(_HebrewLetter|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB7b
-		if current.is(_DoubleQuote) && subsequent(_HebrewLetter, data[next:]) && previous(_HebrewLetter, data[:pos]) {
-			pos += w
-			continue
+		if considerWB7b {
+			if subsequent(_HebrewLetter, data[next:]) && previous(_HebrewLetter, data[:pos]) {
+				pos += w
+				continue
+			}
 		}
+
+		// Optimization: determine if WB7c can possibly apply
+		considerWB7c := current.is(_HebrewLetter) && last.is(_DoubleQuote|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB7c
-		if current.is(_HebrewLetter) {
-			pi := previousIndex(_DoubleQuote, data[:pos])
-			if pi >= 0 && previous(_HebrewLetter, data[:pi]) {
+		if considerWB7c {
+			i := previousIndex(_DoubleQuote, data[:pos])
+			if i > 0 && previous(_HebrewLetter, data[:i]) {
 				pos += w
 				continue
 			}
 		}
+
+		// Optimization: determine if WB8 can possibly apply
+		considerWB8 := current.is(_Numeric) && last.is(_Numeric|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB8
-		if current.is(_Numeric) && previous(_Numeric, data[:pos]) {
-			pos += w
+		if considerWB8 {
+			if previous(_Numeric, data[:pos]) {
+				pos += w
 
-			// Optimization: there's a likelihood of a run of Numeric
-			for pos < len(data) {
-				lookup, w2 := trie.lookup(data[pos:])
-				if lookup.is(_Numeric) {
+				// Optimization: there's a likelihood of a run of Numeric
+				for pos < len(data) {
+					lookup, w2 := trie.lookup(data[pos:])
+
+					if !lookup.is(_Numeric) {
+						break
+					}
+
 					// Update stateful vars
 					current = lookup
 					w = w2
 
 					pos += w
-					continue
 				}
-				break
-			}
 
-			continue
+				continue
+			}
 		}
+
+		// Optimization: determine if WB9 can possibly apply
+		considerWB9 := current.is(_Numeric) && last.is(_AHLetter|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB9
-		if current.is(_Numeric) && previous(_AHLetter, data[:pos]) {
-			pos += w
-			continue
-		}
-
-		// https://unicode.org/reports/tr29/#WB10
-		if current.is(_AHLetter) && previous(_Numeric, data[:pos]) {
-			pos += w
-			continue
-		}
-
-		// https://unicode.org/reports/tr29/#WB11
-		if current.is(_Numeric) {
-			pi := previousIndex(_MidNum|_MidNumLetQ, data[:pos])
-			if pi >= 0 && previous(_Numeric, data[:pi]) {
+		if considerWB9 {
+			if previous(_AHLetter, data[:pos]) {
 				pos += w
 				continue
 			}
 		}
 
-		// https://unicode.org/reports/tr29/#WB12
-		if current.is(_MidNum|_MidNumLet|_SingleQuote) && subsequent(_Numeric, data[next:]) && previous(_Numeric, data[:pos]) {
-			pos += w
-			continue
+		// Optimization: determine if WB10 can possibly apply
+		considerWB10 := current.is(_AHLetter) && last.is(_Numeric|_Ignore)
+
+		// https://unicode.org/reports/tr29/#WB10
+		if considerWB10 {
+			if previous(_Numeric, data[:pos]) {
+				pos += w
+				continue
+			}
 		}
 
-		// https://unicode.org/reports/tr29/#WB13
-		if current.is(_Katakana) && previous(_Katakana, data[:pos]) {
-			pos += w
+		// Optimization: determine if WB11 can possibly apply
+		considerWB11 := current.is(_Numeric) && last.is(_MidNum|_MidNumLetQ|_Ignore)
 
-			// Optimization: there's a likelihood of a run of Katakana
-			for pos < len(data) {
-				lookup, w2 := trie.lookup(data[pos:])
-				if lookup.is(_Katakana) {
+		// https://unicode.org/reports/tr29/#WB11
+		if considerWB11 {
+			i := previousIndex(_MidNum|_MidNumLetQ, data[:pos])
+			if i > 0 && previous(_Numeric, data[:i]) {
+				pos += w
+				continue
+			}
+		}
+
+		// Optimization: determine if WB12 can possibly apply
+		considerWB12 := current.is(_MidNum|_MidNumLet|_SingleQuote) && last.is(_Numeric|_Ignore)
+
+		// https://unicode.org/reports/tr29/#WB12
+		if considerWB12 {
+			if subsequent(_Numeric, data[next:]) && previous(_Numeric, data[:pos]) {
+				pos += w
+				continue
+			}
+		}
+
+		// Optimization: determine if WB13 can possibly apply
+		considerWB13 := current.is(_Katakana) && last.is(_Katakana|_Ignore)
+
+		// https://unicode.org/reports/tr29/#WB13
+		if considerWB13 {
+			if previous(_Katakana, data[:pos]) {
+				pos += w
+
+				// Optimization: there's a likelihood of a run of Katakana
+				for pos < len(data) {
+					lookup, w2 := trie.lookup(data[pos:])
+					if !lookup.is(_Katakana) {
+						break
+					}
+
 					// Update stateful vars
 					current = lookup
 					w = w2
 
 					pos += w
-					continue
 				}
-				break
-			}
 
-			continue
+				continue
+			}
 		}
+
+		// Optimization: determine if WB13a can possibly apply
+		considerWB13a := current.is(_ExtendNumLet) && last.is(_AHLetter|_Numeric|_Katakana|_ExtendNumLet|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB13a
-		if current.is(_ExtendNumLet) && previous(_AHLetter|_Numeric|_Katakana|_ExtendNumLet, data[:pos]) {
-			pos += w
-			continue
+		if considerWB13a {
+			if previous(_AHLetter|_Numeric|_Katakana|_ExtendNumLet, data[:pos]) {
+				pos += w
+				continue
+			}
 		}
+
+		// Optimization: determine if WB13b can possibly apply
+		considerWB13b := current.is(_AHLetter|_Numeric|_Katakana) && last.is(_ExtendNumLet|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB13b
-		if current.is(_AHLetter|_Numeric|_Katakana) && previous(_ExtendNumLet, data[:pos]) {
-			pos += w
-			continue
+		if considerWB13b {
+			if previous(_ExtendNumLet, data[:pos]) {
+				pos += w
+				continue
+			}
 		}
 
-		// Optimization: if no previous RI, can skip WB15 and WB16
-		considerRI := current.is(_RegionalIndicator) && last.is(_RegionalIndicator|_Ignore)
+		// Optimization: determine if WB15 or WB16 can possibly apply
+		considerWB1516 := current.is(_RegionalIndicator) && last.is(_RegionalIndicator|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB15 and
 		// https://unicode.org/reports/tr29/#WB16
-		if considerRI {
+		if considerWB1516 {
 			// WB15: Odd number of RI before hitting start of text
 			// WB16: Odd number of RI before hitting [^RI], aka "not RI"
 
@@ -289,14 +357,14 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// If i == 0, we fell through and hit sot (start of text), so WB15 applies
 			// If i > 0, we hit a non-RI, so WB16 applies
 
-			// Note: I believe WB16 is unreachable with the current logic.
+			// Note: I *suspect* WB16 is unreachable with the current logic.
 			// A non-RI will have caused a word break on a previous pass,
 			// by falling through to the break below (WB999). Therefore,
 			// the non-RI will not be present in the current pass, so we will
 			// always hit start-of-text, i.e., WB15.
 
 			// The tests pass, however. This means there is an untested logical
-			// flaw above, or WB16 is in fact a redundant rule.
+			// flaw above, or WB16 is a redundant rule, or I'm simply mistaken.
 
 			oddRI := count%2 == 1
 			if oddRI {

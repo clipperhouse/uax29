@@ -135,41 +135,12 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			continue
 		}
 
-		// https://unicode.org/reports/tr29/#GB12
-		if current.is(_RegionalIndicator) {
-			allRI := true
-
-			// Buffer comprised entirely of an odd number of RI
-			i := pos
-			count := 0
-			for i > 0 {
-				_, w := utf8.DecodeLastRune(data[:i])
-				i -= w
-
-				lookup, _ := trie.lookup(data[i:])
-
-				if !lookup.is(_RegionalIndicator) {
-					allRI = false
-					break
-				}
-				count++
-			}
-
-			if allRI {
-				odd := count > 0 && count%2 == 1
-				if odd {
-					pos += w
-					continue
-				}
-			}
-		}
-
+		// https://unicode.org/reports/tr29/#GB12 and
 		// https://unicode.org/reports/tr29/#GB13
-		if current.is(_RegionalIndicator) {
-			odd := false
-			// Last n runes represent an odd number of RI
+		if current.is(_RegionalIndicator) && last.is(_RegionalIndicator) {
 			i := pos
 			count := 0
+
 			for i > 0 {
 				_, w := utf8.DecodeLastRune(data[:i])
 				i -= w
@@ -177,13 +148,18 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 				lookup, _ := trie.lookup(data[i:])
 
 				if !lookup.is(_RegionalIndicator) {
-					odd = count > 0 && count%2 == 1
+					// It's GB13
 					break
 				}
+
 				count++
 			}
 
-			if odd {
+			// If i == 0, we fell through and hit sot (start of text), so GB12 applies
+			// If i > 0, we hit a non-RI, so GB13 applies
+
+			oddRI := count%2 == 1
+			if oddRI {
 				pos += w
 				continue
 			}
