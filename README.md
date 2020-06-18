@@ -58,3 +58,9 @@ In my local benchmarking (Mac laptop), `uax29/words` processes around 16MM token
 ### See also
 
 [jargon](https://github.com/clipperhouse/jargon), a text pipelines package for CLI and Go, which consumes this package.
+
+### Prior art
+
+[blevesearch/segment](https://github.com/blevesearch/segment)
+
+[rivo/uniseg](https://github.com/rivo/uniseg)
