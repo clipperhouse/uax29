@@ -105,3 +105,31 @@ func BenchmarkScanner(b *testing.B) {
 		b.ReportMetric(float64(c), "tokens")
 	}
 }
+
+func BenchmarkUnicodeSegments(b *testing.B) {
+	var buf bytes.Buffer
+	for _, test := range segment.UnicodeSentenceTests {
+		buf.Write(test.Input)
+	}
+	file := buf.Bytes()
+
+	b.ResetTimer()
+	b.SetBytes(int64(len(file)))
+
+	r := bytes.NewReader(file)
+
+	for i := 0; i < b.N; i++ {
+		r.Reset(file)
+		sc := sentences.NewScanner(r)
+
+		c := 0
+		for sc.Scan() {
+			c++
+		}
+		if err := sc.Err(); err != nil {
+			b.Error(err)
+		}
+
+		b.ReportMetric(float64(c), "tokens")
+	}
+}
