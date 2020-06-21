@@ -40,7 +40,7 @@ var (
 
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner
 func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	if atEOF && len(data) == 0 {
+	if len(data) == 0 {
 		return 0, nil, nil
 	}
 
@@ -49,23 +49,27 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	var current property
 
 	for {
-		if pos == len(data) && !atEOF {
-			// Request more data
+		sot := pos == 0         // "start of text"
+		eot := pos == len(data) // "end of text"
+
+		if eot && !atEOF {
+			// Token extends past current data, request more
 			return 0, nil, nil
 		}
 
-		sot := pos == 0 // "start of text"
-		eof := len(data) == pos
-
 		// https://unicode.org/reports/tr29/#WB1
-		if sot && !eof {
+		if sot {
 			current, w = trie.lookup(data[pos:])
+			if w == 0 {
+				// Rune extends past current data, request more
+				return 0, nil, nil
+			}
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB2
-		if eof {
+		if eot {
 			break
 		}
 
@@ -76,7 +80,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		current, w = trie.lookup(data[pos:])
 		if w == 0 {
-			// Not enough bytes to decode rune, request more data
+			// Rune extends past current data, request more
 			return 0, nil, nil
 		}
 
