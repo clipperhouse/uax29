@@ -3,7 +3,6 @@ package sentences
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 )
 
@@ -76,7 +75,8 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		current, w = trie.lookup(data[pos:])
 		if w == 0 {
-			return 0, nil, fmt.Errorf("error decoding rune at byte 0x%x", data[pos])
+			// Not enough bytes to decode rune, request more data
+			return 0, nil, nil
 		}
 
 		// https://unicode.org/reports/tr29/#SB3
