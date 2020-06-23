@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/clipperhouse/segment"
 	"github.com/clipperhouse/uax29/words"
@@ -158,11 +159,15 @@ func TestUnicodeSegments(t *testing.T) {
 }
 
 func TestRoundtrip(t *testing.T) {
-	input, err := ioutil.ReadFile("testdata/wikipedia.txt")
+	input, err := ioutil.ReadFile("testdata/sample.txt")
 	inlen := len(input)
 
 	if err != nil {
 		t.Error(err)
+	}
+
+	if !utf8.Valid(input) {
+		t.Error("input file is not valid utf8")
 	}
 
 	r := bytes.NewReader(input)
@@ -187,7 +192,7 @@ func TestRoundtrip(t *testing.T) {
 }
 
 func BenchmarkScanner(b *testing.B) {
-	file, err := ioutil.ReadFile("testdata/wikipedia.txt")
+	file, err := ioutil.ReadFile("testdata/sample.txt")
 
 	if err != nil {
 		b.Error(err)
