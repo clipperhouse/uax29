@@ -191,6 +191,51 @@ func TestRoundtrip(t *testing.T) {
 	}
 }
 
+func TestInvalidUTF8(t *testing.T) {
+	// This tests that we don't get into an infinite loop or otherwise blow up
+	// on invalid UTF-8. Bad UTF-8 is undefined behavior for our purposes;
+	// our goal is merely to be non-pathological.
+
+	// The SplitFunc seems to just pass on the bad bytes verbatim,
+	// as their own segments, though it's not specified to do so.
+
+	// For background, see testdata/UTF-8-test.txt, or:
+	// https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
+
+	// Btw, don't edit UTF-8-test.txt: your editor might turn it into valid UTF-8!
+
+	input, err := ioutil.ReadFile("testdata/UTF-8-test.txt")
+	inlen := len(input)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if utf8.Valid(input) {
+		t.Error("input file should not be valid utf8")
+	}
+
+	r := bytes.NewReader(input)
+	sc := words.NewScanner(r)
+
+	var output []byte
+	for sc.Scan() {
+		output = append(output, sc.Bytes()...)
+	}
+	if err := sc.Err(); err != nil {
+		t.Error(err)
+	}
+	outlen := len(output)
+
+	if inlen != outlen {
+		t.Fatalf("input: %d bytes, output: %d bytes", inlen, outlen)
+	}
+
+	if !reflect.DeepEqual(output, input) {
+		t.Fatalf("input bytes are not the same as scanned bytes")
+	}
+}
+
 func BenchmarkScanner(b *testing.B) {
 	file, err := ioutil.ReadFile("testdata/sample.txt")
 
