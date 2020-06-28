@@ -47,6 +47,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	var pos, w int
 	var current property
 
+main:
 	for {
 		sot := pos == 0         // "start of text"
 		eot := pos == len(data) // "end of text"
@@ -59,10 +60,6 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// https://unicode.org/reports/tr29/#SB1
 		if sot {
 			current, w = trie.lookup(data[pos:])
-			if w == 0 {
-				// Rune extends past current data, request more
-				return 0, nil, nil
-			}
 			pos += w
 			continue
 		}
@@ -79,6 +76,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		current, w = trie.lookup(data[pos:])
 		if w == 0 {
+			if atEOF {
+				// Just return the bytes, we can't do anything with them
+				pos = len(data)
+				break
+			}
 			// Rune extends past current data, request more
 			return 0, nil, nil
 		}
@@ -138,13 +140,21 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// Zero or more of not-the-above properties
 			for p < len(data) {
 				lookup, w := trie.lookup(data[p:])
+				if w == 0 {
+					if atEOF {
+						// Just return the bytes, we can't do anything with them
+						pos = len(data)
+						break main
+					}
+					// Rune extends past current data, request more
+					return 0, nil, nil
+				}
 
 				if lookup.is(_OLetter | _Upper | _Lower | _ParaSep | _SATerm) {
 					break
 				}
 
 				p += w
-				continue
 			}
 
 			if subsequent(_Lower, data[p:]) {

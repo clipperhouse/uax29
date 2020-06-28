@@ -3,6 +3,7 @@ package sentences_test
 import (
 	"bytes"
 	"io/ioutil"
+	"math/rand"
 	"reflect"
 	"strings"
 	"testing"
@@ -121,6 +122,43 @@ func TestInvalidUTF8(t *testing.T) {
 
 	if !reflect.DeepEqual(output, input) {
 		t.Fatalf("input bytes are not the same as scanned bytes")
+	}
+}
+
+func getRandomBytes() []byte {
+	min := 1
+	max := 5000
+
+	// rand is deliberately not seeded, to keep tests deterministic
+
+	len := rand.Intn(max-min) + min
+	b := make([]byte, len)
+	rand.Read(b)
+
+	return b
+}
+
+func TestRandomBytes(t *testing.T) {
+	runs := 100
+
+	for i := 0; i < runs; i++ {
+		input := getRandomBytes()
+
+		sc := sentences.NewScanner(bytes.NewReader(input))
+
+		var output []byte
+		for sc.Scan() {
+			output = append(output, sc.Bytes()...)
+		}
+		if err := sc.Err(); err != nil {
+			t.Error(err)
+		}
+
+		if !reflect.DeepEqual(output, input) {
+			t.Log("input bytes are not the same as scanned bytes")
+			t.Logf("input:\n%#v", input)
+			t.Fatalf("output:\n%#v", output)
+		}
 	}
 }
 

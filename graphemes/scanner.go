@@ -56,10 +56,6 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// https://unicode.org/reports/tr29/#SB1
 		if sot {
 			current, w = trie.lookup(data[pos:])
-			if w == 0 {
-				// Rune extends past current data, request more
-				return 0, nil, nil
-			}
 			pos += w
 			continue
 		}
@@ -77,6 +73,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		current, w = trie.lookup(data[pos:])
 		if w == 0 {
+			if atEOF {
+				// Just return the bytes, we can't do anything with them
+				pos = len(data)
+				break
+			}
 			// Rune extends past current data, request more
 			return 0, nil, nil
 		}

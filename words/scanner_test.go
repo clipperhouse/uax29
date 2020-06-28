@@ -239,9 +239,9 @@ func TestInvalidUTF8(t *testing.T) {
 
 func getRandomBytes() []byte {
 	min := 1
-	max := 100
+	max := 5000
 
-	// rand is deliberately not seeded, to keep tests dterministic
+	// rand is deliberately not seeded, to keep tests deterministic
 
 	len := rand.Intn(max-min) + min
 	b := make([]byte, len)
@@ -251,7 +251,7 @@ func getRandomBytes() []byte {
 }
 
 func TestRandomBytes(t *testing.T) {
-	runs := 50
+	runs := 100
 
 	for i := 0; i < runs; i++ {
 		input := getRandomBytes()
@@ -267,8 +267,8 @@ func TestRandomBytes(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(output, input) {
-			t.Error("input bytes are not the same as scanned bytes")
-			t.Errorf("input:\n%#v", input)
+			t.Log("input bytes are not the same as scanned bytes")
+			t.Logf("input:\n%#v", input)
 			t.Fatalf("output:\n%#v", output)
 		}
 	}
