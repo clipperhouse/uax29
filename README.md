@@ -55,6 +55,12 @@ In my local benchmarking (Mac laptop), `uax29/words` processes around 16MM token
 
 - There is [discussion](https://groups.google.com/d/msg/golang-nuts/_79vJ65KuXc/B_QgeU6rAgAJ) of implementing the above in Go’s [`x/text`](https://godoc.org/golang.org/x/text) package
 
+### Invalid inputs
+
+Invalid UTF-8 input is considered undefined behavior. That said, we’ve worked to ensure that such inputs will not cause pathological outcomes, such as a panic or infinite loop. Callers should expect “garbage-in, garbage-out”.
+
+There are two basic tests in each package, called `TestInvalidUTF8` and `TestRandomBytes`. Those tests pass, returning the invalid bytes verbatim, without a guarantee as to how they will be segmented.
+
 ### See also
 
 [jargon](https://github.com/clipperhouse/jargon), a text pipelines package for CLI and Go, which consumes this package.

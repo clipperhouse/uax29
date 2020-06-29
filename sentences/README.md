@@ -23,14 +23,20 @@ if err := scanner.Err(); err != nil {
 
 [GoDoc](https://godoc.org/github.com/clipperhouse/uax29/sentences)
 
+### Conformance
+
+We use the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29), thanks to [bleve](https://github.com/blevesearch/segment/blob/master/tables_test.go). Status:
+
+![Go](https://github.com/clipperhouse/uax29/workflows/Go/badge.svg)
+
 ### Performance
 
 `uax29` is designed to work in constant memory, regardless of input size. It buffers input and streams tokens.
 
 Execution time is `O(n)` on input size. It can be I/O bound; you can control I/O and performance implications by the `io.Reader` you pass to `NewScanner`.
 
-### Conformance
+### Invalid inputs
 
-We use the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29), thanks to [bleve](https://github.com/blevesearch/segment/blob/master/tables_test.go). Status:
+Invalid UTF-8 input is considered undefined behavior. That said, we’ve worked to ensure that such inputs will not cause pathological outcomes, such as a panic or infinite loop. Callers should expect “garbage-in, garbage-out”.
 
-![Go](https://github.com/clipperhouse/uax29/workflows/Go/badge.svg)
+There are two basic tests in each package, called `TestInvalidUTF8` and `TestRandomBytes`. Those tests pass, returning the invalid bytes verbatim, without a guarantee as to how they will be segmented.
