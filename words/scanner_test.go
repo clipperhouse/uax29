@@ -239,7 +239,7 @@ func TestInvalidUTF8(t *testing.T) {
 
 func getRandomBytes() []byte {
 	min := 1
-	max := 5000
+	max := 10000
 
 	// rand is deliberately not seeded, to keep tests deterministic
 
