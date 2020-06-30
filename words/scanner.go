@@ -85,6 +85,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			return 0, nil, nil
 		}
 
+		// Optimization: no rule can possibly apply
+		if current|last == 0 { // i.e. both are zero
+			break
+		}
+
 		next := pos + w
 
 		// https://unicode.org/reports/tr29/#WB3

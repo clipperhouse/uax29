@@ -85,6 +85,12 @@ main:
 			return 0, nil, nil
 		}
 
+		// Optimization: no rule can possibly apply
+		if current|last == 0 { // i.e. both are zero
+			pos += w
+			continue
+		}
+
 		// https://unicode.org/reports/tr29/#SB3
 		if current.is(_LF) && last.is(_CR) {
 			pos += w
