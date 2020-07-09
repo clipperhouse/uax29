@@ -1,6 +1,7 @@
 package sentences_test
 
 import (
+	"bufio"
 	"bytes"
 	"io/ioutil"
 	"math/rand"
@@ -139,12 +140,18 @@ func getRandomBytes() []byte {
 }
 
 func TestRandomBytes(t *testing.T) {
-	runs := 100
+	runs := 200
 
 	for i := 0; i < runs; i++ {
 		input := getRandomBytes()
 
-		sc := sentences.NewScanner(bytes.NewReader(input))
+		// Randomize buffer size
+		min := 1
+		max := 10000
+		s := rand.Intn(max-min) + min
+		r := bufio.NewReaderSize(bytes.NewReader(input), s)
+
+		sc := sentences.NewScanner(r)
 
 		var output []byte
 		for sc.Scan() {
