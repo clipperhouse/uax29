@@ -52,22 +52,21 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		sot := pos == 0         // "start of text"
 		eot := pos == len(data) // "end of text"
 
-		if eot && !atEOF {
-			// Token extends past current data, request more
-			return 0, nil, nil
-		}
-
-		// https://unicode.org/reports/tr29/#WB1
-		if sot {
-			current, w = trie.lookup(data[pos:])
-			pos += w
-			continue
-		}
-
-		// https://unicode.org/reports/tr29/#WB2
 		if eot {
+			if !atEOF {
+				// Token extends past current data, request more
+				return 0, nil, nil
+			}
+
+			// https://unicode.org/reports/tr29/#WB2
 			break
 		}
+
+		/*
+			We've switched the evaluation order of WB1↓ and WB2↑. It's ok:
+			because we've checked for len(data) at the top of this function,
+			sot and eot are mutually exclusive, order doesn't matter.
+		*/
 
 		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 		// to the right of the ×, from which we look back or forward
@@ -85,12 +84,16 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			return 0, nil, nil
 		}
 
+		// https://unicode.org/reports/tr29/#WB1
+		if sot {
+			pos += w
+			continue
+		}
+
 		// Optimization: no rule can possibly apply
 		if current|last == 0 { // i.e. both are zero
 			break
 		}
-
-		next := pos + w
 
 		// https://unicode.org/reports/tr29/#WB3
 		if current.is(_LF) && last.is(_CR) {
@@ -157,12 +160,14 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 		}
 
+		nextPos := pos + w
+
 		// Optimization: determine if WB6 can possibly apply
 		considerWB6 := current.is(_MidLetter|_MidNumLetQ) && last.is(_AHLetter|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB6
 		if considerWB6 {
-			if subsequent(_AHLetter, data[next:]) && previous(_AHLetter, data[:pos]) {
+			if subsequent(_AHLetter, data[nextPos:]) && previous(_AHLetter, data[:pos]) {
 				pos += w
 				continue
 			}
@@ -196,7 +201,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		// https://unicode.org/reports/tr29/#WB7b
 		if considerWB7b {
-			if subsequent(_HebrewLetter, data[next:]) && previous(_HebrewLetter, data[:pos]) {
+			if subsequent(_HebrewLetter, data[nextPos:]) && previous(_HebrewLetter, data[:pos]) {
 				pos += w
 				continue
 			}
@@ -280,7 +285,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		// https://unicode.org/reports/tr29/#WB12
 		if considerWB12 {
-			if subsequent(_Numeric, data[next:]) && previous(_Numeric, data[:pos]) {
+			if subsequent(_Numeric, data[nextPos:]) && previous(_Numeric, data[:pos]) {
 				pos += w
 				continue
 			}

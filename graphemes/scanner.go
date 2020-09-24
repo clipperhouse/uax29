@@ -48,22 +48,21 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		sot := pos == 0         // "start of text"
 		eot := pos == len(data) // "end of text"
 
-		if eot && !atEOF {
-			// Token extends past current data, request more
-			return 0, nil, nil
-		}
-
-		// https://unicode.org/reports/tr29/#SB1
-		if sot {
-			current, w = trie.lookup(data[pos:])
-			pos += w
-			continue
-		}
-
-		// https://unicode.org/reports/tr29/#SB2
 		if eot {
+			if !atEOF {
+				// Token extends past current data, request more
+				return 0, nil, nil
+			}
+
+			// https://unicode.org/reports/tr29/#GB2
 			break
 		}
+
+		/*
+			We've switched the evaluation order of GB1↓ and GB2↑. It's ok:
+			because we've checked for len(data) at the top of this function,
+			sot and eot are mutually exclusive, order doesn't matter.
+		*/
 
 		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 		// to the right of the ×, from which we look back or forward
@@ -80,6 +79,12 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 			// Rune extends past current data, request more
 			return 0, nil, nil
+		}
+
+		// https://unicode.org/reports/tr29/#GB1
+		if sot {
+			pos += w
+			continue
 		}
 
 		// Optimization: no rule can possibly apply
