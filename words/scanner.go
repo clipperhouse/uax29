@@ -118,7 +118,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB3d
-		if current.is(_WSegSpace) && last.is(_WSegSpace) {
+		if (current & last).is(_WSegSpace) {
 			pos += w
 			continue
 		}

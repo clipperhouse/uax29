@@ -152,7 +152,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		// https://unicode.org/reports/tr29/#GB12 and
 		// https://unicode.org/reports/tr29/#GB13
-		if current.is(_RegionalIndicator) && last.is(_RegionalIndicator) {
+		if (current & last).is(_RegionalIndicator) {
 			i := pos
 			count := 0
 
