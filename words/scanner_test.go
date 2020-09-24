@@ -188,7 +188,7 @@ func TestRoundtrip(t *testing.T) {
 		t.Fatalf("input: %d bytes, output: %d bytes", inlen, outlen)
 	}
 
-	if !reflect.DeepEqual(output, input) {
+	if !bytes.Equal(output, input) {
 		t.Fatalf("input bytes are not the same as scanned bytes")
 	}
 }
@@ -233,7 +233,7 @@ func TestInvalidUTF8(t *testing.T) {
 		t.Fatalf("input: %d bytes, output: %d bytes", inlen, outlen)
 	}
 
-	if !reflect.DeepEqual(output, input) {
+	if !bytes.Equal(output, input) {
 		t.Fatalf("input bytes are not the same as scanned bytes")
 	}
 }
@@ -273,7 +273,7 @@ func TestRandomBytes(t *testing.T) {
 			t.Error(err)
 		}
 
-		if !reflect.DeepEqual(output, input) {
+		if !bytes.Equal(output, input) {
 			t.Log("input bytes are not the same as scanned bytes")
 			t.Logf("input:\n%#v", input)
 			t.Fatalf("output:\n%#v", output)
