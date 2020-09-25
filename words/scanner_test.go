@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"io/ioutil"
 	"math/rand"
-	"reflect"
 	"strings"
 	"testing"
 	"unicode/utf8"
@@ -150,7 +149,7 @@ func TestUnicodeSegments(t *testing.T) {
 		if err := scanner.Err(); err != nil {
 			t.Fatal(err)
 		}
-		if !reflect.DeepEqual(rv, test.Output) {
+		if !equal(rv, test.Output) {
 			failed++
 			t.Fatalf("expected:\n%#v\ngot:\n%#v\nfor: '%s' comment: %s", test.Output, rv, test.Input, test.Comment)
 		} else {
@@ -335,4 +334,18 @@ func BenchmarkUnicodeSegments(b *testing.B) {
 
 		b.ReportMetric(float64(c), "tokens")
 	}
+}
+
+func equal(a, b [][]byte) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if !bytes.Equal(a[i], b[i]) {
+			return false
+		}
+	}
+
+	return true
 }

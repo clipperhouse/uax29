@@ -48,7 +48,7 @@ func TestUnicodeSegments(t *testing.T) {
 		if err := scanner.Err(); err != nil {
 			t.Fatal(err)
 		}
-		if !reflect.DeepEqual(rv, test.Output) {
+		if !equal(rv, test.Output) {
 			failed++
 			t.Fatalf("test %d, expected:\n%#v\ngot:\n%#v\nfor: '%s'\ncomment: %s", i, test.Output, rv, test.Input, test.Comment)
 		} else {
@@ -223,4 +223,18 @@ func BenchmarkUnicodeSegments(b *testing.B) {
 
 		b.ReportMetric(float64(c), "tokens")
 	}
+}
+
+func equal(a, b [][]byte) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if !bytes.Equal(a[i], b[i]) {
+			return false
+		}
+	}
+
+	return true
 }
