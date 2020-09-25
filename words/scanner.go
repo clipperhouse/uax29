@@ -372,15 +372,6 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			// If i == 0, we fell through and hit sot (start of text), so WB15 applies
 			// If i > 0, we hit a non-RI, so WB16 applies
 
-			// Note: I *suspect* WB16 is unreachable with the current logic.
-			// A non-RI will have caused a word break on a previous pass,
-			// by falling through to the break below (WB999). Therefore,
-			// the non-RI will not be present in the current pass, so we will
-			// always hit start-of-text, i.e., WB15.
-
-			// The tests pass, however. This means there is an untested logical
-			// flaw above, or WB16 is a redundant rule, or I'm simply mistaken.
-
 			oddRI := count%2 == 1
 			if oddRI {
 				pos += w
