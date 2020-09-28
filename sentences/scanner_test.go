@@ -7,7 +7,10 @@ import (
 	"math/rand"
 	"reflect"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"testing"
+	"time"
 	"unicode/utf8"
 
 	"github.com/clipperhouse/segment"
@@ -126,13 +129,14 @@ func TestInvalidUTF8(t *testing.T) {
 	}
 }
 
+var seed = time.Now().UnixNano()
+var rnd = rand.New(rand.NewSource(seed))
+
+const max = 10000
+const min = 1
+
 func getRandomBytes() []byte {
-	min := 1
-	max := 10000
-
-	// rand is deliberately not seeded, to keep tests deterministic
-
-	len := rand.Intn(max-min) + min
+	len := rnd.Intn(max-min) + min
 	b := make([]byte, len)
 	rand.Read(b)
 
@@ -140,32 +144,44 @@ func getRandomBytes() []byte {
 }
 
 func TestRandomBytes(t *testing.T) {
-	runs := 200
+	const runs = 2000
+	const workers = 4
+	var ran int32
 
-	for i := 0; i < runs; i++ {
-		input := getRandomBytes()
+	var wg sync.WaitGroup
+	for j := 0; j < workers; j++ {
+		wg.Add(1)
+		go func() {
+			for i := 0; i < runs/workers; i++ {
+				input := getRandomBytes()
 
-		// Randomize buffer size
-		min := 1
-		max := 10000
-		s := rand.Intn(max-min) + min
-		r := bufio.NewReaderSize(bytes.NewReader(input), s)
+				// Randomize buffer size, too
+				s := rnd.Intn(max-min) + min
+				r := bufio.NewReaderSize(bytes.NewReader(input), s)
 
-		sc := sentences.NewScanner(r)
+				sc := sentences.NewScanner(r)
 
-		var output []byte
-		for sc.Scan() {
-			output = append(output, sc.Bytes()...)
-		}
-		if err := sc.Err(); err != nil {
-			t.Error(err)
-		}
+				var output []byte
+				for sc.Scan() {
+					output = append(output, sc.Bytes()...)
+				}
+				if err := sc.Err(); err != nil {
+					t.Error(err)
+				}
 
-		if !bytes.Equal(output, input) {
-			t.Log("input bytes are not the same as scanned bytes")
-			t.Logf("input:\n%#v", input)
-			t.Fatalf("output:\n%#v", output)
-		}
+				if !bytes.Equal(output, input) {
+					t.Errorf("input bytes are not the same as scanned bytes; rand seed is %d", seed)
+				}
+				atomic.AddInt32(&ran, 1)
+			}
+			wg.Done()
+		}()
+	}
+
+	wg.Wait()
+
+	if int(ran) != runs {
+		t.Errorf("expected %d runs, got %d", runs, ran)
 	}
 }
 
