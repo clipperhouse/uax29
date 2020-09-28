@@ -11,8 +11,10 @@ func previousIndex(properties property, data []byte) int {
 	for i > 0 {
 		_, w := utf8.DecodeLastRune(data[:i])
 		i -= w
+		// I think it's OK not to handle w == 0 here; will fall through to break
 
 		lookup, _ := trie.lookup(data[i:])
+		// I think it's OK to elide width here; will fall through to break
 
 		if lookup.is(_Ignore) {
 			continue
@@ -41,6 +43,7 @@ func subsequent(properties property, data []byte) bool {
 	i := 0
 	for i < len(data) {
 		lookup, w := trie.lookup(data[i:])
+		// I think it's OK not to handle w == 0 here; will fall through to break
 
 		if lookup.is(_Ignore) {
 			i += w

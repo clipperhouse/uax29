@@ -118,10 +118,10 @@ main:
 		// The previous/subsequent methods are shorthand for "seek a property but skip over Extend & Format on the way"
 
 		// Optimization: determine if SB6 can possibly apply
-		considerSB6 := current.is(_Numeric) && last.is(_ATerm|_Ignore)
+		maybeSB6 := current.is(_Numeric) && last.is(_ATerm|_Ignore)
 
 		// https://unicode.org/reports/tr29/#SB6
-		if considerSB6 {
+		if maybeSB6 {
 			if previous(_ATerm, data[:pos]) {
 				pos += w
 				continue
@@ -129,10 +129,10 @@ main:
 		}
 
 		// Optimization: determine if SB7 can possibly apply
-		considerSB7 := current.is(_Upper) && last.is(_ATerm|_Ignore)
+		maybeSB7 := current.is(_Upper) && last.is(_ATerm|_Ignore)
 
 		// https://unicode.org/reports/tr29/#SB7
-		if considerSB7 {
+		if maybeSB7 {
 			pi := previousIndex(_ATerm, data[:pos])
 			if pi >= 0 && previous(_Upper|_Lower, data[:pi]) {
 				pos += w
@@ -141,10 +141,10 @@ main:
 		}
 
 		// Optimization: determine if SB8 can possibly apply
-		considerSB8 := last.is(_ATerm | _Close | _Sp | _Ignore)
+		maybeSB8 := last.is(_ATerm | _Close | _Sp | _Ignore)
 
 		// https://unicode.org/reports/tr29/#SB8
-		if considerSB8 {
+		if maybeSB8 {
 			p := pos
 
 			// ( ¬(OLetter | Upper | Lower | ParaSep | SATerm) )*
@@ -236,10 +236,10 @@ main:
 		}
 
 		// Optimization: determine if SB9 can possibly apply
-		considerSB9 := current.is(_Close|_Sp|_ParaSep) && last.is(_SATerm|_Close|_Ignore)
+		maybeSB9 := current.is(_Close|_Sp|_ParaSep) && last.is(_SATerm|_Close|_Ignore)
 
 		// https://unicode.org/reports/tr29/#SB9
-		if considerSB9 {
+		if maybeSB9 {
 			p := pos
 
 			// Zero or more Close's
@@ -261,10 +261,10 @@ main:
 		}
 
 		// Optimization: determine if SB10 can possibly apply
-		considerSB10 := current.is(_Sp|_ParaSep) && last.is(_SATerm|_Close|_Sp|_Ignore)
+		maybeSB10 := current.is(_Sp|_ParaSep) && last.is(_SATerm|_Close|_Sp|_Ignore)
 
 		// https://unicode.org/reports/tr29/#SB10
-		if considerSB10 {
+		if maybeSB10 {
 			p := pos
 
 			// Zero or more Sp's
@@ -296,10 +296,10 @@ main:
 		}
 
 		// Optimization: determine if SB11 can possibly apply
-		considerSB11 := last.is(_SATerm | _Close | _Sp | _ParaSep | _Ignore)
+		maybeSB11 := last.is(_SATerm | _Close | _Sp | _ParaSep | _Ignore)
 
 		// https://unicode.org/reports/tr29/#SB11
-		if considerSB11 {
+		if maybeSB11 {
 			p := pos
 
 			// Zero or one ParaSep

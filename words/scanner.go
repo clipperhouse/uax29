@@ -134,10 +134,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// The previous/subsequent methods are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
 
 		// Optimization: determine if WB5 can possibly apply
-		considerWB5 := current.is(_AHLetter) && last.is(_AHLetter|_Ignore)
+		maybeWB5 := current.is(_AHLetter) && last.is(_AHLetter|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB5
-		if considerWB5 {
+		if maybeWB5 {
 			if previous(_AHLetter, data[:pos]) {
 				pos += w
 
@@ -163,10 +163,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		nextPos := pos + w
 
 		// Optimization: determine if WB6 can possibly apply
-		considerWB6 := current.is(_MidLetter|_MidNumLetQ) && last.is(_AHLetter|_Ignore)
+		maybeWB6 := current.is(_MidLetter|_MidNumLetQ) && last.is(_AHLetter|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB6
-		if considerWB6 {
+		if maybeWB6 {
 			if subsequent(_AHLetter, data[nextPos:]) && previous(_AHLetter, data[:pos]) {
 				pos += w
 				continue
@@ -174,10 +174,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// Optimization: determine if WB7 can possibly apply
-		considerWB7 := current.is(_AHLetter) && last.is(_MidLetter|_MidNumLetQ|_Ignore)
+		maybeWB7 := current.is(_AHLetter) && last.is(_MidLetter|_MidNumLetQ|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB7
-		if considerWB7 {
+		if maybeWB7 {
 			i := previousIndex(_MidLetter|_MidNumLetQ, data[:pos])
 			if i > 0 && previous(_AHLetter, data[:i]) {
 				pos += w
@@ -220,10 +220,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// Optimization: determine if WB8 can possibly apply
-		considerWB8 := current.is(_Numeric) && last.is(_Numeric|_Ignore)
+		maybeWB8 := current.is(_Numeric) && last.is(_Numeric|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB8
-		if considerWB8 {
+		if maybeWB8 {
 			if previous(_Numeric, data[:pos]) {
 				pos += w
 
@@ -247,10 +247,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// Optimization: determine if WB9 can possibly apply
-		considerWB9 := current.is(_Numeric) && last.is(_AHLetter|_Ignore)
+		maybeWB9 := current.is(_Numeric) && last.is(_AHLetter|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB9
-		if considerWB9 {
+		if maybeWB9 {
 			if previous(_AHLetter, data[:pos]) {
 				pos += w
 				continue
@@ -258,10 +258,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// Optimization: determine if WB10 can possibly apply
-		considerWB10 := current.is(_AHLetter) && last.is(_Numeric|_Ignore)
+		maybeWB10 := current.is(_AHLetter) && last.is(_Numeric|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB10
-		if considerWB10 {
+		if maybeWB10 {
 			if previous(_Numeric, data[:pos]) {
 				pos += w
 				continue
@@ -269,10 +269,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// Optimization: determine if WB11 can possibly apply
-		considerWB11 := current.is(_Numeric) && last.is(_MidNum|_MidNumLetQ|_Ignore)
+		maybeWB11 := current.is(_Numeric) && last.is(_MidNum|_MidNumLetQ|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB11
-		if considerWB11 {
+		if maybeWB11 {
 			i := previousIndex(_MidNum|_MidNumLetQ, data[:pos])
 			if i > 0 && previous(_Numeric, data[:i]) {
 				pos += w
@@ -281,10 +281,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// Optimization: determine if WB12 can possibly apply
-		considerWB12 := current.is(_MidNum|_MidNumLet|_SingleQuote) && last.is(_Numeric|_Ignore)
+		maybeWB12 := current.is(_MidNum|_MidNumLet|_SingleQuote) && last.is(_Numeric|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB12
-		if considerWB12 {
+		if maybeWB12 {
 			if subsequent(_Numeric, data[nextPos:]) && previous(_Numeric, data[:pos]) {
 				pos += w
 				continue
@@ -292,10 +292,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// Optimization: determine if WB13 can possibly apply
-		considerWB13 := current.is(_Katakana) && last.is(_Katakana|_Ignore)
+		maybeWB13 := current.is(_Katakana) && last.is(_Katakana|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB13
-		if considerWB13 {
+		if maybeWB13 {
 			if previous(_Katakana, data[:pos]) {
 				pos += w
 
@@ -340,11 +340,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// Optimization: determine if WB15 or WB16 can possibly apply
-		considerWB1516 := current.is(_RegionalIndicator) && last.is(_RegionalIndicator|_Ignore)
+		maybeWB1516 := current.is(_RegionalIndicator) && last.is(_RegionalIndicator|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB15 and
 		// https://unicode.org/reports/tr29/#WB16
-		if considerWB1516 {
+		if maybeWB1516 {
 			// WB15: Odd number of RI before hitting start of text
 			// WB16: Odd number of RI before hitting [^RI], aka "not RI"
 
