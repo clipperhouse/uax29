@@ -35,10 +35,10 @@ We use the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#T
 
 Execution time is `O(n)` on input size. It can be I/O bound; I/O performance is determined by the `io.Reader` you pass to `NewScanner`.
 
-In my local benchmarking (Mac laptop), `uax29/words` processes around 16MM tokens per second, or 40MB/s, of [wiki text](https://en.wikipedia.org/w/index.php?title=New_York_City&action=edit).
+In my local benchmarking (Mac laptop), [`uax29/words`](https://github.com/clipperhouse/uax29/tree/master/words) processes around 20MM tokens per second, or 80MB/s, of [multi-lingual prose](https://github.com/clipperhouse/uax29/blob/master/words/testdata/sample.txt).
 
 ### Invalid inputs
 
-Invalid UTF-8 input is considered undefined behavior. That said, we’ve worked to ensure that such inputs will not cause pathological outcomes, such as a panic or infinite loop. Callers should expect “garbage-in, garbage-out”.
+Invalid UTF-8 input is undefined behavior. That said, we’ve worked to ensure that such inputs will not cause pathological outcomes, such as a panic or infinite loop. Callers should expect “garbage-in, garbage-out”.
 
-There are two basic tests in each package, called `TestInvalidUTF8` and `TestRandomBytes`. Those tests pass, returning the invalid bytes verbatim, without a guarantee as to how they will be segmented.
+There are two tests in each package, called `TestInvalidUTF8` and `TestRandomBytes`. Those tests pass, returning the invalid bytes verbatim, without a guarantee as to how they will be segmented.
