@@ -186,10 +186,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// Optimization: determine if WB7a can possibly apply
-		considerWB7a := current.is(_SingleQuote) && last.is(_HebrewLetter|_Ignore)
+		maybeWB7a := current.is(_SingleQuote) && last.is(_HebrewLetter|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB7a
-		if considerWB7a {
+		if maybeWB7a {
 			if previous(_HebrewLetter, data[:pos]) {
 				pos += w
 				continue
@@ -197,10 +197,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// Optimization: determine if WB7b can possibly apply
-		considerWB7b := current.is(_DoubleQuote) && last.is(_HebrewLetter|_Ignore)
+		maybeWB7b := current.is(_DoubleQuote) && last.is(_HebrewLetter|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB7b
-		if considerWB7b {
+		if maybeWB7b {
 			if subsequent(_HebrewLetter, data[nextPos:]) && previous(_HebrewLetter, data[:pos]) {
 				pos += w
 				continue
@@ -208,10 +208,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// Optimization: determine if WB7c can possibly apply
-		considerWB7c := current.is(_HebrewLetter) && last.is(_DoubleQuote|_Ignore)
+		maybeWB7c := current.is(_HebrewLetter) && last.is(_DoubleQuote|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB7c
-		if considerWB7c {
+		if maybeWB7c {
 			i := previousIndex(_DoubleQuote, data[:pos])
 			if i > 0 && previous(_HebrewLetter, data[:i]) {
 				pos += w
@@ -318,10 +318,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// Optimization: determine if WB13a can possibly apply
-		considerWB13a := current.is(_ExtendNumLet) && last.is(_AHLetter|_Numeric|_Katakana|_ExtendNumLet|_Ignore)
+		maybeWB13a := current.is(_ExtendNumLet) && last.is(_AHLetter|_Numeric|_Katakana|_ExtendNumLet|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB13a
-		if considerWB13a {
+		if maybeWB13a {
 			if previous(_AHLetter|_Numeric|_Katakana|_ExtendNumLet, data[:pos]) {
 				pos += w
 				continue
@@ -329,10 +329,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// Optimization: determine if WB13b can possibly apply
-		considerWB13b := current.is(_AHLetter|_Numeric|_Katakana) && last.is(_ExtendNumLet|_Ignore)
+		maybeWB13b := current.is(_AHLetter|_Numeric|_Katakana) && last.is(_ExtendNumLet|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB13b
-		if considerWB13b {
+		if maybeWB13b {
 			if previous(_ExtendNumLet, data[:pos]) {
 				pos += w
 				continue

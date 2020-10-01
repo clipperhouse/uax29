@@ -201,10 +201,10 @@ main:
 		}
 
 		// Optimization: determine if SB8a can possibly apply
-		considerSB8a := current.is(_SContinue|_SATerm) && last.is(_SATerm|_Close|_Sp|_Ignore)
+		maybeSB8a := current.is(_SContinue|_SATerm) && last.is(_SATerm|_Close|_Sp|_Ignore)
 
 		// https://unicode.org/reports/tr29/#SB8a
-		if considerSB8a {
+		if maybeSB8a {
 			p := pos
 
 			// Zero or more Sp
