@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"math/rand"
+	"reflect"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -141,20 +142,43 @@ func TestScanner(t *testing.T) {
 	}
 }
 
+func TestEquivalent(t *testing.T) {
+	for i := range segment.UnicodeWordTests {
+		t1 := segment.UnicodeWordTests[i]
+		t2 := unicodeTests[i]
+		if !bytes.Equal(t1.Input, t2.input) {
+			t.Fatalf("not equal %v, %v", t1.Input, t2.input)
+		}
+		if !reflect.DeepEqual(t1.Output, t2.expected) {
+			t.Log(t1.Comment)
+			t.Log(t2.comment)
+			t.Fatalf("not equal at index %d %v, %v", i, t1.Output, t2.expected)
+		}
+	}
+}
+
 func TestUnicodeSegments(t *testing.T) {
 	var passed, failed int
-	for _, test := range segment.UnicodeWordTests {
-		rv := make([][]byte, 0)
-		scanner := words.NewScanner(bytes.NewReader(test.Input))
-		for scanner.Scan() {
-			rv = append(rv, scanner.Bytes())
+	for _, test := range unicodeTests {
+
+		var got [][]byte
+		sc := words.NewScanner(bytes.NewReader(test.input))
+
+		for sc.Scan() {
+			got = append(got, sc.Bytes())
 		}
-		if err := scanner.Err(); err != nil {
+
+		if err := sc.Err(); err != nil {
 			t.Fatal(err)
 		}
-		if !equal(rv, test.Output) {
+
+		if !reflect.DeepEqual(got, test.expected) {
 			failed++
-			t.Fatalf("expected:\n%#v\ngot:\n%#v\nfor: '%s' comment: %s", test.Output, rv, test.Input, test.Comment)
+			t.Errorf(`
+for input %v
+expected  %v
+got       %v
+spec      %s`, test.input, test.expected, got, test.comment)
 		} else {
 			passed++
 		}

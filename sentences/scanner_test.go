@@ -40,20 +40,43 @@ func TestSentences(t *testing.T) {
 	}
 }
 
+func TestEquivalent(t *testing.T) {
+	for i := range segment.UnicodeSentenceTests {
+		t1 := segment.UnicodeSentenceTests[i]
+		t2 := unicodeTests[i]
+		if !bytes.Equal(t1.Input, t2.input) {
+			t.Fatalf("not equal %v, %v", t1.Input, t2.input)
+		}
+		if !reflect.DeepEqual(t1.Output, t2.expected) {
+			t.Log(t1.Comment)
+			t.Log(t2.comment)
+			t.Fatalf("not equal at index %d %v, %v", i, t1.Output, t2.expected)
+		}
+	}
+}
+
 func TestUnicodeSegments(t *testing.T) {
 	var passed, failed int
-	for i, test := range segment.UnicodeSentenceTests {
-		rv := make([][]byte, 0)
-		scanner := sentences.NewScanner(bytes.NewReader(test.Input))
-		for scanner.Scan() {
-			rv = append(rv, scanner.Bytes())
+	for _, test := range unicodeTests {
+
+		var got [][]byte
+		sc := sentences.NewScanner(bytes.NewReader(test.input))
+
+		for sc.Scan() {
+			got = append(got, sc.Bytes())
 		}
-		if err := scanner.Err(); err != nil {
+
+		if err := sc.Err(); err != nil {
 			t.Fatal(err)
 		}
-		if !equal(rv, test.Output) {
+
+		if !reflect.DeepEqual(got, test.expected) {
 			failed++
-			t.Fatalf("test %d, expected:\n%#v\ngot:\n%#v\nfor: '%s'\ncomment: %s", i, test.Output, rv, test.Input, test.Comment)
+			t.Errorf(`
+for input %v
+expected  %v
+got       %v
+spec      %s`, test.input, test.expected, got, test.comment)
 		} else {
 			passed++
 		}
