@@ -9,8 +9,7 @@ type unicodeTest struct {
 	comment  string
 }
 
-// 1823 tests
-var unicodeTests = []unicodeTest{
+var unicodeTests = [1823]unicodeTest{
 	{
 		input:    []byte{0x1, 0x1},
 		expected: [][]byte{{0x1}, {0x1}},

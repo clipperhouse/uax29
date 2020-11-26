@@ -284,8 +284,7 @@ type unicodeTest struct {
 	comment  string
 }
 
-// %d tests
-var unicodeTests = []unicodeTest {
+var unicodeTests = [%d]unicodeTest {
 `, len(tests))
 
 	for _, t := range tests {
