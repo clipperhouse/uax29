@@ -13,7 +13,6 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/segment"
 	"github.com/clipperhouse/uax29/sentences"
 )
 
@@ -37,21 +36,6 @@ func TestSentences(t *testing.T) {
 
 	if !reflect.DeepEqual(got, expected) {
 		t.Errorf("expected %q, got %q", expected, got)
-	}
-}
-
-func TestEquivalent(t *testing.T) {
-	for i := range segment.UnicodeSentenceTests {
-		t1 := segment.UnicodeSentenceTests[i]
-		t2 := unicodeTests[i]
-		if !bytes.Equal(t1.Input, t2.input) {
-			t.Fatalf("not equal %v, %v", t1.Input, t2.input)
-		}
-		if !reflect.DeepEqual(t1.Output, t2.expected) {
-			t.Log(t1.Comment)
-			t.Log(t2.comment)
-			t.Fatalf("not equal at index %d %v, %v", i, t1.Output, t2.expected)
-		}
 	}
 }
 
@@ -238,8 +222,8 @@ func BenchmarkScanner(b *testing.B) {
 
 func BenchmarkUnicodeSegments(b *testing.B) {
 	var buf bytes.Buffer
-	for _, test := range segment.UnicodeSentenceTests {
-		buf.Write(test.Input)
+	for _, test := range unicodeTests {
+		buf.Write(test.input)
 	}
 	file := buf.Bytes()
 
@@ -262,18 +246,4 @@ func BenchmarkUnicodeSegments(b *testing.B) {
 
 		b.ReportMetric(float64(c), "tokens")
 	}
-}
-
-func equal(a, b [][]byte) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i := range a {
-		if !bytes.Equal(a[i], b[i]) {
-			return false
-		}
-	}
-
-	return true
 }
