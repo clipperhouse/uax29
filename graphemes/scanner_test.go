@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"io/ioutil"
+	"math"
 	"math/rand"
 	"reflect"
 	"sync"
@@ -126,7 +127,8 @@ func getRandomBytes() []byte {
 }
 
 func TestRandomBytes(t *testing.T) {
-	const runs = 2000
+	// Increase this number to do pseudo-fuzzing
+	const runs = 2_000
 	const workers = 4
 	var ran int32
 
@@ -160,7 +162,27 @@ func TestRandomBytes(t *testing.T) {
 		}()
 	}
 
+	t.Logf("started: %d runs on %d goroutines, with random seed %d", runs, workers, seed)
+
+	ticker := time.NewTicker(5 * time.Second)
+	stop := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				t.Logf("%d runs of %d completed (%v%%)", ran, runs, math.Round(float64(ran)/runs*100))
+			case <-stop:
+				ticker.Stop()
+				return
+			}
+		}
+	}()
+
 	wg.Wait()
+
+	stop <- struct{}{}
+
+	t.Logf("finished: %d runs of %d completed (%v%%)", ran, runs, math.Round(float64(ran)/runs*100))
 
 	if int(ran) != runs {
 		t.Errorf("expected %d runs, got %d", runs, ran)
