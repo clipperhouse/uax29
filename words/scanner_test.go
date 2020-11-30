@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"math/rand"
+	"reflect"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -12,7 +13,6 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/segment"
 	"github.com/clipperhouse/uax29/words"
 )
 
@@ -143,18 +143,26 @@ func TestScanner(t *testing.T) {
 
 func TestUnicodeSegments(t *testing.T) {
 	var passed, failed int
-	for _, test := range segment.UnicodeWordTests {
-		rv := make([][]byte, 0)
-		scanner := words.NewScanner(bytes.NewReader(test.Input))
-		for scanner.Scan() {
-			rv = append(rv, scanner.Bytes())
+	for _, test := range unicodeTests {
+
+		var got [][]byte
+		sc := words.NewScanner(bytes.NewReader(test.input))
+
+		for sc.Scan() {
+			got = append(got, sc.Bytes())
 		}
-		if err := scanner.Err(); err != nil {
+
+		if err := sc.Err(); err != nil {
 			t.Fatal(err)
 		}
-		if !equal(rv, test.Output) {
+
+		if !reflect.DeepEqual(got, test.expected) {
 			failed++
-			t.Fatalf("expected:\n%#v\ngot:\n%#v\nfor: '%s' comment: %s", test.Output, rv, test.Input, test.Comment)
+			t.Errorf(`
+for input %v
+expected  %v
+got       %v
+spec      %s`, test.input, test.expected, got, test.comment)
 		} else {
 			passed++
 		}
@@ -326,8 +334,8 @@ func BenchmarkScanner(b *testing.B) {
 
 func BenchmarkUnicodeSegments(b *testing.B) {
 	var buf bytes.Buffer
-	for _, test := range segment.UnicodeWordTests {
-		buf.Write(test.Input)
+	for _, test := range unicodeTests {
+		buf.Write(test.input)
 	}
 	file := buf.Bytes()
 
@@ -350,18 +358,4 @@ func BenchmarkUnicodeSegments(b *testing.B) {
 
 		b.ReportMetric(float64(c), "tokens")
 	}
-}
-
-func equal(a, b [][]byte) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i := range a {
-		if !bytes.Equal(a[i], b[i]) {
-			return false
-		}
-	}
-
-	return true
 }

@@ -5,37 +5,44 @@ import (
 	"bytes"
 	"io/ioutil"
 	"math/rand"
+	"reflect"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/segment"
 	"github.com/clipperhouse/uax29/graphemes"
 )
 
 func TestUnicodeSegments(t *testing.T) {
 	var passed, failed int
-	for i, test := range segment.UnicodeGraphemeTests {
-		rv := make([][]byte, 0)
-		scanner := graphemes.NewScanner(bytes.NewReader(test.Input))
-		for scanner.Scan() {
-			rv = append(rv, scanner.Bytes())
+	for _, test := range unicodeTests {
+
+		var got [][]byte
+		sc := graphemes.NewScanner(bytes.NewReader(test.input))
+
+		for sc.Scan() {
+			got = append(got, sc.Bytes())
 		}
-		if err := scanner.Err(); err != nil {
+
+		if err := sc.Err(); err != nil {
 			t.Fatal(err)
 		}
-		if !equal(rv, test.Output) {
+
+		if !reflect.DeepEqual(got, test.expected) {
 			failed++
-			t.Fatalf("test %d, expected:\n%#v\ngot:\n%#v\nfor: '%s'\ncomment: %s", i, test.Output, rv, test.Input, test.Comment)
+			t.Errorf(`
+for input %v
+expected  %v
+got       %v
+spec      %s`, test.input, test.expected, got, test.comment)
 		} else {
 			passed++
 		}
 	}
 	t.Logf("passed %d, failed %d", passed, failed)
 }
-
 func TestRoundtrip(t *testing.T) {
 	file, err := ioutil.ReadFile("testdata/wikipedia.txt")
 
@@ -190,8 +197,8 @@ func BenchmarkScanner(b *testing.B) {
 
 func BenchmarkUnicodeSegments(b *testing.B) {
 	var buf bytes.Buffer
-	for _, test := range segment.UnicodeGraphemeTests {
-		buf.Write(test.Input)
+	for _, test := range unicodeTests {
+		buf.Write(test.input)
 	}
 	file := buf.Bytes()
 
@@ -214,18 +221,4 @@ func BenchmarkUnicodeSegments(b *testing.B) {
 
 		b.ReportMetric(float64(c), "tokens")
 	}
-}
-
-func equal(a, b [][]byte) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i := range a {
-		if !bytes.Equal(a[i], b[i]) {
-			return false
-		}
-	}
-
-	return true
 }
