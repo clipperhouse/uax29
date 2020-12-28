@@ -31,7 +31,7 @@ func (lookup property) is(properties property) bool {
 	return (lookup & properties) != 0
 }
 
-var (
+const (
 	_SATerm  = _STerm | _ATerm
 	_ParaSep = _Sep | _CR | _LF
 	_Ignore  = _Extend | _Format

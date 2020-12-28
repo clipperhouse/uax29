@@ -5,7 +5,7 @@ package words
 
 type property uint32
 
-var (
+const (
 	_ALetter              property = 1 << 0
 	_CR                   property = 1 << 1
 	_DoubleQuote          property = 1 << 2

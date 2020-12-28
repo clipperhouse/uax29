@@ -32,7 +32,7 @@ func (lookup property) is(properties property) bool {
 	return (lookup & properties) != 0
 }
 
-var (
+const (
 	_AHLetter   = _ALetter | _HebrewLetter
 	_MidNumLetQ = _MidNumLet | _SingleQuote
 	_Ignore     = _Extend | _Format | _ZWJ

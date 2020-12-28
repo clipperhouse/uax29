@@ -350,7 +350,7 @@ func writeTrie(prop prop, trie *triegen.Trie, iotasByProperty map[string]uint64)
 
 	fmt.Fprintf(&buf, "type property %s\n\n", inttype)
 
-	fmt.Fprintln(&buf, "var (")
+	fmt.Fprintln(&buf, "const (")
 	for i, property := range properties {
 		fmt.Fprintf(&buf, "_%s property = 1 << %d\n", strings.ReplaceAll(property, "_", ""), i)
 	}

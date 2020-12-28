@@ -5,7 +5,7 @@ package sentences
 
 type property uint16
 
-var (
+const (
 	_ATerm     property = 1 << 0
 	_CR        property = 1 << 1
 	_Close     property = 1 << 2

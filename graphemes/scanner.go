@@ -32,7 +32,7 @@ func (lookup property) is(properties property) bool {
 	return (lookup & properties) != 0
 }
 
-var _Ignore = _Extend
+const _Ignore = _Extend
 
 // SplitFunc is a bufio.SplitFunc implementation of grapheme cluster segmentation, for use with bufio.Scanner
 func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {

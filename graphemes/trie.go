@@ -5,7 +5,7 @@ package graphemes
 
 type property uint16
 
-var (
+const (
 	_CR                   property = 1 << 0
 	_Control              property = 1 << 1
 	_Extend               property = 1 << 2
