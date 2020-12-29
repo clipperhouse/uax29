@@ -102,12 +102,8 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB3a
-		if last.is(_CR | _LF | _Newline) {
-			break
-		}
-
 		// https://unicode.org/reports/tr29/#WB3b
-		if current.is(_CR | _LF | _Newline) {
+		if (last | current).is(_Newline | _CR | _LF) {
 			break
 		}
 
@@ -155,7 +151,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 
 			// Otherwise, do proper lookback
-			if last.is(_Ignore) && previous(_AHLetter, data[:pos]) {
+			if previous(_AHLetter, data[:pos]) {
 				pos += w
 				continue
 			}
@@ -242,7 +238,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 
 			// Otherwise, do proper lookback
-			if last.is(_Ignore) && previous(_Numeric, data[:pos]) {
+			if previous(_Numeric, data[:pos]) {
 				pos += w
 				continue
 			}
@@ -315,7 +311,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 
 			// Otherwise, do proper lookback
-			if last.is(_Ignore) && previous(_Katakana, data[:pos]) {
+			if previous(_Katakana, data[:pos]) {
 				pos += w
 				continue
 			}
