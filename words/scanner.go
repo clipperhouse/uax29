@@ -133,15 +133,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
 		// The previous/subsequent methods are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
 
-		// Optimization: determine if WB5 can possibly apply
-		maybeWB5 := current.is(_AHLetter) && last.is(_AHLetter|_Ignore)
-
 		// https://unicode.org/reports/tr29/#WB5
-		if maybeWB5 {
-			if previous(_AHLetter, data[:pos]) {
+		if current.is(_AHLetter) && last.is(_AHLetter|_Ignore) {
+			// Hot path: WB5 applies, and maybe a run
+			if last.is(_AHLetter) {
 				pos += w
-
-				// Optimization: there's a likelihood of a run of AHLetter
 				for pos < len(data) {
 					lookup, w2 := trie.lookup(data[pos:])
 
@@ -155,7 +151,12 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 					pos += w
 				}
+				continue
+			}
 
+			// Otherwise, do proper lookback
+			if last.is(_Ignore) && previous(_AHLetter, data[:pos]) {
+				pos += w
 				continue
 			}
 		}
@@ -219,15 +220,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 		}
 
-		// Optimization: determine if WB8 can possibly apply
-		maybeWB8 := current.is(_Numeric) && last.is(_Numeric|_Ignore)
-
 		// https://unicode.org/reports/tr29/#WB8
-		if maybeWB8 {
-			if previous(_Numeric, data[:pos]) {
+		if current.is(_Numeric) && last.is(_Numeric|_Ignore) {
+			// Hot path: WB8 applies, and maybe a run
+			if last.is(_Numeric) {
 				pos += w
-
-				// Optimization: there's a likelihood of a run of Numeric
 				for pos < len(data) {
 					lookup, w2 := trie.lookup(data[pos:])
 
@@ -241,7 +238,12 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 					pos += w
 				}
+				continue
+			}
 
+			// Otherwise, do proper lookback
+			if last.is(_Ignore) && previous(_Numeric, data[:pos]) {
+				pos += w
 				continue
 			}
 		}
@@ -291,17 +293,14 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 		}
 
-		// Optimization: determine if WB13 can possibly apply
-		maybeWB13 := current.is(_Katakana) && last.is(_Katakana|_Ignore)
-
 		// https://unicode.org/reports/tr29/#WB13
-		if maybeWB13 {
-			if previous(_Katakana, data[:pos]) {
+		if current.is(_Katakana) && last.is(_Katakana|_Ignore) {
+			// Hot path: WB13 applies, and maybe a run
+			if last.is(_Katakana) {
 				pos += w
-
-				// Optimization: there's a likelihood of a run of Katakana
 				for pos < len(data) {
 					lookup, w2 := trie.lookup(data[pos:])
+
 					if !lookup.is(_Katakana) {
 						break
 					}
@@ -312,7 +311,12 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 					pos += w
 				}
+				continue
+			}
 
+			// Otherwise, do proper lookback
+			if last.is(_Ignore) && previous(_Katakana, data[:pos]) {
+				pos += w
 				continue
 			}
 		}
