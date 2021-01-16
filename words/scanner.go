@@ -62,12 +62,6 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			break
 		}
 
-		/*
-			We've switched the evaluation order of WB1↓ and WB2↑. It's ok:
-			because we've checked for len(data) at the top of this function,
-			sot and eot are mutually exclusive, order doesn't matter.
-		*/
-
 		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 		// to the right of the ×, from which we look back or forward
 
@@ -130,14 +124,17 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// The previous/subsequent methods are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
 
 		// https://unicode.org/reports/tr29/#WB5
-		if current.is(_AHLetter) && last.is(_AHLetter|_Ignore) {
-			// Hot path: WB5 applies, and maybe a run
-			if last.is(_AHLetter) {
+		// https://unicode.org/reports/tr29/#WB8
+		// https://unicode.org/reports/tr29/#WB9
+		// https://unicode.org/reports/tr29/#WB10
+		if current.is(_Numeric|_AHLetter) && last.is(_Numeric|_AHLetter|_Ignore) {
+			// Hot path: WB5/8/9/10 applies, and maybe a run
+			if last.is(_Numeric | _AHLetter) {
 				pos += w
 				for pos < len(data) {
 					lookup, w2 := trie.lookup(data[pos:])
 
-					if !lookup.is(_AHLetter) {
+					if !lookup.is(_Numeric | _AHLetter) {
 						break
 					}
 
@@ -151,20 +148,18 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 
 			// Otherwise, do proper lookback
-			if previous(_AHLetter, data[:pos]) {
+			if previous(_Numeric|_AHLetter, data[:pos]) {
 				pos += w
 				continue
 			}
 		}
-
-		nextPos := pos + w
 
 		// Optimization: determine if WB6 can possibly apply
 		maybeWB6 := current.is(_MidLetter|_MidNumLetQ) && last.is(_AHLetter|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB6
 		if maybeWB6 {
-			if subsequent(_AHLetter, data[nextPos:]) && previous(_AHLetter, data[:pos]) {
+			if subsequent(_AHLetter, data[pos+w:]) && previous(_AHLetter, data[:pos]) {
 				pos += w
 				continue
 			}
@@ -198,7 +193,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		// https://unicode.org/reports/tr29/#WB7b
 		if maybeWB7b {
-			if subsequent(_HebrewLetter, data[nextPos:]) && previous(_HebrewLetter, data[:pos]) {
+			if subsequent(_HebrewLetter, data[pos+w:]) && previous(_HebrewLetter, data[:pos]) {
 				pos += w
 				continue
 			}
@@ -211,51 +206,6 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		if maybeWB7c {
 			i := previousIndex(_DoubleQuote, data[:pos])
 			if i > 0 && previous(_HebrewLetter, data[:i]) {
-				pos += w
-				continue
-			}
-		}
-
-		// https://unicode.org/reports/tr29/#WB8
-		// https://unicode.org/reports/tr29/#WB9
-		if current.is(_Numeric) && last.is(_Numeric|_AHLetter|_Ignore) {
-			// Hot path: WB8 applies, and maybe a run
-			if last.is(_Numeric) {
-				pos += w
-				for pos < len(data) {
-					lookup, w2 := trie.lookup(data[pos:])
-
-					if !lookup.is(_Numeric) {
-						break
-					}
-
-					// Update stateful vars
-					current = lookup
-					w = w2
-
-					pos += w
-				}
-				continue
-			}
-
-			// Otherwise, do proper lookbacks
-			if previous(_Numeric, data[:pos]) {
-				pos += w
-				continue
-			}
-
-			if previous(_AHLetter, data[:pos]) {
-				pos += w
-				continue
-			}
-		}
-
-		// Optimization: determine if WB10 can possibly apply
-		maybeWB10 := current.is(_AHLetter) && last.is(_Numeric|_Ignore)
-
-		// https://unicode.org/reports/tr29/#WB10
-		if maybeWB10 {
-			if previous(_Numeric, data[:pos]) {
 				pos += w
 				continue
 			}
@@ -274,11 +224,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// Optimization: determine if WB12 can possibly apply
-		maybeWB12 := current.is(_MidNum|_MidNumLet|_SingleQuote) && last.is(_Numeric|_Ignore)
+		maybeWB12 := current.is(_MidNum|_MidNumLetQ) && last.is(_Numeric|_Ignore)
 
 		// https://unicode.org/reports/tr29/#WB12
 		if maybeWB12 {
-			if subsequent(_Numeric, data[nextPos:]) && previous(_Numeric, data[:pos]) {
+			if subsequent(_Numeric, data[pos+w:]) && previous(_Numeric, data[:pos]) {
 				pos += w
 				continue
 			}
