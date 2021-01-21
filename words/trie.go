@@ -6,25 +6,25 @@ package words
 type property uint32
 
 const (
-	_ALetter              property = 1 << 0
-	_CR                   property = 1 << 1
-	_DoubleQuote          property = 1 << 2
-	_Extend               property = 1 << 3
-	_ExtendNumLet         property = 1 << 4
-	_ExtendedPictographic property = 1 << 5
-	_Format               property = 1 << 6
-	_HebrewLetter         property = 1 << 7
-	_Katakana             property = 1 << 8
-	_LF                   property = 1 << 9
-	_MidLetter            property = 1 << 10
-	_MidNum               property = 1 << 11
-	_MidNumLet            property = 1 << 12
-	_Newline              property = 1 << 13
-	_Numeric              property = 1 << 14
-	_RegionalIndicator    property = 1 << 15
-	_SingleQuote          property = 1 << 16
-	_WSegSpace            property = 1 << 17
-	_ZWJ                  property = 1 << 18
+	_ALetter property = 1 << iota
+	_CR
+	_DoubleQuote
+	_Extend
+	_ExtendNumLet
+	_ExtendedPictographic
+	_Format
+	_HebrewLetter
+	_Katakana
+	_LF
+	_MidLetter
+	_MidNum
+	_MidNumLet
+	_Newline
+	_Numeric
+	_RegionalIndicator
+	_SingleQuote
+	_WSegSpace
+	_ZWJ
 )
 
 // lookup returns the trie value for the first UTF-8 encoding in s and

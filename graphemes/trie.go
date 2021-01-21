@@ -6,20 +6,20 @@ package graphemes
 type property uint16
 
 const (
-	_CR                   property = 1 << 0
-	_Control              property = 1 << 1
-	_Extend               property = 1 << 2
-	_ExtendedPictographic property = 1 << 3
-	_L                    property = 1 << 4
-	_LF                   property = 1 << 5
-	_LV                   property = 1 << 6
-	_LVT                  property = 1 << 7
-	_Prepend              property = 1 << 8
-	_RegionalIndicator    property = 1 << 9
-	_SpacingMark          property = 1 << 10
-	_T                    property = 1 << 11
-	_V                    property = 1 << 12
-	_ZWJ                  property = 1 << 13
+	_CR property = 1 << iota
+	_Control
+	_Extend
+	_ExtendedPictographic
+	_L
+	_LF
+	_LV
+	_LVT
+	_Prepend
+	_RegionalIndicator
+	_SpacingMark
+	_T
+	_V
+	_ZWJ
 )
 
 // lookup returns the trie value for the first UTF-8 encoding in s and

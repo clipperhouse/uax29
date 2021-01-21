@@ -6,20 +6,20 @@ package sentences
 type property uint16
 
 const (
-	_ATerm     property = 1 << 0
-	_CR        property = 1 << 1
-	_Close     property = 1 << 2
-	_Extend    property = 1 << 3
-	_Format    property = 1 << 4
-	_LF        property = 1 << 5
-	_Lower     property = 1 << 6
-	_Numeric   property = 1 << 7
-	_OLetter   property = 1 << 8
-	_SContinue property = 1 << 9
-	_STerm     property = 1 << 10
-	_Sep       property = 1 << 11
-	_Sp        property = 1 << 12
-	_Upper     property = 1 << 13
+	_ATerm property = 1 << iota
+	_CR
+	_Close
+	_Extend
+	_Format
+	_LF
+	_Lower
+	_Numeric
+	_OLetter
+	_SContinue
+	_STerm
+	_Sep
+	_Sp
+	_Upper
 )
 
 // lookup returns the trie value for the first UTF-8 encoding in s and
