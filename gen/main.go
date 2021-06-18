@@ -23,7 +23,7 @@ func main() {
 		// make sure emoji goes first, subsequent props need it
 		{
 			name: "Emoji",
-			url:  "https://www.unicode.org/Public/emoji/12.0/emoji-data.txt",
+			url:  "https://www.unicode.org/Public/" + unicode.Version + "/ucd/emoji/emoji-data.txt",
 		},
 		{
 			name: "Word",

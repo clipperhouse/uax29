@@ -1,4 +1,4 @@
-This package tokenizes words, sentences and graphemes, based on [Unicode text segmentation](https://unicode.org/reports/tr29/#Word_Boundaries) (UAX 29), for Unicode version 12.0.
+This package tokenizes words, sentences and graphemes, based on [Unicode text segmentation](https://unicode.org/reports/tr29/#Word_Boundaries) (UAX 29), for Unicode version 13.0.0.
 
 ### Usage
 
