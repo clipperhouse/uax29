@@ -1,15 +1,10 @@
 package words_test
 
 import (
-	"bufio"
 	"bytes"
 	"io/ioutil"
-	"math"
 	"math/rand"
 	"reflect"
-	"strings"
-	"sync"
-	"sync/atomic"
 	"testing"
 	"time"
 	"unicode/utf8"
@@ -17,208 +12,76 @@ import (
 	"github.com/clipperhouse/uax29/words"
 )
 
-func TestScanner(t *testing.T) {
-	original := `Hi.    
-	node.js, first_last, my.name@domain.com
-	123.456, 789, .234, 1,000, a16z, 3G and $200.13.
-	wishy-washy and C++ and F# and .net
-	Let’s Let's possessive' possessive’
-	ש״ח
-	א"ב
-	ב'
-	🇦🇺🇦🇶
-	"אא"בב"abc
-	Then ウィキペディア and 象形.`
-	original += "crlf is \r\n"
-
-	scanner := words.NewScanner(strings.NewReader(original))
-	got := map[string]bool{}
-
-	for scanner.Scan() {
-		token := scanner.Text()
-		got[token] = true
-	}
-	if err := scanner.Err(); err != nil {
-		t.Error(err)
-	}
-
-	type test struct {
-		value string
-		found bool
-	}
-
-	expecteds := []test{
-		{"Hi", true},
-		{".", true},
-		{"Hi.", false},
-
-		{"node.js", true},
-		{"node", false},
-		{"js", false},
-
-		{"first_last", true},
-		{"first", false},
-		{"_", false},
-		{"last", false},
-
-		{"my.name", true},
-		{"my.name@", false},
-		{"@", true},
-		{"domain.com", true},
-		{"@domain.com", false},
-
-		{"123.456", true},
-		{"123,", false},
-		{"456", false},
-		{"123.456,", false},
-
-		{"789", true},
-		{"789,", false},
-
-		{".234", false},
-		{"234", true},
-
-		{"1,000", true},
-		{"1,000,", false},
-
-		{"wishy-washy", false},
-		{"wishy", true},
-		{"-", true},
-		{"washy", true},
-
-		{"C++", false},
-		{"C", true},
-		{"+", true},
-
-		{"F#", false},
-		{"F", true},
-		{"#", true},
-
-		{".net", false},
-		{"net", true},
-
-		{"Let's", true},
-		{"Let’s", true},
-		{"Let", false},
-		{"s", false},
-
-		{"possessive", true},
-		{"'", true},
-		{"’", true},
-		{"possessive'", false},
-		{"possessive’", false},
-
-		{"a16z", true},
-
-		{"3G", true},
-
-		{"$", true},
-		{"200.13", true},
-
-		{"ש״ח", true},
-		{`א"ב`, true},
-		{"ב'", true},
-		{"אא\"בב", true},
-		{"abc", true},
-
-		{"ウィキペディア", true},
-		{"ウ", false},
-
-		{"象", true},
-		{"形", true},
-		{"象形", false},
-
-		{"\r\n", true},
-		{"\r", false},
-
-		{"🇦🇺", true},
-		{"🇦🇶", true},
-	}
-
-	for _, expected := range expecteds {
-		if got[expected.value] != expected.found {
-			t.Errorf("expected %q to be %t", expected.value, expected.found)
-		}
-	}
-}
-
-func TestUnicodeSegments(t *testing.T) {
+func TestScannerUnicode(t *testing.T) {
+	// From the Unicode test suite; see the gen/ folder.
 	var passed, failed int
 	for _, test := range unicodeTests {
+		test := test
+		t.Run("", func(t *testing.T) {
+			t.Parallel()
 
-		var got [][]byte
-		sc := words.NewScanner(bytes.NewReader(test.input))
+			var got [][]byte
+			sc := words.NewScanner(bytes.NewReader(test.input))
 
-		for sc.Scan() {
-			got = append(got, sc.Bytes())
-		}
+			for sc.Scan() {
+				got = append(got, sc.Bytes())
+			}
 
-		if err := sc.Err(); err != nil {
-			t.Fatal(err)
-		}
+			if err := sc.Err(); err != nil {
+				t.Fatal(err)
+			}
 
-		if !reflect.DeepEqual(got, test.expected) {
-			failed++
-			t.Errorf(`
-for input %v
-expected  %v
-got       %v
-spec      %s`, test.input, test.expected, got, test.comment)
-		} else {
-			passed++
-		}
+			if !reflect.DeepEqual(got, test.expected) {
+				failed++
+				t.Errorf(`
+	for input %v
+	expected  %v
+	got       %v
+	spec      %s`, test.input, test.expected, got, test.comment)
+			} else {
+				passed++
+			}
+		})
 	}
 	t.Logf("passed %d, failed %d", passed, failed)
 }
 
-func TestRoundtrip(t *testing.T) {
-	input, err := ioutil.ReadFile("testdata/sample.txt")
-	inlen := len(input)
+// TestScannerRoundtrip tests that all input bytes are output after segmentation.
+// De facto, it also tests that we don't get infinite loops, or ever return an error.
+func TestScannerRoundtrip(t *testing.T) {
+	const runs = 2_000
 
-	if err != nil {
-		t.Error(err)
-	}
+	for i := 0; i < runs; i++ {
+		t.Run("", func(t *testing.T) {
+			t.Parallel()
 
-	if !utf8.Valid(input) {
-		t.Error("input file is not valid utf8")
-	}
+			input := getRandomBytes()
 
-	r := bytes.NewReader(input)
-	sc := words.NewScanner(r)
+			r := bytes.NewReader(input)
+			sc := words.NewScanner(r)
 
-	var output []byte
-	for sc.Scan() {
-		output = append(output, sc.Bytes()...)
-	}
-	if err := sc.Err(); err != nil {
-		t.Error(err)
-	}
-	outlen := len(output)
+			var output []byte
+			for sc.Scan() {
+				output = append(output, sc.Bytes()...)
+			}
+			if err := sc.Err(); err != nil {
+				t.Fatal(err)
+			}
 
-	if inlen != outlen {
-		t.Fatalf("input: %d bytes, output: %d bytes", inlen, outlen)
-	}
-
-	if !bytes.Equal(output, input) {
-		t.Fatalf("input bytes are not the same as scanned bytes")
+			if !bytes.Equal(output, input) {
+				t.Fatal("input bytes are not the same as scanned bytes")
+			}
+		})
 	}
 }
 
 func TestInvalidUTF8(t *testing.T) {
-	// This tests that we don't get into an infinite loop or otherwise blow up
-	// on invalid UTF-8. Bad UTF-8 is undefined behavior for our purposes;
-	// our goal is merely to be non-pathological.
-
-	// The SplitFunc seems to just pass on the bad bytes verbatim,
-	// as their own segments, though it's not specified to do so.
-
 	// For background, see testdata/UTF-8-test.txt, or:
 	// https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
 
 	// Btw, don't edit UTF-8-test.txt: your editor might turn it into valid UTF-8!
 
 	input, err := ioutil.ReadFile("testdata/UTF-8-test.txt")
-	inlen := len(input)
 
 	if err != nil {
 		t.Error(err)
@@ -238,14 +101,54 @@ func TestInvalidUTF8(t *testing.T) {
 	if err := sc.Err(); err != nil {
 		t.Error(err)
 	}
-	outlen := len(output)
-
-	if inlen != outlen {
-		t.Fatalf("input: %d bytes, output: %d bytes", inlen, outlen)
-	}
 
 	if !bytes.Equal(output, input) {
 		t.Fatalf("input bytes are not the same as scanned bytes")
+	}
+}
+
+func TestNeverZeroAtEOF(t *testing.T) {
+	// SplitFunc should never return advance = 0 when atEOF. This test is redundant
+	// with the roundtrip test above, but nice to call out this invariant.
+
+	const runs = 50
+
+	for i := 0; i < runs; i++ {
+		t.Run("", func(t *testing.T) {
+			t.Parallel()
+
+			input := getRandomBytes()
+
+			advance, _, _ := words.SplitFunc(input, true)
+
+			if advance == 0 {
+				t.Error("advance should never be zero when atEOF is true")
+			}
+		})
+	}
+}
+
+func TestNeverErr(t *testing.T) {
+	// SplitFunc should never return an error. This test is redundant
+	// with the roundtrip test above, but nice to call out this invariant.
+
+	const runs = 50
+	atEOFs := []bool{true, false}
+
+	for i := 0; i < runs; i++ {
+		t.Run("", func(t *testing.T) {
+			t.Parallel()
+
+			for _, atEOF := range atEOFs {
+				input := getRandomBytes()
+
+				_, _, err := words.SplitFunc(input, atEOF)
+
+				if err != nil {
+					t.Errorf("SplitFunc should never error (atEOF %t)", atEOF)
+				}
+			}
+		})
 	}
 }
 
@@ -261,69 +164,6 @@ func getRandomBytes() []byte {
 	rand.Read(b)
 
 	return b
-}
-
-func TestRandomBytes(t *testing.T) {
-	// Increase this number to do pseudo-fuzzing
-	const runs = 2_000
-	const workers = 4
-	var ran int32
-
-	var wg sync.WaitGroup
-	for j := 0; j < workers; j++ {
-		wg.Add(1)
-		go func() {
-			for i := 0; i < runs/workers; i++ {
-				input := getRandomBytes()
-
-				// Randomize buffer size, too
-				s := rnd.Intn(max-min) + min
-				r := bufio.NewReaderSize(bytes.NewReader(input), s)
-
-				sc := words.NewScanner(r)
-
-				var output []byte
-				for sc.Scan() {
-					output = append(output, sc.Bytes()...)
-				}
-				if err := sc.Err(); err != nil {
-					t.Error(err)
-				}
-
-				if !bytes.Equal(output, input) {
-					t.Errorf("input bytes are not the same as scanned bytes; rand seed is %d", seed)
-				}
-				atomic.AddInt32(&ran, 1)
-			}
-			wg.Done()
-		}()
-	}
-
-	t.Logf("started: %d runs on %d goroutines, with random seed %d", runs, workers, seed)
-
-	ticker := time.NewTicker(5 * time.Second)
-	stop := make(chan struct{})
-	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				t.Logf("%d runs of %d completed (%v%%)", ran, runs, math.Round(float64(ran)/runs*100))
-			case <-stop:
-				ticker.Stop()
-				return
-			}
-		}
-	}()
-
-	wg.Wait()
-
-	stop <- struct{}{}
-
-	t.Logf("finished: %d runs of %d completed (%v%%)", ran, runs, math.Round(float64(ran)/runs*100))
-
-	if int(ran) != runs {
-		t.Errorf("expected %d runs, got %d", runs, ran)
-	}
 }
 
 func BenchmarkScanner(b *testing.B) {
