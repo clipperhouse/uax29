@@ -3,7 +3,7 @@ An implementation of grapheme cluster boundaries from [Unicode text segmentation
 ### Usage
 
 ```go
-import "github.com/clipperhouse/uax29/graphemes"
+import "github.com/kevwang/uax29/graphemes"
 
 text := "This is an example."
 reader := strings.NewReader(text)
@@ -21,13 +21,13 @@ if err := scanner.Err(); err != nil {
 }
 ```
 
-[GoDoc](https://godoc.org/github.com/clipperhouse/uax29/graphemes)
+[GoDoc](https://godoc.org/github.com/kevwang/uax29/graphemes)
 
 ### Conformance
 
 We use the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29), thanks to [bleve](https://github.com/blevesearch/segment/blob/master/tables_test.go). Status:
 
-![Go](https://github.com/clipperhouse/uax29/workflows/Go/badge.svg)
+![Go](https://github.com/kevwang/uax29/workflows/Go/badge.svg)
 
 ### Performance
 

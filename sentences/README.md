@@ -3,7 +3,7 @@ An implementation of sentence boundaries from [Unicode text segmentation](https:
 ### Usage
 
 ```go
-import "github.com/clipperhouse/uax29/sentences"
+import "github.com/kevwang/uax29/sentences"
 
 text := "This is a test. “Is it?”, he wondered."
 reader := strings.NewReader(text)
@@ -21,13 +21,13 @@ if err := scanner.Err(); err != nil {
 }
 ```
 
-[GoDoc](https://godoc.org/github.com/clipperhouse/uax29/sentences)
+[GoDoc](https://godoc.org/github.com/kevwang/uax29/sentences)
 
 ### Conformance
 
 We use the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29), thanks to [bleve](https://github.com/blevesearch/segment/blob/master/tables_test.go). Status:
 
-![Go](https://github.com/clipperhouse/uax29/workflows/Go/badge.svg)
+![Go](https://github.com/kevwang/uax29/workflows/Go/badge.svg)
 
 ### Performance
 

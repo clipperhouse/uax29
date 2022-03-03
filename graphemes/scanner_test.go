@@ -13,7 +13,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/graphemes"
+	"github.com/kevwang/uax29/graphemes"
 )
 
 func TestUnicodeSegments(t *testing.T) {

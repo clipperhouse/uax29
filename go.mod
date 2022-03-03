@@ -1,3 +1,3 @@
-module github.com/clipperhouse/uax29
+module github.com/kevwang/uax29
 
 go 1.16

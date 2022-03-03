@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/clipperhouse/uax29/words"
+	"github.com/kevwang/uax29/words"
 )
 
 func ExampleScanner_Scan() {

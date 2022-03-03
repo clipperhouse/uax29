@@ -3,7 +3,7 @@ This package tokenizes words, sentences and graphemes, based on [Unicode text se
 ### Usage
 
 ```go
-import "github.com/clipperhouse/uax29/words"
+import "github.com/kevwang/uax29/words"
 
 text := "It’s not “obvious” (IMHO) what comprises a word, a sentence, or a grapheme. 👍🏼🐶!"
 reader := strings.NewReader(text)
@@ -21,7 +21,7 @@ if err := scanner.Err(); err != nil {
 }
 ```
 
-[GoDoc](https://godoc.org/github.com/clipperhouse/uax29/words)
+[GoDoc](https://godoc.org/github.com/kevwang/uax29/words)
 
 ### Why tokenize?
 
@@ -31,7 +31,7 @@ Any time our code operates on individual words, we are tokenizing. Often, we do 
 
 We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#Tests29), thanks to [bleve](https://github.com/blevesearch/segment/blob/master/tables_test.go). Status:
 
-![Go](https://github.com/clipperhouse/uax29/workflows/Go/badge.svg)
+![Go](https://github.com/kevwang/uax29/workflows/Go/badge.svg)
 
 ### Performance
 
@@ -39,7 +39,7 @@ We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#
 
 Execution time is `O(n)` on input size. It can be I/O bound; I/O performance is determined by the `io.Reader` you pass to `NewScanner`.
 
-In my local benchmarking (Mac laptop), [`uax29/words`](https://github.com/clipperhouse/uax29/tree/master/words) processes around 25MM tokens per second, or 90MB/s, of [multi-lingual prose](https://github.com/clipperhouse/uax29/blob/master/words/testdata/sample.txt).
+In my local benchmarking (Mac laptop), [`uax29/words`](https://github.com/kevwang/uax29/tree/master/words) processes around 25MM tokens per second, or 90MB/s, of [multi-lingual prose](https://github.com/kevwang/uax29/blob/master/words/testdata/sample.txt).
 
 ### Status
 
@@ -63,7 +63,7 @@ There are two tests in each package, called `TestInvalidUTF8` and `TestRandomByt
 
 ### See also
 
-[jargon](https://github.com/clipperhouse/jargon), a text pipelines package for CLI and Go, which consumes this package.
+[jargon](https://github.com/kevwang/jargon), a text pipelines package for CLI and Go, which consumes this package.
 
 ### Prior art
 

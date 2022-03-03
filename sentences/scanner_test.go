@@ -14,7 +14,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/sentences"
+	"github.com/kevwang/uax29/sentences"
 )
 
 func TestSentences(t *testing.T) {

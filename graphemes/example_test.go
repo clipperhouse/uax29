@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/clipperhouse/uax29/graphemes"
+	"github.com/kevwang/uax29/graphemes"
 )
 
 func ExampleScanner_Scan() {

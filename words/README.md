@@ -3,7 +3,7 @@ An implementation of word boundaries from [Unicode text segmentation](https://un
 ### Usage
 
 ```go
-import "github.com/clipperhouse/uax29/words"
+import "github.com/kevwang/uax29/words"
 
 text := "This is an example."
 reader := strings.NewReader(text)
@@ -21,13 +21,13 @@ if err := scanner.Err(); err != nil {
 }
 ```
 
-[GoDoc](https://godoc.org/github.com/clipperhouse/uax29/words)
+[GoDoc](https://godoc.org/github.com/kevwang/uax29/words)
 
 ### Conformance
 
 We use the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29), thanks to [bleve](https://github.com/blevesearch/segment/blob/master/tables_test.go). Status:
 
-![Go](https://github.com/clipperhouse/uax29/workflows/Go/badge.svg)
+![Go](https://github.com/kevwang/uax29/workflows/Go/badge.svg)
 
 ### Performance
 
@@ -35,7 +35,7 @@ We use the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#T
 
 Execution time is `O(n)` on input size. It can be I/O bound; I/O performance is determined by the `io.Reader` you pass to `NewScanner`.
 
-In my local benchmarking (Mac laptop), [`uax29/words`](https://github.com/clipperhouse/uax29/tree/master/words) processes around 25MM tokens per second, or 90MB/s, of [multi-lingual prose](https://github.com/clipperhouse/uax29/blob/master/words/testdata/sample.txt).
+In my local benchmarking (Mac laptop), [`uax29/words`](https://github.com/kevwang/uax29/tree/master/words) processes around 25MM tokens per second, or 90MB/s, of [multi-lingual prose](https://github.com/kevwang/uax29/blob/master/words/testdata/sample.txt).
 
 ### Invalid inputs
 

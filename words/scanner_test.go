@@ -14,7 +14,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/words"
+	"github.com/kevwang/uax29/words"
 )
 
 func TestScanner(t *testing.T) {
