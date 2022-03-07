@@ -381,3 +381,32 @@ func BenchmarkUnicodeSegments(b *testing.B) {
 		b.ReportMetric(float64(c), "tokens")
 	}
 }
+
+func TestScannerMaxTokenLen(t *testing.T) {
+	str := ""
+	for i := 0; i < 505; i++ {
+		if i == 500 {
+			str += "."
+		}
+		str += "a"
+	}
+
+	scanner := words.NewScanner(strings.NewReader(str))
+
+	expected := []string{str[:words.TOKEN_BREAK_LEN], ".", str[words.TOKEN_BREAK_LEN + 1:]}
+	i := 0
+
+	for scanner.Scan() {
+		token := scanner.Text()
+		if token != expected[i] {
+			t.Errorf("expected %q to be %q", token, expected[i])
+		}
+		i++
+	}
+	if i != len(expected) {
+		t.Errorf("found %d tokens but expected %d", i, len(expected))
+	}
+	if err := scanner.Err(); err != nil {
+		t.Error(err)
+	}
+}

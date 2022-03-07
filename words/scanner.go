@@ -36,6 +36,8 @@ const (
 	_AHLetter   = _ALetter | _HebrewLetter
 	_MidNumLetQ = _MidNumLet | _SingleQuote
 	_Ignore     = _Extend | _Format | _ZWJ
+
+	TOKEN_BREAK_LEN = 500
 )
 
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner
@@ -51,6 +53,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	for {
 		sot := pos == 0         // "start of text"
 		eot := pos == len(data) // "end of text"
+
+		if pos >= TOKEN_BREAK_LEN {
+			break
+		}
 
 		if eot {
 			if !atEOF {
@@ -143,6 +149,9 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 					w = w2
 
 					pos += w
+					if pos >= TOKEN_BREAK_LEN {
+						break
+					}
 				}
 				continue
 			}
@@ -251,6 +260,9 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 					w = w2
 
 					pos += w
+					if pos >= TOKEN_BREAK_LEN {
+						break
+					}
 				}
 				continue
 			}
