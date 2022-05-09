@@ -37,7 +37,7 @@ func TestScannerUnicode(t *testing.T) {
 			passed++
 		}
 	}
-	t.Logf("passed %d, failed %d", passed, failed)
+	t.Logf("%d tests: passed %d, failed %d", len(unicodeTests), passed, failed)
 }
 
 // TestScannerRoundtrip tests that all input bytes are output after segmentation.

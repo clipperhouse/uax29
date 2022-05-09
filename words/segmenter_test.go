@@ -36,8 +36,15 @@ func TestSegmenterUnicode(t *testing.T) {
 		} else {
 			passed++
 		}
+
+		// Test All while we're here
+		all := words.SegmentAll(test.input)
+		if !reflect.DeepEqual(all, segmented) {
+			t.Error("calling All should be identical to iterating using Segmenter")
+		}
 	}
-	t.Logf("passed %d, failed %d", passed, failed)
+
+	t.Logf("%d tests: passed %d, failed %d", len(unicodeTests), passed, failed)
 }
 
 // TestSegmenterRoundtrip tests that all input bytes are output after segmentation.

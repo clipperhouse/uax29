@@ -74,3 +74,30 @@ func (seg *Segmenter) Err() error {
 func (seg *Segmenter) Bytes() []byte {
 	return seg.token
 }
+
+func All(data []byte, split bufio.SplitFunc) [][]byte {
+	var result [][]byte
+	var pos int
+
+	for {
+		advance, token, err := split(data[pos:], true)
+
+		if advance == 0 {
+			break
+		}
+
+		pos += advance
+
+		if len(token) == 0 {
+			break
+		}
+
+		if err != nil {
+			break
+		}
+
+		result = append(result, token)
+	}
+
+	return result
+}

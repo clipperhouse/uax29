@@ -7,3 +7,7 @@ func NewSegmenter(data []byte) *segmenter.Segmenter {
 	seg.SetText(data)
 	return seg
 }
+
+func SegmentAll(data []byte) [][]byte {
+	return segmenter.All(data, SplitFunc)
+}
