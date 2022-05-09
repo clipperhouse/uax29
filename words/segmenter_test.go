@@ -106,9 +106,10 @@ func BenchmarkSegmenter(b *testing.B) {
 
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
+	seg := words.NewSegmenter(file)
 
 	for i := 0; i < b.N; i++ {
-		seg := words.NewSegmenter(file)
+		seg.SetText(file)
 
 		c := 0
 		for seg.Next() {
@@ -133,14 +134,16 @@ func BenchmarkUnicodeSegmenter(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 
+	seg := words.NewSegmenter(file)
+
 	for i := 0; i < b.N; i++ {
-		sc := words.NewSegmenter(file)
+		seg.SetText(file)
 
 		c := 0
-		for sc.Next() {
+		for seg.Next() {
 			c++
 		}
-		if err := sc.Err(); err != nil {
+		if err := seg.Err(); err != nil {
 			b.Error(err)
 		}
 

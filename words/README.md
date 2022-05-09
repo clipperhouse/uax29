@@ -5,18 +5,16 @@ An implementation of word boundaries from [Unicode text segmentation](https://un
 ```go
 import "github.com/clipperhouse/uax29/words"
 
-text := "This is an example."
-reader := strings.NewReader(text)
+text := []byte("This is an example.")
+segmenter := words.NewSegmenter(text)
 
-scanner := words.NewScanner(reader)
-
-// Scan returns true until error or EOF
-for scanner.Scan() {
-	fmt.Printf("%q\n", scanner.Text())
+// Next returns true until error or end of text
+for segmenter.Next() {
+	fmt.Printf("%s\n", segmenter.Bytes())
 }
 
-// Gotta check the error (because we depend on I/O).
-if err := scanner.Err(); err != nil {
+// Gotta check the error
+if err := segmenter.Err(); err != nil {
 	log.Fatal(err)
 }
 ```
@@ -35,7 +33,7 @@ We use the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#T
 
 Execution time is `O(n)` on input size. It can be I/O bound; I/O performance is determined by the `io.Reader` you pass to `NewScanner`.
 
-In my local benchmarking (Mac laptop), [`uax29/words`](https://github.com/clipperhouse/uax29/tree/master/words) processes around 25MM tokens per second, or 90MB/s, of [multi-lingual prose](https://github.com/clipperhouse/uax29/blob/master/words/testdata/sample.txt).
+In my local benchmarking (Mac Intel laptop), [`uax29/words`](https://github.com/clipperhouse/uax29/tree/master/words) processes around 25MM tokens per second, or 90MB/s, of [multi-lingual prose](https://github.com/clipperhouse/uax29/blob/master/words/testdata/sample.txt).
 
 ### Invalid inputs
 
