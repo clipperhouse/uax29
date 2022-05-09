@@ -20,24 +20,23 @@ func TestScannerUnicode(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			t.Parallel()
 
-			var got [][]byte
-			sc := words.NewScanner(bytes.NewReader(test.input))
-
-			for sc.Scan() {
-				got = append(got, sc.Bytes())
+			var scanned [][]byte
+			scanner := words.NewScanner(bytes.NewReader(test.input))
+			for scanner.Scan() {
+				scanned = append(scanned, scanner.Bytes())
 			}
 
-			if err := sc.Err(); err != nil {
+			if err := scanner.Err(); err != nil {
 				t.Fatal(err)
 			}
 
-			if !reflect.DeepEqual(got, test.expected) {
+			if !reflect.DeepEqual(scanned, test.expected) {
 				failed++
 				t.Errorf(`
 	for input %v
 	expected  %v
 	got       %v
-	spec      %s`, test.input, test.expected, got, test.comment)
+	spec      %s`, test.input, test.expected, scanned, test.comment)
 			} else {
 				passed++
 			}
