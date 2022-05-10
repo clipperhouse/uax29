@@ -12,6 +12,18 @@ import (
 	"github.com/clipperhouse/uax29/words"
 )
 
+func TestScanner(t *testing.T) {
+	text := []byte("Hello, .net how are you?")
+	r := bytes.NewReader(text)
+	sc := words.NewScanner(r)
+	sc.OmitWhitespace()
+	sc.OmitPunct()
+
+	for sc.Scan() {
+		t.Log(sc.Text())
+	}
+}
+
 func TestScannerUnicode(t *testing.T) {
 	// From the Unicode test suite; see the gen/ folder.
 	var passed, failed int

@@ -19,10 +19,78 @@ import (
 //	if err := scanner.Err(); err != nil {
 //		log.Fatal(err)
 //	}
-func NewScanner(r io.Reader) *bufio.Scanner {
-	scanner := bufio.NewScanner(r)
-	scanner.Split(SplitFunc)
-	return scanner
+func NewScanner(r io.Reader) *Scanner {
+	b := bufio.NewScanner(r)
+	b.Split(SplitFunc)
+	return &Scanner{
+		Scanner: b,
+	}
+}
+
+type Scanner struct {
+	*bufio.Scanner
+	tokenMustContain property
+	tokenMustNotBe   property
+}
+
+func (scanner *Scanner) Scan() bool {
+	scan := true
+
+	for scan {
+		scan = scanner.Scanner.Scan()
+
+		if scanner.tokenMustContain != 0 {
+			if contains(scanner.Scanner.Bytes(), scanner.tokenMustContain) {
+				break
+			}
+		}
+
+		if scanner.tokenMustNotBe != 0 {
+			if !entirely(scanner.Scanner.Bytes(), scanner.tokenMustNotBe) {
+				break
+			}
+		}
+	}
+
+	return scan
+}
+
+func (scanner *Scanner) OnlyWordlike() {
+	scanner.tokenMustContain = _Wordlike
+}
+
+func (scanner *Scanner) OmitWhitespace() {
+	scanner.tokenMustNotBe |= _WhiteSpace
+}
+
+func (scanner *Scanner) OmitPunct() {
+	scanner.tokenMustNotBe |= _Punct
+}
+
+func contains(token []byte, p property) bool {
+	pos := 0
+	for pos < len(token) {
+		prop, w := trie.lookup(token)
+		if prop.is(p) {
+			return true
+		}
+		pos += w
+	}
+
+	return false
+}
+
+func entirely(token []byte, p property) bool {
+	pos := 0
+	for pos < len(token) {
+		prop, w := trie.lookup(token)
+		if !prop.is(p) {
+			return false
+		}
+		pos += w
+	}
+
+	return true
 }
 
 var trie = newWordsTrie(0)
