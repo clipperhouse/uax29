@@ -39,23 +39,23 @@ const _Wordlike = _Letter | _Number | _Symbol
 // IsWordlike indicates that the current token is a word (as opposed to other things
 // like whitespace or punctuation). There is not a technical definition of what comprises
 // a "word" in common parlance, so we define it as any token that contains letter(s),
-// number(s), or symbols(s), as defined by Unicode. This defintion should
+// number(s), or symbol(s), as defined by Unicode. This definition should
 // suit most applications.
 func (scanner *Scanner) IsWordlike() bool {
 	return contains(scanner.Bytes(), _Wordlike)
 }
 
-// IsWhitespace indicates that the current token consists entirely of whitespace,
-// as defined by Unicode.
-func (scanner *Scanner) IsWhitespace() bool {
-	return entirely(scanner.Bytes(), _WhiteSpace)
-}
+// // IsWhitespace indicates that the current token consists entirely of whitespace,
+// // as defined by Unicode.
+// func (scanner *Scanner) IsWhitespace() bool {
+// 	return entirely(scanner.Bytes(), _WhiteSpace)
+// }
 
-// IsPunct indicates that the current token consists entirely of punctuation,
-// as defined by Unicode.
-func (scanner *Scanner) IsPunct() bool {
-	return entirely(scanner.Bytes(), _Punct)
-}
+// // IsPunct indicates that the current token consists entirely of punctuation,
+// // as defined by Unicode.
+// func (scanner *Scanner) IsPunct() bool {
+// 	return entirely(scanner.Bytes(), _Punct)
+// }
 
 func contains(token []byte, p property) bool {
 	pos := 0

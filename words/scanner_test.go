@@ -18,7 +18,7 @@ func TestScanner(t *testing.T) {
 	sc := words.NewScanner(r)
 
 	for sc.Scan() {
-		t.Logf("%q IsWordlike: %t, IsWhiteSpace: %t, IsPunct: %t", sc.Text(), sc.IsWordlike(), sc.IsWhitespace(), sc.IsPunct())
+		t.Logf("%q IsWordlike: %t", sc.Text(), sc.IsWordlike())
 	}
 }
 
