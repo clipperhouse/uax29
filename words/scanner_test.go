@@ -13,14 +13,12 @@ import (
 )
 
 func TestScanner(t *testing.T) {
-	text := []byte("Hello, .net how are you?")
+	text := []byte("Hello, .net how are you? Hello, 世界.")
 	r := bytes.NewReader(text)
 	sc := words.NewScanner(r)
-	sc.OmitWhitespace()
-	sc.OmitPunct()
 
 	for sc.Scan() {
-		t.Log(sc.Text())
+		t.Logf("%q IsWordlike: %t, IsWhiteSpace: %t, IsPunct: %t", sc.Text(), sc.IsWordlike(), sc.IsWhitespace(), sc.IsPunct())
 	}
 }
 

@@ -129,17 +129,20 @@ func (p prop) generateTrie() error {
 	}
 
 	if p.name == "Word" {
+
 		// see unicode.PrintRanges for the idea here; it's all of those minus punctuation
-		wordlike := []*unicode.RangeTable{
-			unicode.Letter, unicode.Mark, unicode.Number, unicode.Symbol,
+		ranges := map[string]*unicode.RangeTable{
+			"Letter":      unicode.Letter,
+			"Number":      unicode.Number,
+			"Symbol":      unicode.Symbol,
+			"White_Space": unicode.White_Space,
+			"Punct":       unicode.Punct,
+			// "Mark":        unicode.Mark,
 		}
-		runesByProperty["Wordlike"] = getRunesFromRangeTable(wordlike...)
 
-		whitespace := unicode.White_Space
-		runesByProperty["White_Space"] = getRunesFromRangeTable(whitespace)
-
-		punct := unicode.Punct
-		runesByProperty["Punct"] = getRunesFromRangeTable(punct)
+		for k, v := range ranges {
+			runesByProperty[k] = getRunesFromRangeTable(v)
+		}
 	}
 
 	err = writeTrie(p, runesByProperty)

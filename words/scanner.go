@@ -7,6 +7,9 @@ import (
 	"unicode/utf8"
 )
 
+// b is a private alias just so callers don't see the embedded type
+type b = *bufio.Scanner
+
 // NewScanner tokenizes a reader into a stream of tokens according to Unicode Text Segmentation word boundaries https://unicode.org/reports/tr29/#Word_Boundaries.
 // Iterate through the stream by calling Scan() until false.
 //	text := "This is an example."
@@ -23,48 +26,35 @@ func NewScanner(r io.Reader) *Scanner {
 	b := bufio.NewScanner(r)
 	b.Split(SplitFunc)
 	return &Scanner{
-		Scanner: b,
+		b: b,
 	}
 }
 
 type Scanner struct {
-	*bufio.Scanner
-	tokenMustContain property
-	tokenMustNotBe   property
+	b
 }
 
-func (scanner *Scanner) Scan() bool {
-	scan := true
+const _Wordlike = _Letter | _Number | _Symbol
 
-	for scan {
-		scan = scanner.Scanner.Scan()
-
-		if scanner.tokenMustContain != 0 {
-			if contains(scanner.Scanner.Bytes(), scanner.tokenMustContain) {
-				break
-			}
-		}
-
-		if scanner.tokenMustNotBe != 0 {
-			if !entirely(scanner.Scanner.Bytes(), scanner.tokenMustNotBe) {
-				break
-			}
-		}
-	}
-
-	return scan
+// IsWordlike indicates that the current token is a word (as opposed to other things
+// like whitespace or punctuation). There is not a technical definition of what comprises
+// a "word" in common parlance, so we define it as any token that contains letter(s),
+// number(s), or symbols(s), as defined by Unicode. This defintion should
+// suit most applications.
+func (scanner *Scanner) IsWordlike() bool {
+	return contains(scanner.Bytes(), _Wordlike)
 }
 
-func (scanner *Scanner) OnlyWordlike() {
-	scanner.tokenMustContain = _Wordlike
+// IsWhitespace indicates that the current token consists entirely of whitespace,
+// as defined by Unicode.
+func (scanner *Scanner) IsWhitespace() bool {
+	return entirely(scanner.Bytes(), _WhiteSpace)
 }
 
-func (scanner *Scanner) OmitWhitespace() {
-	scanner.tokenMustNotBe |= _WhiteSpace
-}
-
-func (scanner *Scanner) OmitPunct() {
-	scanner.tokenMustNotBe |= _Punct
+// IsPunct indicates that the current token consists entirely of punctuation,
+// as defined by Unicode.
+func (scanner *Scanner) IsPunct() bool {
+	return entirely(scanner.Bytes(), _Punct)
 }
 
 func contains(token []byte, p property) bool {
