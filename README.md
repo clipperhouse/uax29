@@ -5,18 +5,16 @@ This package tokenizes words, sentences and graphemes, based on [Unicode text se
 ```go
 import "github.com/clipperhouse/uax29/words"
 
-text := "It’s not “obvious” (IMHO) what comprises a word, a sentence, or a grapheme. 👍🏼🐶!"
-reader := strings.NewReader(text)
+text := []byte("It’s not “obvious” (IMHO) what comprises a word, a sentence, or a grapheme. 👍🏼🐶!")
+segmenter := words.NewSegmenter(text)
 
-scanner := words.NewScanner(reader)
-
-// Scan returns true until error or EOF
-for scanner.Scan() {
-	fmt.Printf("%q\n", scanner.Text())
+// Next() returns true until error or end of data
+for segmenter.Next() {
+	fmt.Printf("%q\n", segmenter.Bytes())
 }
 
-// Gotta check the error (because we depend on I/O).
-if err := scanner.Err(); err != nil {
+// Should check the error
+if err := segmenter.Err(); err != nil {
 	log.Fatal(err)
 }
 ```
@@ -25,7 +23,7 @@ if err := scanner.Err(); err != nil {
 
 ### Why tokenize?
 
-Any time our code operates on individual words, we are tokenizing. Often, we do it ad hoc, such as splitting on spaces, which gives inconsistent results. Best to do it consistently.
+Any time our code operates on individual words, we are tokenizing. Often, we do it ad hoc, such as splitting on spaces, which gives inconsistent results. The Unicode standard is better: it is multi-lingual, and handles punctuation, special characters, etc.
 
 ### Conformance
 
@@ -40,20 +38,6 @@ We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#
 Execution time is `O(n)` on input size. It can be I/O bound; I/O performance is determined by the `io.Reader` you pass to `NewScanner`.
 
 In my local benchmarking (Mac laptop), [`uax29/words`](https://github.com/clipperhouse/uax29/tree/master/words) processes around 25MM tokens per second, or 90MB/s, of [multi-lingual prose](https://github.com/clipperhouse/uax29/blob/master/words/testdata/sample.txt).
-
-### Status
-
-- The [word boundary rules](https://unicode.org/reports/tr29/#Word_Boundaries) have been implemented in the `words` package
-
-- The [sentence boundary rules](https://unicode.org/reports/tr29/#Sentence_Boundaries) have been implemented in the `sentences` package
-
-- The [grapheme cluster rules](https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries) have been implemented in the `graphemes` package
-
-- The official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29) passes for words, sentences, and graphemes
-
-- We code-gen the Unicode categories relevant to UAX 29 by running `go generate` at the repository root
-
-- There is [discussion](https://groups.google.com/d/msg/golang-nuts/_79vJ65KuXc/B_QgeU6rAgAJ) of implementing the above in Go’s [`x/text`](https://godoc.org/golang.org/x/text) package
 
 ### Invalid inputs
 
