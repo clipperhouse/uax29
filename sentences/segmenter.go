@@ -2,10 +2,19 @@ package sentences
 
 import "github.com/clipperhouse/uax29/segmenter"
 
+type s = segmenter.Segmenter
+
+// Segmenter is an iterator over the segmented sentences. Use Next().
+type Segmenter struct {
+	*s
+}
+
 // NewSegmenter retuns a Segmenter, which is an iterator over the source text.
 // Call Next() until it's false.
-func NewSegmenter(data []byte) *segmenter.Segmenter {
-	seg := segmenter.New(SplitFunc)
+func NewSegmenter(data []byte) *Segmenter {
+	seg := &Segmenter{
+		s: segmenter.New(SplitFunc),
+	}
 	seg.SetText(data)
 	return seg
 }

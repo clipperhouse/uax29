@@ -30,7 +30,7 @@ func ExampleSegmenter_Next() {
 
 	segments := words.NewSegmenter(text)
 
-	// Scan returns true until error or EOF
+	// Next returns true until error or end of data
 	for segments.Next() {
 		fmt.Printf("%q\n", segments.Bytes())
 	}

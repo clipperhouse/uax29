@@ -2,8 +2,17 @@ package words
 
 import "github.com/clipperhouse/uax29/segmenter"
 
-func NewSegmenter(data []byte) *segmenter.Segmenter {
-	seg := segmenter.New(SplitFunc)
+type s = segmenter.Segmenter
+
+// Segmenter is an iterator over the segmented words. Use Next().
+type Segmenter struct {
+	*s
+}
+
+func NewSegmenter(data []byte) *Segmenter {
+	seg := &Segmenter{
+		s: segmenter.New(SplitFunc),
+	}
 	seg.SetText(data)
 	return seg
 }
