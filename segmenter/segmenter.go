@@ -75,29 +75,30 @@ func (seg *Segmenter) Bytes() []byte {
 	return seg.token
 }
 
-func All(data []byte, split bufio.SplitFunc) [][]byte {
-	var result [][]byte
-	var pos int
+// All will iterate through all tokens and collect them into a [][]byte. It is a
+// convenience method -- if you will be allocating such a slice anyway, this
+// will save you some code. The downside is that it allocates, and can do so
+// unbounded -- O(n) on the number of tokens. Use Segmenter for more bounded
+// memory usage.
+func All(src []byte, dest *[][]byte, split bufio.SplitFunc) error {
+	pos := 0
 
-	for {
-		advance, token, err := split(data[pos:], true)
+	for pos < len(src) {
+		advance, token, err := split(src[pos:], true)
+		if err != nil {
+			return err
+		}
 
 		if advance == 0 {
 			break
 		}
-
 		pos += advance
 
 		if len(token) == 0 {
 			break
 		}
-
-		if err != nil {
-			break
-		}
-
-		result = append(result, token)
+		*dest = append(*dest, token)
 	}
 
-	return result
+	return nil
 }

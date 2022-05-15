@@ -1,7 +1,9 @@
-package words
+package sentences
 
 import "github.com/clipperhouse/uax29/segmenter"
 
+// NewSegmenter retuns a Segmenter, which is an iterator over the source text.
+// Call Next() until it's false.
 func NewSegmenter(data []byte) *segmenter.Segmenter {
 	seg := segmenter.New(SplitFunc)
 	seg.SetText(data)
@@ -14,9 +16,9 @@ func NewSegmenter(data []byte) *segmenter.Segmenter {
 // unbounded -- O(n) on the number of tokens. Use Segmenter for more bounded
 // memory usage.
 func SegmentAll(data []byte) [][]byte {
-	// Optimization: guesstimate that the average token is 3 bytes,
+	// Optimization: guesstimate that the average sentence is 100 bytes,
 	// allocate a large enough array to avoid resizing
-	result := make([][]byte, 0, len(data)/3)
+	result := make([][]byte, 0, len(data)/100)
 
 	_ = segmenter.All(data, &result, SplitFunc) // can elide the error, see tests
 	return result

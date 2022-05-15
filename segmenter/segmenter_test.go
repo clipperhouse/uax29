@@ -33,21 +33,23 @@ func TestAll(t *testing.T) {
 	seg := New(split)
 	seg.SetText(text)
 
-	var result1 [][]byte
+	var segResult [][]byte
 	for seg.Next() {
-		result1 = append(result1, seg.Bytes())
+		segResult = append(segResult, seg.Bytes())
 	}
-
 	if seg.Err() != nil {
 		t.Fatal(seg.Err())
 	}
 
-	result2 := All(text, split)
-
-	if !reflect.DeepEqual(result1, result2) {
-		t.Fatal("All and Segmenter should be identical")
+	var allResult [][]byte
+	err := All(text, &allResult, split)
+	if seg.Err() != nil {
+		t.Fatal(err)
 	}
 
-	t.Log(result1, result2)
-	t.Log(result2)
+	if !reflect.DeepEqual(segResult, allResult) {
+		t.Logf("Segmenter result: %q", segResult)
+		t.Logf("All result: %q", allResult)
+		t.Fatal("All and Segmenter should give identical results")
+	}
 }

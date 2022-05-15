@@ -24,3 +24,26 @@ func ExampleScanner_Scan() {
 		log.Fatal(err)
 	}
 }
+
+func ExampleSegmenter_Next() {
+	text := []byte("This is an example.")
+
+	segments := words.NewSegmenter(text)
+
+	// Scan returns true until error or EOF
+	for segments.Next() {
+		fmt.Printf("%q\n", segments.Bytes())
+	}
+
+	// Gotta check the error!
+	if err := segments.Err(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func ExampleSegmentAll() {
+	text := []byte("This is an example.")
+
+	segments := words.SegmentAll(text)
+	fmt.Printf("%q\n", segments)
+}

@@ -1,4 +1,4 @@
-package words_test
+package graphemes_test
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/words"
+	"github.com/clipperhouse/uax29/graphemes"
 )
 
 func TestSegmenterUnicode(t *testing.T) {
@@ -17,7 +17,7 @@ func TestSegmenterUnicode(t *testing.T) {
 		test := test
 
 		var segmented [][]byte
-		segmenter := words.NewSegmenter(test.input)
+		segmenter := graphemes.NewSegmenter(test.input)
 		for segmenter.Next() {
 			segmented = append(segmented, segmenter.Bytes())
 		}
@@ -38,7 +38,7 @@ func TestSegmenterUnicode(t *testing.T) {
 		}
 
 		// Test SegmentAll while we're here
-		all := words.SegmentAll(test.input)
+		all := graphemes.SegmentAll(test.input)
 		if !reflect.DeepEqual(all, segmented) {
 			t.Error("calling SegmentAll should be identical to iterating Segmenter")
 		}
@@ -54,7 +54,7 @@ func TestSegmenterUnicode(t *testing.T) {
 func TestSegmenterRoundtrip(t *testing.T) {
 	const runs = 2000
 
-	seg := words.NewSegmenter(nil)
+	seg := graphemes.NewSegmenter(nil)
 
 	for i := 0; i < runs; i++ {
 		input := getRandomBytes()
@@ -91,7 +91,7 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 		t.Error("input file should not be valid utf8")
 	}
 
-	sc := words.NewSegmenter(input)
+	sc := graphemes.NewSegmenter(input)
 
 	var output []byte
 	for sc.Next() {
@@ -107,15 +107,14 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 }
 
 func BenchmarkSegmenter(b *testing.B) {
-	file, err := ioutil.ReadFile("testdata/sample.txt")
-
+	file, err := ioutil.ReadFile("testdata/wikipedia.txt")
 	if err != nil {
 		b.Error(err)
 	}
 
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
-	seg := words.NewSegmenter(file)
+	seg := graphemes.NewSegmenter(file)
 
 	for i := 0; i < b.N; i++ {
 		seg.SetText(file)
@@ -140,19 +139,16 @@ func BenchmarkSegmentAll(b *testing.B) {
 		b.Error(err)
 	}
 
+	c := len(graphemes.SegmentAll(file))
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 
 	for i := 0; i < b.N; i++ {
-		segs := words.SegmentAll(file)
-
-		c := 0
-		for range segs {
-			c++
-		}
-
-		b.ReportMetric(float64(c), "tokens")
+		_ = graphemes.SegmentAll(file)
 	}
+
+	b.ReportMetric(float64(c), "tokens")
+	b.Logf("tokens %d, len %d, avg %d", c, len(file), len(file)/c)
 }
 
 func BenchmarkUnicodeTests(b *testing.B) {
@@ -165,7 +161,7 @@ func BenchmarkUnicodeTests(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 
-	seg := words.NewSegmenter(file)
+	seg := graphemes.NewSegmenter(file)
 
 	for i := 0; i < b.N; i++ {
 		seg.SetText(file)
