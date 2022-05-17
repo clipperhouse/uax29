@@ -9,7 +9,7 @@ import (
 )
 
 func ExampleScanner_Scan() {
-	text := "This is an example."
+	text := "Hello, 世界. Nice dog! 👍🐶"
 	reader := strings.NewReader(text)
 
 	scanner := words.NewScanner(reader)
@@ -26,7 +26,7 @@ func ExampleScanner_Scan() {
 }
 
 func ExampleSegmenter_Next() {
-	text := []byte("This is an example.")
+	text := []byte("Hello, 世界. Nice dog! 👍🐶")
 
 	segments := words.NewSegmenter(text)
 
@@ -42,7 +42,7 @@ func ExampleSegmenter_Next() {
 }
 
 func ExampleSegmentAll() {
-	text := []byte("This is an example.")
+	text := []byte("Hello, 世界. Nice dog! 👍🐶")
 
 	segments := words.SegmentAll(text)
 	fmt.Printf("%q\n", segments)
