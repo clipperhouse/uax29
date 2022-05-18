@@ -35,6 +35,7 @@ func (lookup property) is(properties property) bool {
 const _Ignore = _Extend
 
 // SplitFunc is a bufio.SplitFunc implementation of grapheme cluster segmentation, for use with bufio.Scanner
+// By design, it never returns an error, rather it just returns the data it has
 func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if len(data) == 0 {
 		return 0, nil, nil

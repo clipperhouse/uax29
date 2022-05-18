@@ -1,0 +1,11 @@
+root = true
+
+# this is here to make GitHub READMEs look like they do in my previewer. Is that a good reason? It is not.
+# https://stackoverflow.com/a/33831598
+[*.md]
+indent_style = tab
+indent_size = 4
+
+[*.go]
+indent_style = tab
+indent_size = 4

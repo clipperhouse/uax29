@@ -1,44 +1,91 @@
-An implementation of word boundaries from [Unicode text segmentation](https://unicode.org/reports/tr29/#Word_Boundaries) (UAX 29), for Unicode version 13.0.0.
+An implementation of word boundaries from [Unicode text segmentation](https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries) (UAX 29), for Unicode version 13.0.0.
 
-### Usage
+## Quick start
+
+```
+go get "github.com/clipperhouse/uax29/words"
+```
 
 ```go
 import "github.com/clipperhouse/uax29/words"
 
-text := "This is an example."
-reader := strings.NewReader(text)
+text := []byte("Hello, 世界. Nice dog! 👍🐶")
 
-scanner := words.NewScanner(reader)
+segments := words.NewSegmenter(text)            // A segmenter is an iterator over the words
 
-// Scan returns true until error or EOF
-for scanner.Scan() {
-	fmt.Printf("%q\n", scanner.Text())
+for segments.Next() {                           // Next() returns true until end of data or error
+	fmt.Printf("%q\n", segments.Bytes())        // Do something with the current word
 }
 
-// Gotta check the error (because we depend on I/O).
-if err := scanner.Err(); err != nil {
+if err := segments.Err(); err != nil {          // Check the error
 	log.Fatal(err)
 }
 ```
 
-[GoDoc](https://godoc.org/github.com/clipperhouse/uax29/words)
+[![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/words.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/words)
 
-### Conformance
+_For our purposes, “segment”, “word”, and “token” are used synonymously._
 
-We use the official [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29), thanks to [bleve](https://github.com/blevesearch/segment/blob/master/tables_test.go). Status:
+## Conformance
+
+We use the Unicode [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
 
 ![Go](https://github.com/clipperhouse/uax29/workflows/Go/badge.svg)
 
+## APIs
+
+### If you have a `[]byte`
+
+Use `Segmenter` for bounded memory and best performance:
+
+```go
+text := []byte("Hello, 世界. Nice dog! 👍🐶")
+
+segments := words.NewSegmenter(text)            // A segmenter is an iterator over the words
+
+for segments.Next() {                           // Next() returns true until end of data or error
+	fmt.Printf("%q\n", segments.Bytes())        // Do something with the current word
+}
+
+if err := segments.Err(); err != nil {          // Check the error
+	log.Fatal(err)
+}
+```
+
+Use `SegmentAll()` if you prefer brevity, are not too concerned about allocations, or would be populating a `[][]byte` anyway.
+
+```go
+text := []byte("Hello, 世界. Nice dog! 👍🐶")
+segments := words.SegmentAll(text)             // Returns a slice of byte slices; each slice is a word
+
+fmt.Println("Graphemes: %q", segments)
+```
+
+### If you have an `io.Reader`
+
+Use `Scanner` (which is a [`bufio.Scanner`](https://pkg.go.dev/bufio#Scanner), those docs will tell you what to do).
+
+```go
+r := getYourReader()                            // from a file or network maybe
+scanner := words.NewScanner(r)
+
+for scanner.Scan() {                            // Scan() returns true until error or EOF
+	fmt.Println(scanner.Text())                 // Do something with the current word
+}
+
+if err := scanner.Err(); err != nil {           // Check the error
+	log.Fatal(err)
+}
+```
+
 ### Performance
 
-`uax29` is designed to work in constant memory, regardless of input size. It buffers input and streams tokens. (For example, I am showing a maximum resident size of 8MB when processing a 300MB file.)
+On a Mac laptop, we see around 35MB/s, which works out to around 180 thousand words per second.
 
-Execution time is `O(n)` on input size. It can be I/O bound; I/O performance is determined by the `io.Reader` you pass to `NewScanner`.
-
-In my local benchmarking (Mac laptop), [`uax29/words`](https://github.com/clipperhouse/uax29/tree/master/words) processes around 25MM tokens per second, or 90MB/s, of [multi-lingual prose](https://github.com/clipperhouse/uax29/blob/master/words/testdata/sample.txt).
+You should see approximately constant memory when using `Segmenter` or `Scanner`, independent of data size. When using `SegmentAll()`, expect memory to be `O(n)` on the number of words.
 
 ### Invalid inputs
 
-Invalid UTF-8 input is undefined behavior. That said, we’ve worked to ensure that such inputs will not cause pathological outcomes, such as a panic or infinite loop. Callers should expect “garbage-in, garbage-out”.
+Invalid UTF-8 input is considered undefined behavior. We test to ensure that bad inputs will not cause pathological outcomes, such as a panic or infinite loop. Callers should expect “garbage-in, garbage-out”.
 
-There are two tests in each package, called `TestInvalidUTF8` and `TestRandomBytes`. Those tests pass, returning the invalid bytes verbatim, without a guarantee as to how they will be segmented.
+Your pipeline should probably include a call to [`utf8.Valid()`](https://pkg.go.dev/unicode/utf8#Valid).
