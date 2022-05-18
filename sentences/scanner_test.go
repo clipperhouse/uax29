@@ -17,31 +17,28 @@ func TestScannerUnicode(t *testing.T) {
 	var passed, failed int
 	for _, test := range unicodeTests {
 		test := test
-		t.Run("", func(t *testing.T) {
-			t.Parallel()
 
-			var got [][]byte
-			sc := sentences.NewScanner(bytes.NewReader(test.input))
+		var got [][]byte
+		sc := sentences.NewScanner(bytes.NewReader(test.input))
 
-			for sc.Scan() {
-				got = append(got, sc.Bytes())
-			}
+		for sc.Scan() {
+			got = append(got, sc.Bytes())
+		}
 
-			if err := sc.Err(); err != nil {
-				t.Fatal(err)
-			}
+		if err := sc.Err(); err != nil {
+			t.Fatal(err)
+		}
 
-			if !reflect.DeepEqual(got, test.expected) {
-				failed++
-				t.Errorf(`
+		if !reflect.DeepEqual(got, test.expected) {
+			failed++
+			t.Errorf(`
 	for input %v
 	expected  %v
 	got       %v
 	spec      %s`, test.input, test.expected, got, test.comment)
-			} else {
-				passed++
-			}
-		})
+		} else {
+			passed++
+		}
 	}
 	t.Logf("passed %d, failed %d", passed, failed)
 }
@@ -52,26 +49,22 @@ func TestScannerRoundtrip(t *testing.T) {
 	const runs = 2_000
 
 	for i := 0; i < runs; i++ {
-		t.Run("", func(t *testing.T) {
-			t.Parallel()
+		input := getRandomBytes()
 
-			input := getRandomBytes()
+		r := bytes.NewReader(input)
+		sc := sentences.NewScanner(r)
 
-			r := bytes.NewReader(input)
-			sc := sentences.NewScanner(r)
+		var output []byte
+		for sc.Scan() {
+			output = append(output, sc.Bytes()...)
+		}
+		if err := sc.Err(); err != nil {
+			t.Fatal(err)
+		}
 
-			var output []byte
-			for sc.Scan() {
-				output = append(output, sc.Bytes()...)
-			}
-			if err := sc.Err(); err != nil {
-				t.Fatal(err)
-			}
-
-			if !bytes.Equal(output, input) {
-				t.Fatal("input bytes are not the same as scanned bytes")
-			}
-		})
+		if !bytes.Equal(output, input) {
+			t.Fatal("input bytes are not the same as scanned bytes")
+		}
 	}
 }
 
@@ -120,17 +113,13 @@ func TestNeverZeroAtEOF(t *testing.T) {
 	const runs = 50
 
 	for i := 0; i < runs; i++ {
-		t.Run("", func(t *testing.T) {
-			t.Parallel()
+		input := getRandomBytes()
 
-			input := getRandomBytes()
+		advance, _, _ := sentences.SplitFunc(input, true)
 
-			advance, _, _ := sentences.SplitFunc(input, true)
-
-			if advance == 0 {
-				t.Error("advance should never be zero when atEOF is true")
-			}
-		})
+		if advance == 0 {
+			t.Error("advance should never be zero when atEOF is true")
+		}
 	}
 }
 
@@ -142,19 +131,15 @@ func TestNeverErr(t *testing.T) {
 	atEOFs := []bool{true, false}
 
 	for i := 0; i < runs; i++ {
-		t.Run("", func(t *testing.T) {
-			t.Parallel()
+		for _, atEOF := range atEOFs {
+			input := getRandomBytes()
 
-			for _, atEOF := range atEOFs {
-				input := getRandomBytes()
+			_, _, err := sentences.SplitFunc(input, atEOF)
 
-				_, _, err := sentences.SplitFunc(input, atEOF)
-
-				if err != nil {
-					t.Errorf("SplitFunc should never error (atEOF %t)", atEOF)
-				}
+			if err != nil {
+				t.Errorf("SplitFunc should never error (atEOF %t)", atEOF)
 			}
-		})
+		}
 	}
 }
 
