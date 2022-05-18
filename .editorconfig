@@ -5,3 +5,7 @@ root = true
 [*.md]
 indent_style = tab
 indent_size = 4
+
+[*.go]
+indent_style = tab
+indent_size = 4
