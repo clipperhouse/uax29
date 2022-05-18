@@ -14,7 +14,7 @@ text := []byte("Hello, 世界. Nice dog! 👍🐶")
 segments := words.NewSegmenter(text)            // A segmenter is an iterator over the words
 
 for segments.Next() {                           // Next() returns true until end of data or error
-	fmt.Printf("%q\n", segments.Bytes())        // Do something with the current word
+	fmt.Printf("%q\n", segments.Bytes())        // Do something with the current token
 }
 
 if err := segments.Err(); err != nil {          // Check the error
@@ -24,7 +24,7 @@ if err := segments.Err(); err != nil {          // Check the error
 
 [![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/words.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/words)
 
-_For our purposes, “segment”, “word”, and “token” are used synonymously._
+_Note: this package will return all tokens, including whitespace and punctuation — it's not strictly “words” in the common sense. If you wish to omit things like whitespace and punctuation, you'll have to add logic in the above `for` loop. For our purposes, “segment”, “word”, and “token” are used synonymously._
 
 ## Conformance
 
