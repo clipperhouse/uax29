@@ -8,7 +8,7 @@ import (
 	"github.com/clipperhouse/uax29/sentences"
 )
 
-func ExampleSegmenter_Next() {
+func ExampleNewSegmenter() {
 	text := []byte("Hello, 世界. “Nice dog! 👍🐶”, they said.")
 
 	segments := sentences.NewSegmenter(text)
@@ -31,7 +31,7 @@ func ExampleSegmentAll() {
 	fmt.Printf("%q\n", segments)
 }
 
-func ExampleScanner_Scan() {
+func ExampleNewScanner() {
 	text := "Hello, 世界. “Nice dog! 👍🐶”, they said."
 	reader := strings.NewReader(text)
 

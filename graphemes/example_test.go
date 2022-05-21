@@ -8,7 +8,7 @@ import (
 	"github.com/clipperhouse/uax29/graphemes"
 )
 
-func ExampleSegmenter_Next() {
+func ExampleNewSegmenter() {
 	text := []byte("Hello, 世界. Nice dog! 👍🐶")
 
 	segments := graphemes.NewSegmenter(text)
@@ -31,7 +31,7 @@ func ExampleSegmentAll() {
 	fmt.Printf("%q\n", segments)
 }
 
-func ExampleScanner_Scan() {
+func ExampleNewScanner() {
 	text := "Hello, 世界. Nice dog! 👍🐶"
 	reader := strings.NewReader(text)
 

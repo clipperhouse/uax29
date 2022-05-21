@@ -8,7 +8,7 @@ import (
 	"github.com/clipperhouse/uax29/words"
 )
 
-func ExampleScanner_Scan() {
+func ExampleNewScanner() {
 	text := "Hello, 世界. Nice dog! 👍🐶"
 	reader := strings.NewReader(text)
 
@@ -25,7 +25,7 @@ func ExampleScanner_Scan() {
 	}
 }
 
-func ExampleSegmenter_Next() {
+func ExampleNewSegmenter() {
 	text := []byte("Hello, 世界. Nice dog! 👍🐶")
 
 	segments := words.NewSegmenter(text)

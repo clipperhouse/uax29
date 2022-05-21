@@ -2,20 +2,10 @@ package words
 
 import "github.com/clipperhouse/uax29/segmenter"
 
-type s = segmenter.Segmenter
-
-// Segmenter is an iterator over the segmented words. Iterate while Next()
-// is true, and access the segmented words via Bytes().
-type Segmenter struct {
-	*s
-}
-
 // NewSegmenter retuns a Segmenter, which is an iterator over the source text.
 // Iterate while Next() is true, and access the segmented words via Bytes().
-func NewSegmenter(data []byte) *Segmenter {
-	seg := &Segmenter{
-		s: segmenter.New(SplitFunc),
-	}
+func NewSegmenter(data []byte) *segmenter.Segmenter {
+	seg := segmenter.New(SplitFunc)
 	seg.SetText(data)
 	return seg
 }
