@@ -2,15 +2,18 @@ package segmenter
 
 import (
 	"bufio"
+
+	"github.com/clipperhouse/uax29/segmenter/filter"
 )
 
 // Segmenter is an iterator for byte arrays. See the New() and Next() funcs.
 type Segmenter struct {
-	split bufio.SplitFunc
-	data  []byte
-	token []byte
-	pos   int
-	err   error
+	split  bufio.SplitFunc
+	filter filter.Func
+	data   []byte
+	token  []byte
+	pos    int
+	err    error
 }
 
 // New creates a new segmenter given a SplitFunc. To use the new segmenter,
@@ -23,45 +26,48 @@ func New(split bufio.SplitFunc) *Segmenter {
 
 // SetText sets the text for the segmenter to operate on, and resets
 // all state
-func (sc *Segmenter) SetText(data []byte) {
-	sc.data = data
-	sc.token = nil
-	sc.pos = 0
-	sc.err = nil
+func (seg *Segmenter) SetText(data []byte) {
+	seg.data = data
+	seg.token = nil
+	seg.pos = 0
+	seg.err = nil
+}
+
+// Filter applies a filter to all tokens, only returning the token if filter(token) evaluates true
+func (seg *Segmenter) Filter(f filter.Func) {
+	seg.filter = f
 }
 
 // Next advances the Segmenter to the next segment. It returns false when there
 // are no remaining segments, or an error occurred.
-//	text := []byte("This is an example.")
-//
-//	seg := segmenter.New(splitFunc)
-//  seg.SetText(text)
-//	for segment.Next() {
-//		fmt.Printf("%q\n", seg.Bytes())
-//	}
-//	if err := seg.Err(); err != nil {
-//		log.Fatal(err)
-//	}
 func (seg *Segmenter) Next() bool {
-	advance, token, err := seg.split(seg.data[seg.pos:], true)
+	for seg.pos < len(seg.data) {
+		advance, token, err := seg.split(seg.data[seg.pos:], true)
 
-	seg.pos += advance
-	seg.token = token
-	seg.err = err
+		seg.pos += advance
+		seg.token = token
+		seg.err = err
 
-	if advance == 0 {
-		return false
+		if advance == 0 {
+			return false
+		}
+
+		if len(token) == 0 {
+			return false
+		}
+
+		if seg.err != nil {
+			return false
+		}
+
+		if seg.filter != nil && !seg.filter(seg.token) {
+			continue
+		}
+
+		return true
 	}
 
-	if len(token) == 0 {
-		return false
-	}
-
-	if seg.err != nil {
-		return false
-	}
-
-	return true
+	return false
 }
 
 // Err indicates an error occured when calling Next() or Previous(). Next and
