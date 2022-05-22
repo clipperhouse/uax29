@@ -4,7 +4,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/segmenter/util"
+	"github.com/clipperhouse/uax29/iterators/util"
 )
 
 type Func func([]byte) bool

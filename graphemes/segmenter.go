@@ -1,14 +1,14 @@
 package graphemes
 
 import (
-	"github.com/clipperhouse/uax29/segmenter"
-	"github.com/clipperhouse/uax29/segmenter/filter"
+	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/iterators/filter"
 )
 
 // NewSegmenter retuns a Segmenter, which is an iterator over the source text.
 // Iterate while Next() is true, and access the segmented graphemes via Bytes().
-func NewSegmenter(data []byte) *segmenter.Segmenter {
-	seg := segmenter.New(SplitFunc)
+func NewSegmenter(data []byte) *iterators.Segmenter {
+	seg := iterators.NewSegmenter(SplitFunc)
 	seg.SetText(data)
 	return seg
 }
@@ -23,6 +23,6 @@ func SegmentAll(data []byte, filter ...filter.Func) [][]byte {
 	// allocate a large enough array to avoid resizing
 	result := make([][]byte, 0, len(data))
 
-	_ = segmenter.All(data, &result, SplitFunc, filter...) // can elide the error, see tests
+	_ = iterators.All(data, &result, SplitFunc, filter...) // can elide the error, see tests
 	return result
 }

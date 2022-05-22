@@ -1,4 +1,4 @@
-package segmenter
+package iterators
 
 import (
 	"bufio"
@@ -17,7 +17,7 @@ func getRandomBytes() []byte {
 func TestSegmenter(t *testing.T) {
 	text := []byte("Hello. How are you?")
 
-	seg := New(bufio.ScanWords)
+	seg := NewSegmenter(bufio.ScanWords)
 	seg.SetText(text)
 
 	for seg.Next() {
@@ -30,7 +30,7 @@ func TestAll(t *testing.T) {
 
 	split := bufio.ScanWords
 
-	seg := New(split)
+	seg := NewSegmenter(split)
 	seg.SetText(text)
 
 	var segResult [][]byte

@@ -1,14 +1,17 @@
-package segmenter
+package iterators
 
 import (
 	"bufio"
 	"unicode"
 
-	"github.com/clipperhouse/uax29/segmenter/filter"
-	"github.com/clipperhouse/uax29/segmenter/util"
+	"github.com/clipperhouse/uax29/iterators/filter"
+	"github.com/clipperhouse/uax29/iterators/util"
 )
 
-// Segmenter is an iterator for byte arrays. See the New() and Next() funcs.
+// Segmenter is an iterator for byte slices, which are segmented into tokens (segments).
+// To use it, you will define a SplitFunc, SetText with the bytes you wish to tokenize,
+// loop over Next until false, call Bytes to retrieve the current token, and check Err
+// after the loop.
 type Segmenter struct {
 	split   bufio.SplitFunc
 	filters []filter.Func
@@ -18,16 +21,16 @@ type Segmenter struct {
 	err     error
 }
 
-// New creates a new segmenter given a SplitFunc. To use the new segmenter,
+// NewSegmenter creates a new segmenter given a SplitFunc. To use the new segmenter,
 // call SetText() and then iterate while Next() is true.
-func New(split bufio.SplitFunc) *Segmenter {
+func NewSegmenter(split bufio.SplitFunc) *Segmenter {
 	return &Segmenter{
 		split: split,
 	}
 }
 
 // SetText sets the text for the segmenter to operate on, and resets
-// all state
+// all state.
 func (seg *Segmenter) SetText(data []byte) {
 	seg.data = data
 	seg.token = nil
@@ -35,13 +38,13 @@ func (seg *Segmenter) SetText(data []byte) {
 	seg.err = nil
 }
 
-// Filters applies one or more filters to all tokens, only returning those
+// Filters applies one or more filters to all tokens (segments), only returning those
 // where all filters evaluate true.
 func (seg *Segmenter) Filters(f ...filter.Func) {
 	seg.filters = f
 }
 
-// Next advances the Segmenter to the next segment. It returns false when there
+// Next advances Segmenter to the next token (segment). It returns false when there
 // are no remaining segments, or an error occurred.
 func (seg *Segmenter) Next() bool {
 outer:
@@ -73,31 +76,31 @@ outer:
 	return false
 }
 
-// Err indicates an error occured when calling Next() or Previous(). Next and
-// Previous will return false when an error occurs.
+// Err indicates an error occured when calling Next; Next will return false
+// when an error occurs.
 func (seg *Segmenter) Err() error {
 	return seg.err
 }
 
-// Bytes returns the current segment
+// Bytes returns the current token (segment).
 func (seg *Segmenter) Bytes() []byte {
 	return seg.token
 }
 
-// Contains indicates that the current segment (token) contains one or more runes
+// Contains indicates that the current token (segment) contains one or more runes
 // that are in one or more of the ranges.
 func (seg *Segmenter) Contains(ranges ...*unicode.RangeTable) bool {
 	return util.Contains(seg.token, ranges...)
 }
 
-// Entirely indicates that the current segment (token) consists entirely of
+// Entirely indicates that the current token (segment) consists entirely of
 // runes that are in one or more of the ranges.
 func (seg *Segmenter) Entirely(ranges ...*unicode.RangeTable) bool {
 	return util.Entirely(seg.token, ranges...)
 }
 
-// Is indicates that the current segment (token) evaluates to true
-// for all filters.
+// Is indicates that the current token (segment) evaluates to true
+// for all given filters.
 func (seg *Segmenter) Is(filters ...filter.Func) bool {
 	for _, f := range filters {
 		if !f(seg.token) {
@@ -113,6 +116,9 @@ func (seg *Segmenter) Is(filters ...filter.Func) bool {
 // will save you some code. The downside is that it allocates, and can do so
 // unbounded -- O(n) on the number of tokens. Use Segmenter for more bounded
 // memory usage.
+//
+// The filters parameter is optional; when filters is specified, All will
+// only return tokens (segments) for which all filters evaluate to true.
 func All(src []byte, dest *[][]byte, split bufio.SplitFunc, filters ...filter.Func) error {
 outer:
 	for pos := 0; pos < len(src); {

@@ -8,7 +8,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/segmenter/filter"
+	"github.com/clipperhouse/uax29/iterators/filter"
 	"github.com/clipperhouse/uax29/words"
 )
 
