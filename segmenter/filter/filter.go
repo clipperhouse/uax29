@@ -3,6 +3,8 @@ package filter
 import (
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/clipperhouse/uax29/segmenter/util"
 )
 
 type Func func([]byte) bool
@@ -13,7 +15,7 @@ type Func func([]byte) bool
 // allowing testing for a wide variety of character or script types.
 var Contains = func(ranges ...*unicode.RangeTable) Func {
 	return func(token []byte) bool {
-		return contains(token, ranges...)
+		return util.Contains(token, ranges...)
 	}
 }
 
@@ -23,34 +25,8 @@ var Contains = func(ranges ...*unicode.RangeTable) Func {
 // allowing testing for a wide variety of character or script types.
 var Entirely = func(ranges ...*unicode.RangeTable) Func {
 	return func(token []byte) bool {
-		return entirely(token, ranges...)
+		return util.Entirely(token, ranges...)
 	}
-}
-
-func contains(token []byte, ranges ...*unicode.RangeTable) bool {
-	pos := 0
-	for pos < len(token) {
-		r, w := utf8.DecodeRune(token[pos:])
-		if unicode.In(r, ranges...) {
-			return true
-		}
-		pos += w
-	}
-
-	return false
-}
-
-func entirely(token []byte, ranges ...*unicode.RangeTable) bool {
-	pos := 0
-	for pos < len(token) {
-		r, w := utf8.DecodeRune(token[pos:])
-		if !unicode.In(r, ranges...) {
-			return false
-		}
-		pos += w
-	}
-
-	return true
 }
 
 var IsWordlikeSlower = Contains(unicode.Letter, unicode.Number, unicode.Symbol)
