@@ -7,17 +7,17 @@ import (
 
 type Func func([]byte) bool
 
-// Contains return a filter indicating that a segment (token) contains one
+// Contains returns a filter indicating that a segment (token) contains one
 // or more runes that are in one or more of the ranges. Examples of ranges
 // are things like unicode.Letter, unicode.White_Space, or unicode.Title,
-// allowing testing for a wide variety of charater or script types.
+// allowing testing for a wide variety of character or script types.
 var Contains = func(ranges ...*unicode.RangeTable) Func {
 	return func(token []byte) bool {
 		return contains(token, ranges...)
 	}
 }
 
-// Entirely return a filter indicating that a segment (token) consists
+// Entirely returns a filter indicating that a segment (token) consists
 // entirely of runes that are in one or more of the ranges. Examples of ranges
 // are things like unicode.Letter, unicode.White_Space, or unicode.Title,
 // allowing testing for a wide variety of character or script types.

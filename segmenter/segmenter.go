@@ -86,9 +86,10 @@ func (seg *Segmenter) Bytes() []byte {
 // will save you some code. The downside is that it allocates, and can do so
 // unbounded -- O(n) on the number of tokens. Use Segmenter for more bounded
 // memory usage.
-func All(src []byte, dest *[][]byte, split bufio.SplitFunc) error {
+func All(src []byte, dest *[][]byte, split bufio.SplitFunc, filters ...filter.Func) error {
 	pos := 0
 
+outer:
 	for pos < len(src) {
 		advance, token, err := split(src[pos:], true)
 		if err != nil {
@@ -103,6 +104,13 @@ func All(src []byte, dest *[][]byte, split bufio.SplitFunc) error {
 		if len(token) == 0 {
 			break
 		}
+
+		for _, f := range filters {
+			if !f(token) {
+				continue outer
+			}
+		}
+
 		*dest = append(*dest, token)
 	}
 
