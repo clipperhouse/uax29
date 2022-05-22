@@ -80,7 +80,7 @@ func TestSegmenterRoundtrip(t *testing.T) {
 func TestSegmenterWordlike(t *testing.T) {
 	text := []byte("Hello, 世界. Nice dog! 👍🐶")
 	seg := words.NewSegmenter(text)
-	seg.Filter(filter.Entirely(unicode.Punct))
+	seg.Filters(filter.Entirely(unicode.Punct))
 
 	for seg.Next() {
 		t.Logf("%q\n", seg.Bytes())
@@ -128,7 +128,7 @@ func BenchmarkSegmenter(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 	seg := words.NewSegmenter(file)
-	seg.Filter(filter.IsWordlike)
+	seg.Filters(filter.Wordlike)
 
 	for i := 0; i < b.N; i++ {
 		seg.SetText(file)
