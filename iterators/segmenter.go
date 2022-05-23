@@ -88,13 +88,13 @@ func (seg *Segmenter) Bytes() []byte {
 }
 
 // Contains indicates that the current token (segment) contains one or more runes
-// that are in one or more of the ranges.
+// that are in one or more of the given ranges.
 func (seg *Segmenter) Contains(ranges ...*unicode.RangeTable) bool {
 	return util.Contains(seg.token, ranges...)
 }
 
 // Entirely indicates that the current token (segment) consists entirely of
-// runes that are in one or more of the ranges.
+// runes that are in one or more of the given ranges.
 func (seg *Segmenter) Entirely(ranges ...*unicode.RangeTable) bool {
 	return util.Entirely(seg.token, ranges...)
 }
