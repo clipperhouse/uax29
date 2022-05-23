@@ -38,7 +38,6 @@ func (sc *Scanner) Scan() bool {
 outer:
 	for scan {
 		scan = sc.s.Scan()
-
 		if !scan {
 			break
 		}
@@ -65,16 +64,4 @@ func (sc *Scanner) Contains(ranges ...*unicode.RangeTable) bool {
 // runes that are in one or more of the ranges.
 func (sc *Scanner) Entirely(ranges ...*unicode.RangeTable) bool {
 	return util.Entirely(sc.Bytes(), ranges...)
-}
-
-// Is indicates that the current token (segment) evaluates to true
-// for all given filters.
-func (sc *Scanner) Is(filters ...filter.Func) bool {
-	for _, f := range filters {
-		if !f(sc.Bytes()) {
-			return false
-		}
-	}
-
-	return true
 }

@@ -99,18 +99,6 @@ func (seg *Segmenter) Entirely(ranges ...*unicode.RangeTable) bool {
 	return util.Entirely(seg.token, ranges...)
 }
 
-// Is indicates that the current token (segment) evaluates to true
-// for all given filters.
-func (seg *Segmenter) Is(filters ...filter.Func) bool {
-	for _, f := range filters {
-		if !f(seg.token) {
-			return false
-		}
-	}
-
-	return true
-}
-
 // All will iterate through all tokens and collect them into a [][]byte. It is a
 // convenience method -- if you will be allocating such a slice anyway, this
 // will save you some code. The downside is that it allocates, and can do so
