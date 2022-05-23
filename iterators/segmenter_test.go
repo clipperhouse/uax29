@@ -1,10 +1,12 @@
-package iterators
+package iterators_test
 
 import (
 	"bufio"
 	"math/rand"
 	"reflect"
 	"testing"
+
+	"github.com/clipperhouse/uax29/iterators"
 )
 
 func getRandomBytes() []byte {
@@ -17,7 +19,7 @@ func getRandomBytes() []byte {
 func TestSegmenter(t *testing.T) {
 	text := []byte("Hello. How are you?")
 
-	seg := NewSegmenter(bufio.ScanWords)
+	seg := iterators.NewSegmenter(bufio.ScanWords)
 	seg.SetText(text)
 
 	for seg.Next() {
@@ -30,7 +32,7 @@ func TestAll(t *testing.T) {
 
 	split := bufio.ScanWords
 
-	seg := NewSegmenter(split)
+	seg := iterators.NewSegmenter(split)
 	seg.SetText(text)
 
 	var segResult [][]byte
@@ -42,7 +44,7 @@ func TestAll(t *testing.T) {
 	}
 
 	var allResult [][]byte
-	err := All(text, &allResult, split)
+	err := iterators.All(text, &allResult, split)
 	if seg.Err() != nil {
 		t.Fatal(err)
 	}

@@ -47,6 +47,7 @@ func TestEntirely(t *testing.T) {
 		{"Hello世界", false},
 		{"Hello ", false},
 		{"Hello,世界", false},
+		{"世界", false},
 	}
 
 	ranges := []*unicode.RangeTable{

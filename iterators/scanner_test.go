@@ -1,22 +1,35 @@
 package iterators_test
 
 import (
-	"strings"
+	"bufio"
+	"bytes"
+	"reflect"
 	"testing"
 
 	"github.com/clipperhouse/uax29/iterators"
-	"github.com/clipperhouse/uax29/iterators/filter"
-	"github.com/clipperhouse/uax29/words"
 )
 
-func TestScanner(t *testing.T) {
-	text := "Hello. How are you? 🐶👍"
-	r := strings.NewReader(text)
+func TestScannerSameAsBufio(t *testing.T) {
+	for i := 0; i < 100; i++ {
+		text := getRandomBytes()
 
-	sc := iterators.NewScanner(r, words.SplitFunc)
-	sc.Filters(filter.Wordlike)
+		r1 := bytes.NewReader(text)
+		sc1 := iterators.NewScanner(r1, bufio.ScanWords)
+		var all1 [][]byte
+		for sc1.Scan() {
+			all1 = append(all1, sc1.Bytes())
+		}
 
-	for sc.Scan() {
-		t.Logf("%s\n", sc.Bytes())
+		r2 := bytes.NewReader(text)
+		sc2 := bufio.NewScanner(r2)
+		sc2.Split(bufio.ScanWords)
+		var all2 [][]byte
+		for sc2.Scan() {
+			all2 = append(all2, sc2.Bytes())
+		}
+
+		if !reflect.DeepEqual(all1, all2) {
+			t.Error("iterators.Scanner and bufio.Scanner give different results")
+		}
 	}
 }
