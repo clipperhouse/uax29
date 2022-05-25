@@ -37,7 +37,8 @@ func (seg *Segmenter) SetText(data []byte) {
 }
 
 // Filter applies one or more filters (predicates) to all tokens (segments), only returning those
-// where all predicates evaluate true.
+// where all predicates evaluate true. Calling Filter will overwrite previous filters, so call it
+// once (it's variadic, you can add multiple).
 func (seg *Segmenter) Filter(predicates ...filter.Predicate) {
 	seg.predicates = predicates
 }
