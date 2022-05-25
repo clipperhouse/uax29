@@ -1,10 +1,8 @@
 package iterators_test
 
 import (
-	"bufio"
 	"bytes"
 	"math/rand"
-	"reflect"
 	"testing"
 
 	"github.com/clipperhouse/uax29/iterators"
@@ -46,30 +44,24 @@ func TestSegmenterSameAsScanner(t *testing.T) {
 func TestSegmenterSameAsAll(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		text := getRandomBytes()
+		split := words.SplitFunc
 
-		split := bufio.ScanWords
+		var all [][]byte
+		err := iterators.All(text, &all, split)
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		seg := iterators.NewSegmenter(split)
 		seg.SetText(text)
 
-		var segResult [][]byte
-		for seg.Next() {
-			segResult = append(segResult, seg.Bytes())
+		for i := 0; seg.Next(); i++ {
+			if !bytes.Equal(seg.Bytes(), all[i]) {
+				t.Fatal("All and Segmenter should give identical results")
+			}
 		}
 		if seg.Err() != nil {
 			t.Fatal(seg.Err())
-		}
-
-		var allResult [][]byte
-		err := iterators.All(text, &allResult, split)
-		if seg.Err() != nil {
-			t.Fatal(err)
-		}
-
-		if !reflect.DeepEqual(segResult, allResult) {
-			t.Logf("Segmenter result: %q", segResult)
-			t.Logf("All result: %q", allResult)
-			t.Fatal("All and Segmenter should give identical results")
 		}
 	}
 }
