@@ -13,7 +13,7 @@ type s = bufio.Scanner
 
 type Scanner struct {
 	s
-	filters []filter.Func
+	predicates []filter.Predicate
 }
 
 // NewScanner creates a new Scanner given an io.Reader and bufio.SplitFunc. To use the new scanner,
@@ -26,10 +26,10 @@ func NewScanner(r io.Reader, split bufio.SplitFunc) *Scanner {
 	return sc
 }
 
-// Filters applies one or more filters to all tokens (segments), only returning those
-// where all filters evaluate true.
-func (sc *Scanner) Filters(f ...filter.Func) {
-	sc.filters = f
+// Filter applies one or more filters (predicates) to all tokens (segments), only returning those
+// where all predicates evaluate true.
+func (sc *Scanner) Filter(predicates ...filter.Predicate) {
+	sc.predicates = predicates
 }
 
 func (sc *Scanner) Scan() bool {
@@ -42,7 +42,7 @@ outer:
 			break
 		}
 
-		for _, f := range sc.filters {
+		for _, f := range sc.predicates {
 			if !f(sc.Bytes()) {
 				continue outer
 			}

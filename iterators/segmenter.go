@@ -13,12 +13,12 @@ import (
 // loop over Next until false, call Bytes to retrieve the current token, and check Err
 // after the loop.
 type Segmenter struct {
-	split   bufio.SplitFunc
-	filters []filter.Func
-	data    []byte
-	token   []byte
-	pos     int
-	err     error
+	split      bufio.SplitFunc
+	predicates []filter.Predicate
+	data       []byte
+	token      []byte
+	pos        int
+	err        error
 }
 
 // NewSegmenter creates a new segmenter given a SplitFunc. To use the new segmenter,
@@ -38,10 +38,10 @@ func (seg *Segmenter) SetText(data []byte) {
 	seg.err = nil
 }
 
-// Filters applies one or more filters to all tokens (segments), only returning those
-// where all filters evaluate true.
-func (seg *Segmenter) Filters(f ...filter.Func) {
-	seg.filters = f
+// Filter applies one or more filters (predicates) to all tokens (segments), only returning those
+// where all predicates evaluate true.
+func (seg *Segmenter) Filter(predicates ...filter.Predicate) {
+	seg.predicates = predicates
 }
 
 // Next advances Segmenter to the next token (segment). It returns false when there
@@ -64,7 +64,7 @@ outer:
 			return false
 		}
 
-		for _, f := range seg.filters {
+		for _, f := range seg.predicates {
 			if !f(seg.token) {
 				continue outer
 			}
@@ -105,9 +105,9 @@ func (seg *Segmenter) Entirely(ranges ...*unicode.RangeTable) bool {
 // unbounded -- O(n) on the number of tokens. Use Segmenter for more bounded
 // memory usage.
 //
-// The filters parameter is optional; when filters is specified, All will
-// only return tokens (segments) for which all filters evaluate to true.
-func All(src []byte, dest *[][]byte, split bufio.SplitFunc, filters ...filter.Func) error {
+// The predicates parameter is optional; when predicates is specified, All will
+// only return tokens (segments) for which all predicates evaluate to true.
+func All(src []byte, dest *[][]byte, split bufio.SplitFunc, predicates ...filter.Predicate) error {
 outer:
 	for pos := 0; pos < len(src); {
 		advance, token, err := split(src[pos:], true)
@@ -124,7 +124,7 @@ outer:
 			break
 		}
 
-		for _, f := range filters {
+		for _, f := range predicates {
 			if !f(token) {
 				continue outer
 			}
