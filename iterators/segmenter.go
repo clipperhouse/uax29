@@ -2,10 +2,8 @@ package iterators
 
 import (
 	"bufio"
-	"unicode"
 
 	"github.com/clipperhouse/uax29/iterators/filter"
-	"github.com/clipperhouse/uax29/iterators/util"
 )
 
 // Segmenter is an iterator for byte slices, which are segmented into tokens (segments).
@@ -85,18 +83,6 @@ func (seg *Segmenter) Err() error {
 // Bytes returns the current token (segment).
 func (seg *Segmenter) Bytes() []byte {
 	return seg.token
-}
-
-// Contains indicates that the current token (segment) contains one or more runes
-// that are in one or more of the given ranges.
-func (seg *Segmenter) Contains(ranges ...*unicode.RangeTable) bool {
-	return util.Contains(seg.token, ranges...)
-}
-
-// Entirely indicates that the current token (segment) consists entirely of
-// runes that are in one or more of the given ranges.
-func (seg *Segmenter) Entirely(ranges ...*unicode.RangeTable) bool {
-	return util.Entirely(seg.token, ranges...)
 }
 
 // All will iterate through all tokens and collect them into a [][]byte. It is a
