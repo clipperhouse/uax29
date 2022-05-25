@@ -14,6 +14,8 @@ type Predicate func([]byte) bool
 // are things like unicode.Letter, unicode.Arabic, or unicode.Lower,
 // allowing testing for a wide variety of character or script types.
 //
+// Intended for use with segmenter.Filter or scanner.Filter.
+//
 // If the given token is empty, or no ranges are given, it will return false.
 func Contains(ranges ...*unicode.RangeTable) Predicate {
 	return func(token []byte) bool {
@@ -26,6 +28,8 @@ func Contains(ranges ...*unicode.RangeTable) Predicate {
 // Examples of ranges are things like unicode.Letter, unicode.Arabic,
 // or unicode.Lower, allowing testing for a wide variety of character
 // or script types.
+//
+// Intended for use with segmenter.Filter or scanner.Filter.
 //
 // If the given token is empty, or no ranges are given, it will return false.
 func Entirely(ranges ...*unicode.RangeTable) Predicate {
