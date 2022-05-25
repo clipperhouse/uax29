@@ -21,12 +21,8 @@ func TestContains(t *testing.T) {
 		{"世界", true},
 	}
 
-	ranges := []*unicode.RangeTable{
-		unicode.Latin, unicode.Ideographic,
-	}
-
 	for _, test := range tests {
-		got := util.Contains([]byte(test.input), ranges...)
+		got := util.Contains([]byte(test.input), unicode.Latin, unicode.Ideographic)
 
 		if got != test.expected {
 			t.Error(test.expected)
@@ -50,12 +46,8 @@ func TestEntirely(t *testing.T) {
 		{"世界", false},
 	}
 
-	ranges := []*unicode.RangeTable{
-		unicode.Latin,
-	}
-
 	for _, test := range tests {
-		got := util.Entirely([]byte(test.input), ranges...)
+		got := util.Entirely([]byte(test.input), unicode.Latin)
 
 		if got != test.expected {
 			t.Error(test.expected)
