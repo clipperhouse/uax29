@@ -5,8 +5,6 @@ import (
 	"bytes"
 	"strings"
 	"testing"
-	"unicode"
-	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/iterators"
 	"github.com/clipperhouse/uax29/words"
@@ -36,32 +34,40 @@ func TestScannerSameAsBufio(t *testing.T) {
 func TestScannerFilterIsApplied(t *testing.T) {
 	text := "Hello, 世界, how are you? Nice dog aha! 👍🐶"
 
-	containsH := func(token []byte) bool {
-		pos := 0
-		for pos < len(token) {
-			r, w := utf8.DecodeRune(token[pos:])
-			if unicode.ToLower(r) == 'h' {
-				return true
+	{
+		r := strings.NewReader(text)
+		sc := iterators.NewScanner(r, bufio.ScanWords)
+		sc.Filter(startsWithH)
+
+		count := 0
+		for sc.Scan() {
+			if !startsWithH(sc.Bytes()) {
+				t.Fatal("filter was not applied")
 			}
-			pos += w
+			count++
 		}
 
-		return false
-	}
-
-	r := strings.NewReader(text)
-	sc := iterators.NewScanner(r, bufio.ScanWords)
-	sc.Filter(containsH)
-
-	count := 0
-	for sc.Scan() {
-		if !containsH(sc.Bytes()) {
-			t.Fatal("filter was not applied")
+		if count != 2 {
+			t.Fatalf("scanner filter should have found 2 results, got %d", count)
 		}
-		count++
 	}
 
-	if count != 3 {
-		t.Fatalf("scanner filter should have found 3 results, got %d", count)
+	{
+		// variadic
+		r := strings.NewReader(text)
+		sc := iterators.NewScanner(r, bufio.ScanWords)
+		sc.Filter(startsWithH, endsWithW)
+
+		count := 0
+		for sc.Scan() {
+			if !(startsWithH(sc.Bytes()) && endsWithW(sc.Bytes())) {
+				t.Fatal("variadic scanner filter was not applied")
+			}
+			count++
+		}
+
+		if count != 1 {
+			t.Fatalf("variadic scanner filter should have found 1 result, got %d", count)
+		}
 	}
 }

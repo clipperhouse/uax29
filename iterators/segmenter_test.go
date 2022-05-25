@@ -73,68 +73,95 @@ func TestSegmenterSameAsAll(t *testing.T) {
 	}
 }
 
+var startsWithH = func(token []byte) bool {
+	r, _ := utf8.DecodeRune(token)
+	return unicode.ToLower(r) == 'h'
+}
+
+var endsWithW = func(token []byte) bool {
+	r, _ := utf8.DecodeLastRune(token)
+	return unicode.ToLower(r) == 'w'
+}
+
 func TestSegmenterFilterIsApplied(t *testing.T) {
 	text := "Hello, 世界, how are you? Nice dog aha! 👍🐶"
 
-	containsH := func(token []byte) bool {
-		pos := 0
-		for pos < len(token) {
-			r, w := utf8.DecodeRune(token[pos:])
-			if unicode.ToLower(r) == 'h' {
-				return true
+	{
+		seg := iterators.NewSegmenter(bufio.ScanWords)
+		seg.SetText([]byte(text))
+		seg.Filter(startsWithH)
+
+		count := 0
+		for seg.Next() {
+			if !startsWithH(seg.Bytes()) {
+				t.Fatal("segmenter filter was not applied")
 			}
-			pos += w
+			count++
 		}
 
-		return false
-	}
-
-	seg := iterators.NewSegmenter(bufio.ScanWords)
-	seg.SetText([]byte(text))
-	seg.Filter(containsH)
-
-	count := 0
-	for seg.Next() {
-		if !containsH(seg.Bytes()) {
-			t.Fatal("filter was not applied")
+		if count != 2 {
+			t.Fatalf("segmenter filter should have found 2 results, got %d", count)
 		}
-		count++
 	}
 
-	if count != 3 {
-		t.Fatalf("segmenter filter should have found 3 results, got %d", count)
+	{
+		// variadic
+		seg := iterators.NewSegmenter(bufio.ScanWords)
+		seg.SetText([]byte(text))
+		seg.Filter(startsWithH, endsWithW)
+
+		count := 0
+		for seg.Next() {
+			if !(startsWithH(seg.Bytes()) && endsWithW(seg.Bytes())) {
+				t.Fatal("variadic segmenter filter was not applied")
+			}
+			count++
+		}
+
+		if count != 1 {
+			t.Fatalf("variadic segmenter filter should have found 1 result, got %d", count)
+		}
+
 	}
 }
 
 func TestAllFilterIsApplied(t *testing.T) {
-	text := "Hello, 世界, how are you? Nice dog aha! 👍🐶"
+	text := "Hello, 世界, how are you? Nice dog haha! 👍🐶"
 
-	containsH := func(token []byte) bool {
-		pos := 0
-		for pos < len(token) {
-			r, w := utf8.DecodeRune(token[pos:])
-			if unicode.ToLower(r) == 'h' {
-				return true
+	{
+		var all [][]byte
+		err := iterators.All([]byte(text), &all, bufio.ScanWords, startsWithH)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		for _, seg := range all {
+			if !startsWithH(seg) {
+				t.Fatal("all filter was not applied")
 			}
-			pos += w
 		}
 
-		return false
-	}
-
-	var all [][]byte
-	err := iterators.All([]byte(text), &all, bufio.ScanWords, containsH)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for _, seg := range all {
-		if !containsH(seg) {
-			t.Fatal("filter was not applied")
+		if len(all) != 3 {
+			t.Fatalf("all filter should have found 3 results, got %d", len(all))
 		}
 	}
 
-	if len(all) != 3 {
-		t.Fatalf("all filter should have found 3 results, got %d", len(all))
+	{
+		// test variadic
+		var all [][]byte
+		err := iterators.All([]byte(text), &all, bufio.ScanWords, startsWithH, endsWithW)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		for _, seg := range all {
+			if !(startsWithH(seg) && endsWithW(seg)) {
+				t.Fatal("variadic all filter was not applied")
+			}
+		}
+
+		if len(all) != 1 {
+			t.Fatalf("variadic all filter should have found 1 result, got %d", len(all))
+		}
 	}
 }
