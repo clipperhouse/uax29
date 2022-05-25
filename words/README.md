@@ -24,7 +24,7 @@ if err := segments.Err(); err != nil {          // Check the error
 
 [![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/words.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/words)
 
-_Note: this package will return all tokens, including whitespace and punctuation — it's not strictly “words” in the common sense. If you wish to omit things like whitespace and punctuation, you'll have to add logic in the above `for` loop. For our purposes, “segment”, “word”, and “token” are used synonymously._
+_Note: this package will return all tokens, including whitespace and punctuation — it's not strictly “words” in the common sense. If you wish to omit things like whitespace and punctuation, you can use a filter (see below). For our purposes, “segment”, “word”, and “token” are used synonymously._
 
 ## Conformance
 
@@ -89,3 +89,27 @@ You should see approximately constant memory when using `Segmenter` or `Scanner`
 Invalid UTF-8 input is considered undefined behavior. We test to ensure that bad inputs will not cause pathological outcomes, such as a panic or infinite loop. Callers should expect “garbage-in, garbage-out”.
 
 Your pipeline should probably include a call to [`utf8.Valid()`](https://pkg.go.dev/unicode/utf8#Valid).
+
+### Filters
+
+v1.8 adds the ability to filter tokens (segments). This is done by adding a filter to the Scanner or Segmenter.
+
+For example, the Segmenter / Scanner returns _all_ tokens, split by word boundaries. This includes things like whitespace and punctuation, which are not what we think of as "words". By using a filter, you can omit them.
+
+```go
+text := []byte("Hello, 世界. Nice dog! 👍🐶")
+
+segments := words.NewSegmenter(text)
+segments.Filter(filter.Wordlike)
+
+for segments.Next() {
+	// Note that whitespace and punctuation are omitted.
+	fmt.Printf("%q\n", segments.Bytes())
+}
+
+if err := segments.Err(); err != nil {
+	log.Fatal(err)
+}
+```
+
+You can write your own filters (predicates), with arbitrary logic, by implementing a `func([]byte) bool`.
