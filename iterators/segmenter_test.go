@@ -1,6 +1,7 @@
 package iterators_test
 
 import (
+	"bufio"
 	"bytes"
 	"math/rand"
 	"testing"
@@ -17,51 +18,55 @@ func getRandomBytes() []byte {
 }
 
 func TestSegmenterSameAsScanner(t *testing.T) {
-	for i := 0; i < 100; i++ {
-		text := getRandomBytes()
-		split := words.SplitFunc
+	splits := []bufio.SplitFunc{words.SplitFunc, bufio.ScanWords}
+	for _, split := range splits {
+		for i := 0; i < 100; i++ {
+			text := getRandomBytes()
 
-		seg := iterators.NewSegmenter(split)
-		seg.SetText(text)
+			seg := iterators.NewSegmenter(split)
+			seg.SetText(text)
 
-		r := bytes.NewReader(text)
-		sc := iterators.NewScanner(r, split)
+			r := bytes.NewReader(text)
+			sc := iterators.NewScanner(r, split)
 
-		for seg.Next() && sc.Scan() {
-			if !bytes.Equal(seg.Bytes(), sc.Bytes()) {
-				t.Fatal("Scanner and Segmenter should give identical results")
+			for seg.Next() && sc.Scan() {
+				if !bytes.Equal(seg.Bytes(), sc.Bytes()) {
+					t.Fatal("Scanner and Segmenter should give identical results")
+				}
 			}
-		}
-		if seg.Err() != nil {
-			t.Fatal(seg.Err())
-		}
-		if sc.Err() != nil {
-			t.Fatal(sc.Err())
+			if seg.Err() != nil {
+				t.Fatal(seg.Err())
+			}
+			if sc.Err() != nil {
+				t.Fatal(sc.Err())
+			}
 		}
 	}
 }
 
 func TestSegmenterSameAsAll(t *testing.T) {
-	for i := 0; i < 100; i++ {
-		text := getRandomBytes()
-		split := words.SplitFunc
+	splits := []bufio.SplitFunc{words.SplitFunc, bufio.ScanWords}
+	for _, split := range splits {
+		for i := 0; i < 100; i++ {
+			text := getRandomBytes()
 
-		var all [][]byte
-		err := iterators.All(text, &all, split)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		seg := iterators.NewSegmenter(split)
-		seg.SetText(text)
-
-		for i := 0; seg.Next(); i++ {
-			if !bytes.Equal(seg.Bytes(), all[i]) {
-				t.Fatal("All and Segmenter should give identical results")
+			var all [][]byte
+			err := iterators.All(text, &all, split)
+			if err != nil {
+				t.Fatal(err)
 			}
-		}
-		if seg.Err() != nil {
-			t.Fatal(seg.Err())
+
+			seg := iterators.NewSegmenter(split)
+			seg.SetText(text)
+
+			for i := 0; seg.Next(); i++ {
+				if !bytes.Equal(seg.Bytes(), all[i]) {
+					t.Fatal("All and Segmenter should give identical results")
+				}
+			}
+			if seg.Err() != nil {
+				t.Fatal(seg.Err())
+			}
 		}
 	}
 }
