@@ -85,6 +85,11 @@ func (seg *Segmenter) Bytes() []byte {
 	return seg.token
 }
 
+// Text returns the current token (segment) as a newly-allocated string.
+func (seg *Segmenter) Text() string {
+	return string(seg.token)
+}
+
 // All will iterate through all tokens and collect them into a [][]byte. It is a
 // convenience method -- if you will be allocating such a slice anyway, this
 // will save you some code. The downside is that it allocates, and can do so
