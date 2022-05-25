@@ -5,6 +5,8 @@ import (
 	"bytes"
 	"math/rand"
 	"testing"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/iterators"
 	"github.com/clipperhouse/uax29/words"
@@ -68,5 +70,71 @@ func TestSegmenterSameAsAll(t *testing.T) {
 				t.Fatal(seg.Err())
 			}
 		}
+	}
+}
+
+func TestSegmenterFilterIsApplied(t *testing.T) {
+	text := "Hello, 世界, how are you? Nice dog aha! 👍🐶"
+
+	containsH := func(token []byte) bool {
+		pos := 0
+		for pos < len(token) {
+			r, w := utf8.DecodeRune(token[pos:])
+			if unicode.ToLower(r) == 'h' {
+				return true
+			}
+			pos += w
+		}
+
+		return false
+	}
+
+	seg := iterators.NewSegmenter(bufio.ScanWords)
+	seg.SetText([]byte(text))
+	seg.Filter(containsH)
+
+	count := 0
+	for seg.Next() {
+		if !containsH(seg.Bytes()) {
+			t.Fatal("filter was not applied")
+		}
+		count++
+	}
+
+	if count != 3 {
+		t.Fatalf("segmenter filter should have found 3 results, got %d", count)
+	}
+}
+
+func TestAllFilterIsApplied(t *testing.T) {
+	text := "Hello, 世界, how are you? Nice dog aha! 👍🐶"
+
+	containsH := func(token []byte) bool {
+		pos := 0
+		for pos < len(token) {
+			r, w := utf8.DecodeRune(token[pos:])
+			if unicode.ToLower(r) == 'h' {
+				return true
+			}
+			pos += w
+		}
+
+		return false
+	}
+
+	var all [][]byte
+	err := iterators.All([]byte(text), &all, bufio.ScanWords, containsH)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, seg := range all {
+		if !containsH(seg) {
+			t.Fatal("filter was not applied")
+		}
+	}
+
+	if len(all) != 3 {
+		t.Fatalf("all filter should have found 3 results, got %d", len(all))
 	}
 }
