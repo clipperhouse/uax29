@@ -5,8 +5,10 @@ import (
 	"io/ioutil"
 	"reflect"
 	"testing"
+	"unicode"
 	"unicode/utf8"
 
+	"github.com/clipperhouse/uax29/iterators/filter"
 	"github.com/clipperhouse/uax29/words"
 )
 
@@ -75,6 +77,16 @@ func TestSegmenterRoundtrip(t *testing.T) {
 	}
 }
 
+func TestSegmenterWordlike(t *testing.T) {
+	text := []byte("Hello, 世界. Nice dog! 👍🐶")
+	seg := words.NewSegmenter(text)
+	seg.Filter(filter.Entirely(unicode.Punct))
+
+	for seg.Next() {
+		t.Logf("%q\n", seg.Bytes())
+	}
+}
+
 func TestSegmenterInvalidUTF8(t *testing.T) {
 	// For background, see testdata/UTF-8-test.txt, or:
 	// https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
@@ -116,6 +128,7 @@ func BenchmarkSegmenter(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 	seg := words.NewSegmenter(file)
+	seg.Filter(filter.Wordlike)
 
 	for i := 0; i < b.N; i++ {
 		seg.SetText(file)
