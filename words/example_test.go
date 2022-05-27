@@ -74,10 +74,4 @@ func ExampleSegmentAll() {
 
 	segments := words.SegmentAll(text)
 	fmt.Printf("%q\n", segments)
-
-	// You can also choose to filter the returned tokens (segments)
-	filteredSegments := words.SegmentAll(text, filter.Wordlike)
-
-	// Notice that whitespace and punctuation are omitted
-	fmt.Printf("%q\n", filteredSegments)
 }

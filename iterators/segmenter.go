@@ -116,8 +116,7 @@ func (seg *Segmenter) Text() string {
 //
 // The predicates parameter is optional; when predicates is specified, All will
 // only return tokens (segments) for which all predicates evaluate to true.
-func All(src []byte, dest *[][]byte, split bufio.SplitFunc, predicates ...filter.Func) error {
-outer:
+func All(src []byte, dest *[][]byte, split bufio.SplitFunc) error {
 	for pos := 0; pos < len(src); {
 		advance, token, err := split(src[pos:], true)
 		if err != nil {
@@ -131,12 +130,6 @@ outer:
 
 		if len(token) == 0 {
 			break
-		}
-
-		for _, f := range predicates {
-			if !f(token) {
-				continue outer
-			}
 		}
 
 		*dest = append(*dest, token)
