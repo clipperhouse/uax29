@@ -127,14 +127,31 @@ func TestSegmenterFilterIsApplied(t *testing.T) {
 }
 
 func TestSegmenterTransformIsApplied(t *testing.T) {
-	text := "HelloÖ, 世界, how are you at the façade café? Nice dog aha! 👍🐶"
+	text := "Hello, 世界, I enjoy Açaí in Örebro."
 
 	seg := iterators.NewSegmenter(bufio.ScanWords)
 	seg.SetText([]byte(text))
 	seg.Transform(transformer.Lower, transformer.Diacritics)
 
+	var tokens [][]byte
 	for seg.Next() {
-		t.Log(seg.Text())
+		tokens = append(tokens, seg.Bytes())
+	}
+
+	{
+		got := tokens[4]
+		expected := []byte("acai")
+		if !bytes.Equal(expected, got) {
+			t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
+		}
+	}
+
+	{
+		got := tokens[6]
+		expected := []byte("orebro.")
+		if !bytes.Equal(expected, got) {
+			t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
+		}
 	}
 }
 
