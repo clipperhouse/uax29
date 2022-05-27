@@ -92,7 +92,7 @@ Your pipeline should probably include a call to [`utf8.Valid()`](https://pkg.go.
 
 ### Filters
 
-v1.8 adds the ability to filter tokens (segments). This is done by adding a filter to the Scanner or Segmenter.
+v1.8 adds the ability to filter tokens (segments). This is done by adding a filter to a Scanner or Segmenter.
 
 For example, the Segmenter / Scanner returns _all_ tokens, split by word boundaries. This includes things like whitespace and punctuation, which may not be what one means by "words". By using a filter, you can omit them.
 
@@ -113,3 +113,29 @@ if err := segments.Err(); err != nil {
 ```
 
 You can write your own filters (predicates), with arbitrary logic, by implementing a `func([]byte) bool`. You can also create a filter based on Unicode categories with the `filter.Contains` and `filter.Entirely` methods.
+
+### Transforms
+
+v1.9 adds the ability to transform tokens (segments). This is done by adding a transformer to a Scanner or Segmenter.
+
+You might wish to lowercase all the words, for example:
+
+```go
+text := []byte("Hello, 世界. Nice dog! 👍🐶")
+
+segments := words.NewSegmenter(text)
+segments.Transform(transformer.Lower)
+
+for segments.Next() {
+	// Note that tokens come out lowercase
+	fmt.Printf("%q\n", segments.Bytes())
+}
+
+if err := segments.Err(); err != nil {
+	log.Fatal(err)
+}
+```
+
+Here are a [few more examples](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/transformer).
+
+We use the [`x/text/transform` package](https://pkg.go.dev/golang.org/x/text/transform). We can accept anything that conforms to the `transform.Transformer` interface. Many things in `x/text` do that, such as [normalization](https://pkg.go.dev/golang.org/x/text/unicode/norm), [casing](https://pkg.go.dev/golang.org/x/text/cases), and [encoding](https://pkg.go.dev/golang.org/x/text/encoding).

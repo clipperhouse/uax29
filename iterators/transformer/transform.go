@@ -1,5 +1,6 @@
-// Package transformer provides a few handy transformers, for use with Scanner and Segmenter. See https://pkg.go.dev/golang.org/x/text
-// for lots of others.
+// Package transformer provides a few handy transformers, for use with Scanner and Segmenter.
+//
+// We use the golang.org/x/text/transform package. We can accept anything that conforms to the transform.Transformer interface.
 package transformer
 
 import (
