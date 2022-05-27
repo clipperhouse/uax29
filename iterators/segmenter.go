@@ -4,6 +4,7 @@ import (
 	"bufio"
 
 	"github.com/clipperhouse/uax29/iterators/filter"
+	"github.com/clipperhouse/uax29/iterators/transform"
 )
 
 // Segmenter is an iterator for byte slices, which are segmented into tokens (segments).
@@ -12,7 +13,8 @@ import (
 // after the loop.
 type Segmenter struct {
 	split      bufio.SplitFunc
-	predicates []filter.Predicate
+	predicates []filter.Func
+	transforms []transform.Func
 	data       []byte
 	token      []byte
 	pos        int
@@ -39,8 +41,14 @@ func (seg *Segmenter) SetText(data []byte) {
 // Filter applies one or more filters (predicates) to all tokens (segments), only returning those
 // where all predicates evaluate true. Calling Filter will overwrite previous filters, so call it
 // once (it's variadic, you can add multiple).
-func (seg *Segmenter) Filter(predicates ...filter.Predicate) {
+func (seg *Segmenter) Filter(predicates ...filter.Func) {
 	seg.predicates = predicates
+}
+
+// Transform applies one or more transforms to all tokens (segments). Calling Transform will overwrite
+// previous transforms, so call it once (it's variadic, you can add multiple).
+func (seg *Segmenter) Transform(transforms ...transform.Func) {
+	seg.transforms = transforms
 }
 
 // Next advances Segmenter to the next token (segment). It returns false when there
@@ -67,6 +75,10 @@ outer:
 			if !f(seg.token) {
 				continue outer
 			}
+		}
+
+		for _, t := range seg.transforms {
+			seg.token = t(seg.token)
 		}
 
 		return true
@@ -99,7 +111,7 @@ func (seg *Segmenter) Text() string {
 //
 // The predicates parameter is optional; when predicates is specified, All will
 // only return tokens (segments) for which all predicates evaluate to true.
-func All(src []byte, dest *[][]byte, split bufio.SplitFunc, predicates ...filter.Predicate) error {
+func All(src []byte, dest *[][]byte, split bufio.SplitFunc, predicates ...filter.Func) error {
 outer:
 	for pos := 0; pos < len(src); {
 		advance, token, err := split(src[pos:], true)

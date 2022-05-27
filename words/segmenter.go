@@ -18,7 +18,7 @@ func NewSegmenter(data []byte) *iterators.Segmenter {
 // this will save you some code. The downside is that this allocation is
 // unbounded -- O(n) on the number of tokens. Use Segmenter for more bounded
 // memory usage.
-func SegmentAll(data []byte, predicates ...filter.Predicate) [][]byte {
+func SegmentAll(data []byte, predicates ...filter.Func) [][]byte {
 	// Optimization: guesstimate that the average word is 3 bytes,
 	// allocate a large enough array to avoid resizing
 	result := make([][]byte, 0, len(data)/3)

@@ -9,6 +9,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/iterators/transform"
 	"github.com/clipperhouse/uax29/words"
 )
 
@@ -122,6 +123,18 @@ func TestSegmenterFilterIsApplied(t *testing.T) {
 			t.Fatalf("variadic segmenter filter should have found 1 result, got %d", count)
 		}
 
+	}
+}
+
+func TestSegmenterTransformIsApplied(t *testing.T) {
+	text := "Hello, 世界, how are you at the façade café? Nice dog aha! 👍🐶"
+
+	seg := iterators.NewSegmenter(bufio.ScanWords)
+	seg.SetText([]byte(text))
+	seg.Transform(transform.Lower, transform.RemoveDiacritics)
+
+	for seg.Next() {
+		t.Log(seg.Text())
 	}
 }
 
