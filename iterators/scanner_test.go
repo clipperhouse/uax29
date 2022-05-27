@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/iterators/filter"
+	"github.com/clipperhouse/uax29/iterators/transformer"
 	"github.com/clipperhouse/uax29/words"
 )
 
@@ -69,5 +71,17 @@ func TestScannerFilterIsApplied(t *testing.T) {
 		if count != 1 {
 			t.Fatalf("variadic scanner filter should have found 1 result, got %d", count)
 		}
+	}
+}
+
+func TestScannerTransformIsApplied(t *testing.T) {
+	text := "HelloÖ, 世界, how are you at the façade café? Nice dog aha! 👍🐶"
+	r := strings.NewReader(text)
+	sc := iterators.NewScanner(r, words.SplitFunc)
+	sc.Filter(filter.Wordlike)
+	sc.Transform(transformer.Diacritics, transformer.Lower)
+
+	for sc.Scan() {
+		t.Logf("%s\n", sc.Text())
 	}
 }

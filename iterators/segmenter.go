@@ -4,7 +4,7 @@ import (
 	"bufio"
 
 	"github.com/clipperhouse/uax29/iterators/filter"
-	"github.com/clipperhouse/uax29/iterators/transform"
+	"golang.org/x/text/transform"
 )
 
 // Segmenter is an iterator for byte slices, which are segmented into tokens (segments).
@@ -14,7 +14,7 @@ import (
 type Segmenter struct {
 	split      bufio.SplitFunc
 	predicates []filter.Func
-	transforms []transform.Func
+	transforms transform.Transformer
 	data       []byte
 	token      []byte
 	pos        int
@@ -47,8 +47,8 @@ func (seg *Segmenter) Filter(predicates ...filter.Func) {
 
 // Transform applies one or more transforms to all tokens (segments). Calling Transform will overwrite
 // previous transforms, so call it once (it's variadic, you can add multiple).
-func (seg *Segmenter) Transform(transforms ...transform.Func) {
-	seg.transforms = transforms
+func (seg *Segmenter) Transform(transformers ...transform.Transformer) {
+	seg.transforms = transform.Chain(transformers...)
 }
 
 // Next advances Segmenter to the next token (segment). It returns false when there
@@ -71,14 +71,19 @@ outer:
 			return false
 		}
 
+		if seg.transforms != nil {
+			seg.transforms.Reset() // recommended
+			seg.token, _, err = transform.Bytes(seg.transforms, seg.token)
+			if err != nil {
+				seg.err = err
+				return false
+			}
+		}
+
 		for _, f := range seg.predicates {
 			if !f(seg.token) {
 				continue outer
 			}
-		}
-
-		for _, t := range seg.transforms {
-			seg.token = t(seg.token)
 		}
 
 		return true
