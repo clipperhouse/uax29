@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/iterators/transformer"
 	"github.com/clipperhouse/uax29/words"
 )
 
@@ -69,5 +70,50 @@ func TestScannerFilterIsApplied(t *testing.T) {
 		if count != 1 {
 			t.Fatalf("variadic scanner filter should have found 1 result, got %d", count)
 		}
+	}
+}
+
+func TestScannerTransformIsApplied(t *testing.T) {
+	text := "Hello, 世界, I enjoy Açaí in Örebro."
+	r := strings.NewReader(text)
+	sc := iterators.NewScanner(r, bufio.ScanWords)
+	sc.Transform(transformer.Lower, transformer.Diacritics)
+
+	var tokens [][]byte
+	for sc.Scan() {
+		tokens = append(tokens, sc.Bytes())
+	}
+
+	if sc.Err() != nil {
+		t.Fatal(sc.Err())
+	}
+
+	{
+		got := tokens[4]
+		expected := []byte("acai")
+		if !bytes.Equal(expected, got) {
+			t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
+		}
+	}
+
+	{
+		got := tokens[6]
+		expected := []byte("orebro.")
+		if !bytes.Equal(expected, got) {
+			t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
+		}
+	}
+}
+
+func TestScannerErrorOnTransformCall(t *testing.T) {
+	text := "Hello, 世界, I enjoy Açaí in Örebro."
+	r := strings.NewReader(text)
+	sc := iterators.NewScanner(r, bufio.ScanWords)
+
+	sc.Scan()
+	sc.Transform(transformer.Lower, transformer.Diacritics)
+
+	if sc.Err() == nil {
+		t.Fatal("should have gotten ErrorScanCalled when calling Transform after Scan")
 	}
 }

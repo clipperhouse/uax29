@@ -9,6 +9,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/iterators/transformer"
 	"github.com/clipperhouse/uax29/words"
 )
 
@@ -125,43 +126,31 @@ func TestSegmenterFilterIsApplied(t *testing.T) {
 	}
 }
 
-func TestAllFilterIsApplied(t *testing.T) {
-	text := "Hello, 世界, how are you? Nice dog haha! 👍🐶"
+func TestSegmenterTransformIsApplied(t *testing.T) {
+	text := "Hello, 世界, I enjoy Açaí in Örebro."
+
+	seg := iterators.NewSegmenter(bufio.ScanWords)
+	seg.SetText([]byte(text))
+	seg.Transform(transformer.Lower, transformer.Diacritics)
+
+	var tokens [][]byte
+	for seg.Next() {
+		tokens = append(tokens, seg.Bytes())
+	}
 
 	{
-		var all [][]byte
-		err := iterators.All([]byte(text), &all, bufio.ScanWords, startsWithH)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		for _, seg := range all {
-			if !startsWithH(seg) {
-				t.Fatal("all filter was not applied")
-			}
-		}
-
-		if len(all) != 3 {
-			t.Fatalf("all filter should have found 3 results, got %d", len(all))
+		got := tokens[4]
+		expected := []byte("acai")
+		if !bytes.Equal(expected, got) {
+			t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
 		}
 	}
 
 	{
-		// test variadic
-		var all [][]byte
-		err := iterators.All([]byte(text), &all, bufio.ScanWords, startsWithH, endsWithW)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		for _, seg := range all {
-			if !(startsWithH(seg) && endsWithW(seg)) {
-				t.Fatal("variadic all filter was not applied")
-			}
-		}
-
-		if len(all) != 1 {
-			t.Fatalf("variadic all filter should have found 1 result, got %d", len(all))
+		got := tokens[6]
+		expected := []byte("orebro.")
+		if !bytes.Equal(expected, got) {
+			t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
 		}
 	}
 }

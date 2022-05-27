@@ -7,7 +7,8 @@ import (
 	"github.com/clipperhouse/uax29/iterators/util"
 )
 
-type Predicate func([]byte) bool
+type Func func([]byte) bool
+type Predicate = Func // for backwards compat, this was renamed
 
 // Contains returns a filter (predicate) indicating that a segment (token) contains one
 // or more runes that are in one or more of the given ranges. Examples of ranges
@@ -17,7 +18,7 @@ type Predicate func([]byte) bool
 // Intended for passing to segmenter.Filter or scanner.Filter.
 //
 // If the given token is empty, or no ranges are given, it will return false.
-func Contains(ranges ...*unicode.RangeTable) Predicate {
+func Contains(ranges ...*unicode.RangeTable) Func {
 	return func(token []byte) bool {
 		return util.Contains(token, ranges...)
 	}
@@ -32,7 +33,7 @@ func Contains(ranges ...*unicode.RangeTable) Predicate {
 // Intended for passing to segmenter.Filter or scanner.Filter.
 //
 // If the given token is empty, or no ranges are given, it will return false.
-func Entirely(ranges ...*unicode.RangeTable) Predicate {
+func Entirely(ranges ...*unicode.RangeTable) Func {
 	return func(token []byte) bool {
 		return util.Entirely(token, ranges...)
 	}
@@ -42,8 +43,7 @@ func Entirely(ranges ...*unicode.RangeTable) Predicate {
 // in the common sense, excluding tokens that are whitespace or punctuation.
 // It includes any token that contains a Letter, Number, or Symbol, as defined
 // by Unicode. To use it, call Filter(Wordlike) on a Segmenter or Scanner.
-var Wordlike Predicate = func(token []byte) bool {
-	// Hotpath version, faster than using Contains with Rangetables
+var Wordlike Func = func(token []byte) bool {
 	pos := 0
 	for pos < len(token) {
 		r, w := utf8.DecodeRune(token[pos:])

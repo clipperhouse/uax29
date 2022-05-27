@@ -4,6 +4,7 @@ import (
 	"bufio"
 
 	"github.com/clipperhouse/uax29/iterators/filter"
+	"golang.org/x/text/transform"
 )
 
 // Segmenter is an iterator for byte slices, which are segmented into tokens (segments).
@@ -12,7 +13,8 @@ import (
 // after the loop.
 type Segmenter struct {
 	split      bufio.SplitFunc
-	predicates []filter.Predicate
+	predicates []filter.Func
+	transforms transform.Transformer
 	data       []byte
 	token      []byte
 	pos        int
@@ -39,8 +41,14 @@ func (seg *Segmenter) SetText(data []byte) {
 // Filter applies one or more filters (predicates) to all tokens (segments), only returning those
 // where all predicates evaluate true. Calling Filter will overwrite previous filters, so call it
 // once (it's variadic, you can add multiple).
-func (seg *Segmenter) Filter(predicates ...filter.Predicate) {
+func (seg *Segmenter) Filter(predicates ...filter.Func) {
 	seg.predicates = predicates
+}
+
+// Transform applies one or more transforms to all tokens (segments). Calling Transform will overwrite
+// previous transforms, so call it once (it's variadic, you can add multiple).
+func (seg *Segmenter) Transform(transformers ...transform.Transformer) {
+	seg.transforms = transform.Chain(transformers...)
 }
 
 // Next advances Segmenter to the next token (segment). It returns false when there
@@ -61,6 +69,15 @@ outer:
 		}
 		if seg.err != nil {
 			return false
+		}
+
+		if seg.transforms != nil {
+			seg.transforms.Reset() // recommended
+			seg.token, _, err = transform.Bytes(seg.transforms, seg.token)
+			if err != nil {
+				seg.err = err
+				return false
+			}
 		}
 
 		for _, f := range seg.predicates {
@@ -99,8 +116,7 @@ func (seg *Segmenter) Text() string {
 //
 // The predicates parameter is optional; when predicates is specified, All will
 // only return tokens (segments) for which all predicates evaluate to true.
-func All(src []byte, dest *[][]byte, split bufio.SplitFunc, predicates ...filter.Predicate) error {
-outer:
+func All(src []byte, dest *[][]byte, split bufio.SplitFunc) error {
 	for pos := 0; pos < len(src); {
 		advance, token, err := split(src[pos:], true)
 		if err != nil {
@@ -114,12 +130,6 @@ outer:
 
 		if len(token) == 0 {
 			break
-		}
-
-		for _, f := range predicates {
-			if !f(token) {
-				continue outer
-			}
 		}
 
 		*dest = append(*dest, token)
