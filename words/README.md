@@ -34,7 +34,7 @@ We use the Unicode [test suite](https://unicode.org/reports/tr41/tr41-26.html#Te
 
 ## APIs
 
-### If you have a `[]byte`
+#### If you have a `[]byte`
 
 Use `Segmenter` for bounded memory and best performance:
 
@@ -55,15 +55,14 @@ if err := segments.Err(); err != nil {          // Check the error
 Use `SegmentAll()` if you prefer brevity, and are not too concerned about allocations.
 
 ```go
-text := []byte("Hello, 世界. Nice dog! 👍🐶")
 segments := words.SegmentAll(text)             // Returns a slice of byte slices; each slice is a word
 
 fmt.Println("Words: %q", segments)
 ```
 
-### If you have an `io.Reader`
+#### If you have an `io.Reader`
 
-Use `Scanner` (which is a [`bufio.Scanner`](https://pkg.go.dev/bufio#Scanner)).
+Use `Scanner`
 
 ```go
 r := getYourReader()                            // from a file or network maybe
@@ -82,7 +81,7 @@ if err := scanner.Err(); err != nil {           // Check the error
 
 On a Mac laptop, we see around 100MB/s, which works out to around 30 million words (tokens, really) per second.
 
-You should see approximately constant memory when using `Segmenter` or `Scanner`, independent of data size. When using `SegmentAll()`, expect memory to be `O(n)` on the number of words.
+You should see approximately constant memory when using `Segmenter` or `Scanner`, independent of data size. When using `SegmentAll()`, expect memory to be `O(n)` on the number of words (one slice per word, 24 bytes).
 
 ### Invalid inputs
 
@@ -92,9 +91,9 @@ Your pipeline should probably include a call to [`utf8.Valid()`](https://pkg.go.
 
 ### Filters
 
-v1.8 adds the ability to filter tokens (segments). This is done by adding a filter to a Scanner or Segmenter.
+You can add a filter to a `Scanner` or `Segmenter`.
 
-For example, the Segmenter / Scanner returns _all_ tokens, split by word boundaries. This includes things like whitespace and punctuation, which may not be what one means by "words". By using a filter, you can omit them.
+For example, the Segmenter / Scanner returns _all_ tokens, split by word boundaries. This includes things like whitespace and punctuation, which may not be what one means by “words”. By using a filter, you can omit them.
 
 ```go
 text := []byte("Hello, 世界. Nice dog! 👍🐶")
@@ -112,11 +111,11 @@ if err := segments.Err(); err != nil {
 }
 ```
 
-You can write your own filters (predicates), with arbitrary logic, by implementing a `func([]byte) bool`. You can also create a filter based on Unicode categories with the `filter.Contains` and `filter.Entirely` methods.
+You can write your own filters (predicates), with arbitrary logic, by implementing a `func([]byte) bool`. You can also create a filter based on Unicode categories with the [`filter.Contains`](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/filter#Contains) and [`filter.Entirely`](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/filter#Entirely) methods.
 
 ### Transforms
 
-v1.9 adds the ability to transform tokens (segments). This is done by adding a transformer to a Scanner or Segmenter.
+Tokens can be modified by adding a transformer to a `Scanner` or `Segmenter`.
 
 You might wish to lowercase all the words, for example:
 
@@ -138,4 +137,4 @@ if err := segments.Err(); err != nil {
 
 Here are a [few more examples](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/transformer).
 
-We use the [`x/text/transform` package](https://pkg.go.dev/golang.org/x/text/transform). We can accept anything that conforms to the `transform.Transformer` interface. Many things in `x/text` do that, such as [normalization](https://pkg.go.dev/golang.org/x/text/unicode/norm), [casing](https://pkg.go.dev/golang.org/x/text/cases), and [encoding](https://pkg.go.dev/golang.org/x/text/encoding).
+We use the [`x/text/transform`](https://pkg.go.dev/golang.org/x/text/transform) package. We can accept anything that implements the `transform.Transformer` interface. Many things in `x/text` do that, such as [runes](https://pkg.go.dev/golang.org/x/text/runes), [normalization](https://pkg.go.dev/golang.org/x/text/unicode/norm), [casing](https://pkg.go.dev/golang.org/x/text/cases), and [encoding](https://pkg.go.dev/golang.org/x/text/encoding).

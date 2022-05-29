@@ -39,7 +39,7 @@ func Entirely(ranges ...*unicode.RangeTable) Func {
 	}
 }
 
-// Wordlike is a filter which returns only tokens (segments) that are "words"
+// Wordlike is a filter which returns only tokens (segments) that are “words”
 // in the common sense, excluding tokens that are whitespace or punctuation.
 // It includes any token that contains a Letter, Number, or Symbol, as defined
 // by Unicode. To use it, call Filter(Wordlike) on a Segmenter or Scanner.
