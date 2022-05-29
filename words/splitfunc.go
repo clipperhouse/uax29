@@ -15,8 +15,7 @@ const (
 	_Ignore     = _Extend | _Format | _ZWJ
 )
 
-// SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner
-// By design, it never returns an error, rather it just returns the data it has
+// SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner.
 func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if len(data) == 0 {
 		return 0, nil, nil
