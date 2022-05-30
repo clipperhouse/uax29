@@ -17,8 +17,8 @@ for segments.Next() {                           // Next() returns true until end
 	fmt.Printf("%q\n", segments.Bytes())        // Do something with the current token
 }
 
-if err := segments.Err(); err != nil {          // Check the error
-	log.Fatal(err)
+if segments.Err() != nil {                      // Check the error
+	log.Fatal(segments.Err())
 }
 ```
 
@@ -47,8 +47,8 @@ for segments.Next() {                           // Next() returns true until end
 	fmt.Printf("%q\n", segments.Bytes())        // Do something with the current word
 }
 
-if err := segments.Err(); err != nil {          // Check the error
-	log.Fatal(err)
+if segments.Err() != nil {                      // Check the error
+	log.Fatal(segments.Err())
 }
 ```
 
@@ -72,8 +72,8 @@ for scanner.Scan() {                            // Scan() returns true until err
 	fmt.Println(scanner.Text())                 // Do something with the current word
 }
 
-if err := scanner.Err(); err != nil {           // Check the error
-	log.Fatal(err)
+if scanner.Err() != nil {                       // Check the error
+	log.Fatal(scanner.Err())
 }
 ```
 
@@ -106,8 +106,8 @@ for segments.Next() {
 	fmt.Printf("%q\n", segments.Bytes())
 }
 
-if err := segments.Err(); err != nil {
-	log.Fatal(err)
+if segments.Err() != nil {
+	log.Fatal(segments.Err())
 }
 ```
 
@@ -130,8 +130,8 @@ for segments.Next() {
 	fmt.Printf("%q\n", segments.Bytes())
 }
 
-if err := segments.Err(); err != nil {
-	log.Fatal(err)
+if segments.Err() != nil {
+	log.Fatal(segments.Err())
 }
 ```
 
