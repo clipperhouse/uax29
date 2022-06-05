@@ -9,7 +9,7 @@ import (
 	"golang.org/x/text/transform"
 )
 
-type s = bufio.Scanner
+type s = *bufio.Scanner
 
 type Scanner struct {
 	s
@@ -28,7 +28,7 @@ type Scanner struct {
 // iterate while Scan() is true. See also the bufio.Scanner docs.
 func NewScanner(r io.Reader, split bufio.SplitFunc) *Scanner {
 	sc := &Scanner{
-		s: *bufio.NewScanner(r),
+		s: bufio.NewScanner(r),
 	}
 	sc.s.Split(split)
 
@@ -74,7 +74,7 @@ func (sc *Scanner) Transform(transformers ...transform.Transformer) {
 
 	// Gotta swap out the underlying bufio.Scanner. A little risky.
 	// See Scanner.scanCalled and Scanner.err for how we prevent misuse.
-	sc.s = *bufio.NewScanner(r)
+	sc.s = bufio.NewScanner(r)
 	sc.s.Split(sc.split)
 }
 
@@ -88,23 +88,16 @@ func (sc *Scanner) Scan() bool {
 
 	sc.scanCalled = true
 
-	scan := true
-
-outer:
-	for scan {
-		scan = sc.s.Scan()
-		if !scan {
-			break
-		}
-
+scan:
+	for sc.s.Scan() {
 		for _, f := range sc.predicates {
 			if !f(sc.Bytes()) {
-				continue outer
+				continue scan
 			}
 		}
 
-		return scan
+		return true
 	}
 
-	return scan
+	return false
 }
