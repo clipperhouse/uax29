@@ -2,6 +2,7 @@ package iterators
 
 import (
 	"bufio"
+	"errors"
 
 	"github.com/clipperhouse/uax29/iterators/filter"
 	"golang.org/x/text/transform"
@@ -51,6 +52,9 @@ func (seg *Segmenter) Transform(transformers ...transform.Transformer) {
 	seg.transforms = transform.Chain(transformers...)
 }
 
+var ErrAdvanceNegative = errors.New("SplitFunc returned a negative advance")
+var ErrAdvanceTooFar = errors.New("SplitFunc advanced beyond the end of the data")
+
 // Next advances Segmenter to the next token (segment). It returns false when there
 // are no remaining segments, or an error occurred.
 func (seg *Segmenter) Next() bool {
@@ -61,18 +65,31 @@ outer:
 		seg.token = token
 		seg.err = err
 
-		if advance == 0 {
-			return false
-		}
-		if len(seg.token) == 0 {
-			return false
-		}
 		if seg.err != nil {
 			return false
 		}
 
+		// Guardrails
+		if advance < 0 {
+			seg.err = ErrAdvanceNegative
+			return false
+		}
+		if seg.pos > len(seg.data) {
+			seg.err = ErrAdvanceTooFar
+			return false
+		}
+
+		// Interpret as EOF
+		if advance == 0 {
+			return false
+		}
+
+		// Interpret as EOF
+		if len(seg.token) == 0 {
+			return false
+		}
+
 		if seg.transforms != nil {
-			seg.transforms.Reset() // recommended
 			seg.token, _, err = transform.Bytes(seg.transforms, seg.token)
 			if err != nil {
 				seg.err = err
