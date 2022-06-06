@@ -40,7 +40,7 @@ func (seg *Segmenter) SetText(data []byte) {
 }
 
 // Filter applies one or more filters (predicates) to all tokens, returning only those
-// where all predicates evaluate true. Calling Filter will overwrite previous filters, so call it
+// where all filters evaluate true. Calling Filter will overwrite previous filters, so call it
 // once (it's variadic, you can add multiple).
 func (seg *Segmenter) Filter(filters ...filter.Func) {
 	seg.filters = filters
@@ -135,9 +135,6 @@ func (seg *Segmenter) Start() int {
 // will save you some code. The downside is that it allocates, and can do so
 // unbounded -- O(n) on the number of tokens. Use Segmenter for more bounded
 // memory usage.
-//
-// The predicates parameter is optional; when predicates is specified, All will
-// only return tokens (segments) for which all predicates evaluate to true.
 func All(src []byte, dest *[][]byte, split bufio.SplitFunc) error {
 	for pos := 0; pos < len(src); {
 		advance, token, err := split(src[pos:], true)
