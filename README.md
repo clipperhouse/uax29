@@ -25,3 +25,13 @@ We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#
 [blevesearch/segment](https://github.com/blevesearch/segment)
 
 [rivo/uniseg](https://github.com/rivo/uniseg)
+
+### Other language implementations
+
+[JavaScript](https://github.com/tc39/proposal-intl-segmenter)
+
+[Rust](https://unicode-rs.github.io/unicode-segmentation/unicode_segmentation/trait.UnicodeSegmentation.html)
+
+[Java](https://lucene.apache.org/core/3_5_0/api/core/org/apache/lucene/analysis/standard/StandardTokenizerImpl.html)
+
+[Python](https://uniseg-python.readthedocs.io/en/latest/)

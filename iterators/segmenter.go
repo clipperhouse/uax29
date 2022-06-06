@@ -19,6 +19,7 @@ type Segmenter struct {
 	data        []byte
 	token       []byte
 	start       int
+	pos         int
 	err         error
 }
 
@@ -35,7 +36,7 @@ func NewSegmenter(split bufio.SplitFunc) *Segmenter {
 func (seg *Segmenter) SetText(data []byte) {
 	seg.data = data
 	seg.token = nil
-	seg.start = 0
+	seg.pos = 0
 	seg.err = nil
 }
 
@@ -59,9 +60,11 @@ var ErrAdvanceTooFar = errors.New("SplitFunc advanced beyond the end of the data
 // are no remaining segments, or an error occurred.
 func (seg *Segmenter) Next() bool {
 next:
-	for seg.start < len(seg.data) {
-		advance, token, err := seg.split(seg.data[seg.start:], true)
-		seg.start += advance
+	for seg.pos < len(seg.data) {
+		seg.start = seg.pos
+
+		advance, token, err := seg.split(seg.data[seg.pos:], true)
+		seg.pos += advance
 		seg.token = token
 		seg.err = err
 
@@ -74,7 +77,7 @@ next:
 			seg.err = ErrAdvanceNegative
 			return false
 		}
-		if seg.start > len(seg.data) {
+		if seg.pos > len(seg.data) {
 			seg.err = ErrAdvanceTooFar
 			return false
 		}

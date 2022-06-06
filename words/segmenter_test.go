@@ -118,6 +118,15 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 	}
 }
 
+func TestSegmenterStart(t *testing.T) {
+	text := []byte("Hello world")
+	seg := words.NewSegmenter(text)
+	//seg.Filter(filter.AlphaNumeric)
+	for seg.Next() {
+		t.Log(seg.Start())
+	}
+}
+
 func BenchmarkSegmenter(b *testing.B) {
 	file, err := ioutil.ReadFile("testdata/sample.txt")
 
