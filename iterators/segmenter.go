@@ -13,13 +13,13 @@ import (
 // loop over Next until false, call Bytes to retrieve the current token, and check Err
 // after the loop.
 type Segmenter struct {
-	split      bufio.SplitFunc
-	predicates []filter.Func
-	transforms transform.Transformer
-	data       []byte
-	token      []byte
-	pos        int
-	err        error
+	split       bufio.SplitFunc
+	filters     []filter.Func
+	transformer transform.Transformer
+	data        []byte
+	token       []byte
+	start       int
+	err         error
 }
 
 // NewSegmenter creates a new segmenter given a SplitFunc. To use the new segmenter,
@@ -35,21 +35,21 @@ func NewSegmenter(split bufio.SplitFunc) *Segmenter {
 func (seg *Segmenter) SetText(data []byte) {
 	seg.data = data
 	seg.token = nil
-	seg.pos = 0
+	seg.start = 0
 	seg.err = nil
 }
 
-// Filter applies one or more filters (predicates) to all tokens (segments), only returning those
+// Filter applies one or more filters (predicates) to all tokens, returning only those
 // where all predicates evaluate true. Calling Filter will overwrite previous filters, so call it
 // once (it's variadic, you can add multiple).
-func (seg *Segmenter) Filter(predicates ...filter.Func) {
-	seg.predicates = predicates
+func (seg *Segmenter) Filter(filters ...filter.Func) {
+	seg.filters = filters
 }
 
-// Transform applies one or more transforms to all tokens (segments). Calling Transform will overwrite
+// Transform applies one or more transforms to all tokens. Calling Transform will overwrite
 // previous transforms, so call it once (it's variadic, you can add multiple).
 func (seg *Segmenter) Transform(transformers ...transform.Transformer) {
-	seg.transforms = transform.Chain(transformers...)
+	seg.transformer = transform.Chain(transformers...)
 }
 
 var ErrAdvanceNegative = errors.New("SplitFunc returned a negative advance")
@@ -58,10 +58,10 @@ var ErrAdvanceTooFar = errors.New("SplitFunc advanced beyond the end of the data
 // Next advances Segmenter to the next token (segment). It returns false when there
 // are no remaining segments, or an error occurred.
 func (seg *Segmenter) Next() bool {
-outer:
-	for seg.pos < len(seg.data) {
-		advance, token, err := seg.split(seg.data[seg.pos:], true)
-		seg.pos += advance
+next:
+	for seg.start < len(seg.data) {
+		advance, token, err := seg.split(seg.data[seg.start:], true)
+		seg.start += advance
 		seg.token = token
 		seg.err = err
 
@@ -74,7 +74,7 @@ outer:
 			seg.err = ErrAdvanceNegative
 			return false
 		}
-		if seg.pos > len(seg.data) {
+		if seg.start > len(seg.data) {
 			seg.err = ErrAdvanceTooFar
 			return false
 		}
@@ -89,17 +89,17 @@ outer:
 			return false
 		}
 
-		if seg.transforms != nil {
-			seg.token, _, err = transform.Bytes(seg.transforms, seg.token)
+		if seg.transformer != nil {
+			seg.token, _, err = transform.Bytes(seg.transformer, seg.token)
 			if err != nil {
 				seg.err = err
 				return false
 			}
 		}
 
-		for _, f := range seg.predicates {
+		for _, f := range seg.filters {
 			if !f(seg.token) {
-				continue outer
+				continue next
 			}
 		}
 
@@ -115,14 +115,19 @@ func (seg *Segmenter) Err() error {
 	return seg.err
 }
 
-// Bytes returns the current token (segment).
+// Bytes returns the current token.
 func (seg *Segmenter) Bytes() []byte {
 	return seg.token
 }
 
-// Text returns the current token (segment) as a newly-allocated string.
+// Text returns the current token as a newly-allocated string.
 func (seg *Segmenter) Text() string {
 	return string(seg.token)
+}
+
+// Start returns the position (byte index) of the current token in the original text.
+func (seg *Segmenter) Start() int {
+	return seg.start
 }
 
 // All will iterate through all tokens and collect them into a [][]byte. It is a

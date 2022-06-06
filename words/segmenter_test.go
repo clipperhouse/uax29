@@ -128,7 +128,7 @@ func BenchmarkSegmenter(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 	seg := words.NewSegmenter(file)
-	seg.Filter(filter.Wordlike)
+	seg.Filter(filter.AlphaNumeric)
 
 	for i := 0; i < b.N; i++ {
 		seg.SetText(file)

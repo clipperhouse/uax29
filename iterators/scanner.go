@@ -49,8 +49,8 @@ func (sc *Scanner) Err() error {
 
 // Filter applies one or more filters (predicates) to all tokens (segments), only returning those
 // where all predicates evaluate true. Filters are applied after Transformers.
-func (sc *Scanner) Filter(predicates ...filter.Func) {
-	sc.predicates = predicates
+func (sc *Scanner) Filter(filters ...filter.Func) {
+	sc.predicates = filters
 }
 
 var ErrorScanCalled = errors.New("cannot call Transform after Scan has been called")
