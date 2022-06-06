@@ -14,11 +14,10 @@ import (
 // after the loop.
 type Segmenter struct {
 	split       bufio.SplitFunc
-	filters     []filter.Func
+	filter      filter.Func
 	transformer transform.Transformer
 	data        []byte
 	token       []byte
-	start       int
 	pos         int
 	err         error
 }
@@ -44,7 +43,22 @@ func (seg *Segmenter) SetText(data []byte) {
 // where all filters evaluate true. Calling Filter will overwrite previous filters, so call it
 // once (it's variadic, you can add multiple).
 func (seg *Segmenter) Filter(filters ...filter.Func) {
-	seg.filters = filters
+	if len(filters) == 0 {
+		seg.filter = nil
+	}
+	if len(filters) == 1 {
+		seg.filter = filters[0]
+	}
+
+	// merge into a single func
+	seg.filter = func(token []byte) bool {
+		for _, f := range filters {
+			if !f(token) {
+				return false
+			}
+		}
+		return true
+	}
 }
 
 // Transform applies one or more transforms to all tokens. Calling Transform will overwrite
@@ -61,8 +75,6 @@ var ErrAdvanceTooFar = errors.New("SplitFunc advanced beyond the end of the data
 func (seg *Segmenter) Next() bool {
 next:
 	for seg.pos < len(seg.data) {
-		seg.start = seg.pos
-
 		advance, token, err := seg.split(seg.data[seg.pos:], true)
 		seg.pos += advance
 		seg.token = token
@@ -100,10 +112,8 @@ next:
 			}
 		}
 
-		for _, f := range seg.filters {
-			if !f(seg.token) {
-				continue next
-			}
+		if seg.filter != nil && !seg.filter(seg.token) {
+			continue next
 		}
 
 		return true
@@ -130,7 +140,13 @@ func (seg *Segmenter) Text() string {
 
 // Start returns the position (byte index) of the current token in the original text.
 func (seg *Segmenter) Start() int {
-	return seg.start
+	return seg.pos - len(seg.token)
+}
+
+// End returns the position (byte index) of the first byte after the current token,
+// in the original text; segmenter.Bytes() == original[segmenter.Start():segmenter.End()]
+func (seg *Segmenter) End() int {
+	return seg.pos
 }
 
 // All will iterate through all tokens and collect them into a [][]byte. It is a
