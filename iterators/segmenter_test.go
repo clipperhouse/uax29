@@ -146,6 +146,7 @@ func TestSegmenterStart(t *testing.T) {
 			got = append(got, seg.Start())
 		}
 		if !reflect.DeepEqual(got, expected) {
+			t.Log(got)
 			t.Fatal("starts failed")
 		}
 	}
@@ -159,6 +160,7 @@ func TestSegmenterStart(t *testing.T) {
 			got = append(got, seg.Start())
 		}
 		if !reflect.DeepEqual(got, expected) {
+			t.Log(got)
 			t.Fatal("filtered starts failed")
 		}
 	}
@@ -176,6 +178,7 @@ func TestSegmenterEnd(t *testing.T) {
 			got = append(got, seg.End())
 		}
 		if !reflect.DeepEqual(got, expected) {
+			t.Log(got)
 			t.Fatal("ends failed")
 		}
 	}
