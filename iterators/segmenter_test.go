@@ -87,42 +87,20 @@ var endsWithW = func(token []byte) bool {
 func TestSegmenterFilterIsApplied(t *testing.T) {
 	text := "Hello, 世界, how are you? Nice dog aha! 👍🐶"
 
-	{
-		seg := iterators.NewSegmenter(bufio.ScanWords)
-		seg.SetText([]byte(text))
-		seg.Filter(startsWithH)
+	seg := iterators.NewSegmenter(bufio.ScanWords)
+	seg.SetText([]byte(text))
+	seg.Filter(startsWithH)
 
-		count := 0
-		for seg.Next() {
-			if !startsWithH(seg.Bytes()) {
-				t.Fatal("segmenter filter was not applied")
-			}
-			count++
+	count := 0
+	for seg.Next() {
+		if !startsWithH(seg.Bytes()) {
+			t.Fatal("segmenter filter was not applied")
 		}
-
-		if count != 2 {
-			t.Fatalf("segmenter filter should have found 2 results, got %d", count)
-		}
+		count++
 	}
 
-	{
-		// variadic
-		seg := iterators.NewSegmenter(bufio.ScanWords)
-		seg.SetText([]byte(text))
-		seg.Filter(startsWithH, endsWithW)
-
-		count := 0
-		for seg.Next() {
-			if !(startsWithH(seg.Bytes()) && endsWithW(seg.Bytes())) {
-				t.Fatal("variadic segmenter filter was not applied")
-			}
-			count++
-		}
-
-		if count != 1 {
-			t.Fatalf("variadic segmenter filter should have found 1 result, got %d", count)
-		}
-
+	if count != 2 {
+		t.Fatalf("segmenter filter should have found 2 results, got %d", count)
 	}
 }
 

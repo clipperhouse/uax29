@@ -42,23 +42,8 @@ func (seg *Segmenter) SetText(data []byte) {
 // Filter applies one or more filters (predicates) to all tokens, returning only those
 // where all filters evaluate true. Calling Filter will overwrite previous filters, so call it
 // once (it's variadic, you can add multiple).
-func (seg *Segmenter) Filter(filters ...filter.Func) {
-	if len(filters) == 0 {
-		seg.filter = nil
-	}
-	if len(filters) == 1 {
-		seg.filter = filters[0]
-	}
-
-	// merge into a single func
-	seg.filter = func(token []byte) bool {
-		for _, f := range filters {
-			if !f(token) {
-				return false
-			}
-		}
-		return true
-	}
+func (seg *Segmenter) Filter(filters filter.Func) {
+	seg.filter = filters
 }
 
 // Transform applies one or more transforms to all tokens. Calling Transform will overwrite
