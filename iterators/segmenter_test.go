@@ -4,11 +4,13 @@ import (
 	"bufio"
 	"bytes"
 	"math/rand"
+	"reflect"
 	"testing"
 	"unicode"
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/iterators/filter"
 	"github.com/clipperhouse/uax29/iterators/transformer"
 	"github.com/clipperhouse/uax29/words"
 )
@@ -131,4 +133,66 @@ func TestSegmenterTransformIsApplied(t *testing.T) {
 			t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
 		}
 	}
+}
+
+func TestSegmenterStart(t *testing.T) {
+	text := []byte("Hello world")
+
+	{
+		seg := words.NewSegmenter(text)
+		expected := []int{0, 5, 6}
+		var got []int
+		for seg.Next() {
+			got = append(got, seg.Start())
+		}
+		if !reflect.DeepEqual(got, expected) {
+			t.Fatal("starts failed")
+		}
+	}
+
+	{
+		seg := words.NewSegmenter(text)
+		seg.Filter(filter.AlphaNumeric)
+		expected := []int{0, 6}
+		var got []int
+		for seg.Next() {
+			got = append(got, seg.Start())
+		}
+		if !reflect.DeepEqual(got, expected) {
+			t.Fatal("filtered starts failed")
+		}
+	}
+}
+
+func TestSegmenterEnd(t *testing.T) {
+	text := []byte("Hello world")
+
+	{
+		seg := words.NewSegmenter(text)
+
+		expected := []int{5, 6, len(text)}
+		var got []int
+		for seg.Next() {
+			got = append(got, seg.End())
+		}
+		if !reflect.DeepEqual(got, expected) {
+			t.Fatal("ends failed")
+		}
+	}
+
+	{
+		seg := words.NewSegmenter(text)
+		seg.Filter(filter.AlphaNumeric)
+
+		expected := []int{5, len(text)}
+		var got []int
+		for seg.Next() {
+			got = append(got, seg.End())
+		}
+		if !reflect.DeepEqual(got, expected) {
+			t.Log(got)
+			t.Fatal("filtered ends failed")
+		}
+	}
+
 }
