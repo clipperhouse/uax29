@@ -5,6 +5,7 @@ import (
 	"unicode"
 
 	"github.com/clipperhouse/uax29/iterators/util"
+	"golang.org/x/text/unicode/rangetable"
 )
 
 func TestContains(t *testing.T) {
@@ -21,8 +22,10 @@ func TestContains(t *testing.T) {
 		{"世界", true},
 	}
 
+	ranges := rangetable.Merge(unicode.Latin, unicode.Ideographic)
+
 	for _, test := range tests {
-		got := util.Contains([]byte(test.input), unicode.Latin, unicode.Ideographic)
+		got := util.Contains([]byte(test.input), ranges)
 
 		if got != test.expected {
 			t.Error(test.expected)

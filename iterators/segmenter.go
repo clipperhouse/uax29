@@ -13,13 +13,13 @@ import (
 // loop over Next until false, call Bytes to retrieve the current token, and check Err
 // after the loop.
 type Segmenter struct {
-	split      bufio.SplitFunc
-	predicates []filter.Func
-	transforms transform.Transformer
-	data       []byte
-	token      []byte
-	pos        int
-	err        error
+	split       bufio.SplitFunc
+	filter      filter.Func
+	transformer transform.Transformer
+	data        []byte
+	token       []byte
+	pos         int
+	err         error
 }
 
 // NewSegmenter creates a new segmenter given a SplitFunc. To use the new segmenter,
@@ -39,17 +39,17 @@ func (seg *Segmenter) SetText(data []byte) {
 	seg.err = nil
 }
 
-// Filter applies one or more filters (predicates) to all tokens (segments), only returning those
-// where all predicates evaluate true. Calling Filter will overwrite previous filters, so call it
+// Filter applies one or more filters (predicates) to all tokens, returning only those
+// where all filters evaluate true. Calling Filter will overwrite previous filters, so call it
 // once (it's variadic, you can add multiple).
-func (seg *Segmenter) Filter(predicates ...filter.Func) {
-	seg.predicates = predicates
+func (seg *Segmenter) Filter(filters filter.Func) {
+	seg.filter = filters
 }
 
-// Transform applies one or more transforms to all tokens (segments). Calling Transform will overwrite
+// Transform applies one or more transforms to all tokens. Calling Transform will overwrite
 // previous transforms, so call it once (it's variadic, you can add multiple).
 func (seg *Segmenter) Transform(transformers ...transform.Transformer) {
-	seg.transforms = transform.Chain(transformers...)
+	seg.transformer = transform.Chain(transformers...)
 }
 
 var ErrAdvanceNegative = errors.New("SplitFunc returned a negative advance")
@@ -58,7 +58,7 @@ var ErrAdvanceTooFar = errors.New("SplitFunc advanced beyond the end of the data
 // Next advances Segmenter to the next token (segment). It returns false when there
 // are no remaining segments, or an error occurred.
 func (seg *Segmenter) Next() bool {
-outer:
+next:
 	for seg.pos < len(seg.data) {
 		advance, token, err := seg.split(seg.data[seg.pos:], true)
 		seg.pos += advance
@@ -89,18 +89,16 @@ outer:
 			return false
 		}
 
-		if seg.transforms != nil {
-			seg.token, _, err = transform.Bytes(seg.transforms, seg.token)
+		if seg.transformer != nil {
+			seg.token, _, err = transform.Bytes(seg.transformer, seg.token)
 			if err != nil {
 				seg.err = err
 				return false
 			}
 		}
 
-		for _, f := range seg.predicates {
-			if !f(seg.token) {
-				continue outer
-			}
+		if seg.filter != nil && !seg.filter(seg.token) {
+			continue next
 		}
 
 		return true
@@ -115,14 +113,25 @@ func (seg *Segmenter) Err() error {
 	return seg.err
 }
 
-// Bytes returns the current token (segment).
+// Bytes returns the current token.
 func (seg *Segmenter) Bytes() []byte {
 	return seg.token
 }
 
-// Text returns the current token (segment) as a newly-allocated string.
+// Text returns the current token as a newly-allocated string.
 func (seg *Segmenter) Text() string {
 	return string(seg.token)
+}
+
+// Start returns the position (byte index) of the current token in the original text.
+func (seg *Segmenter) Start() int {
+	return seg.pos - len(seg.token)
+}
+
+// End returns the position (byte index) of the first byte after the current token,
+// in the original text; segmenter.Bytes() == original[segmenter.Start():segmenter.End()]
+func (seg *Segmenter) End() int {
+	return seg.pos
 }
 
 // All will iterate through all tokens and collect them into a [][]byte. It is a
@@ -130,9 +139,6 @@ func (seg *Segmenter) Text() string {
 // will save you some code. The downside is that it allocates, and can do so
 // unbounded -- O(n) on the number of tokens. Use Segmenter for more bounded
 // memory usage.
-//
-// The predicates parameter is optional; when predicates is specified, All will
-// only return tokens (segments) for which all predicates evaluate to true.
 func All(src []byte, dest *[][]byte, split bufio.SplitFunc) error {
 	for pos := 0; pos < len(src); {
 		advance, token, err := split(src[pos:], true)

@@ -13,7 +13,7 @@ type s = *bufio.Scanner
 
 type Scanner struct {
 	s
-	predicates []filter.Func
+	filters []filter.Func
 
 	r     io.Reader // gotta keep references to these for Transform, sigh
 	split bufio.SplitFunc
@@ -47,10 +47,10 @@ func (sc *Scanner) Err() error {
 	return sc.s.Err()
 }
 
-// Filter applies one or more filters (predicates) to all tokens (segments), only returning those
-// where all predicates evaluate true. Filters are applied after Transformers.
-func (sc *Scanner) Filter(predicates ...filter.Func) {
-	sc.predicates = predicates
+// Filter applies one or more filters (predicates) to all tokens, only returning those
+// where all filters evaluate true. Filters are applied after Transformers.
+func (sc *Scanner) Filter(filters ...filter.Func) {
+	sc.filters = filters
 }
 
 var ErrorScanCalled = errors.New("cannot call Transform after Scan has been called")
@@ -90,7 +90,7 @@ func (sc *Scanner) Scan() bool {
 
 scan:
 	for sc.s.Scan() {
-		for _, f := range sc.predicates {
+		for _, f := range sc.filters {
 			if !f(sc.Bytes()) {
 				continue scan
 			}
