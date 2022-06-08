@@ -14,6 +14,8 @@ import (
 )
 
 type Func func([]byte) bool
+
+// Deprecated: renamed to Func
 type Predicate = Func // for backwards compat, this was renamed
 
 // Contains returns a filter indicating that a token contains one
