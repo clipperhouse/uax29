@@ -138,3 +138,11 @@ if segments.Err() != nil {
 Here are a [few more examples](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/transformer).
 
 We use the [`x/text/transform`](https://pkg.go.dev/golang.org/x/text/transform) package. We can accept anything that implements the `transform.Transformer` interface. Many things in `x/text` do that, such as [runes](https://pkg.go.dev/golang.org/x/text/runes), [normalization](https://pkg.go.dev/golang.org/x/text/unicode/norm), [casing](https://pkg.go.dev/golang.org/x/text/cases), and [encoding](https://pkg.go.dev/golang.org/x/text/encoding).
+
+### Limitations
+
+This package follows the basic UAX #29 specification. For more effective or idiomatic treatment of words across languages, there is more that can be done, scroll down to the [“Notes:” section of the standard](https://unicode.org/reports/tr29/#Word_Boundary_Rules):
+
+> It is not possible to provide a uniform set of rules that resolves all issues across languages or that handles all ambiguous situations within a given language. The goal for the specification presented in this annex is to provide a workable default; tailored implementations can be more sophisticated.
+
+I also found [this article](https://www.hathitrust.org/blogs/large-scale-search/multilingual-issues-part-1-word-segmentation) helpful.
