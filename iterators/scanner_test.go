@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/clipperhouse/stemmer"
 	"github.com/clipperhouse/uax29/iterators"
 	"github.com/clipperhouse/uax29/iterators/transformer"
 	"github.com/clipperhouse/uax29/words"
@@ -52,32 +53,13 @@ func TestScannerFilterIsApplied(t *testing.T) {
 			t.Fatalf("scanner filter should have found 2 results, got %d", count)
 		}
 	}
-
-	{
-		// variadic
-		r := strings.NewReader(text)
-		sc := iterators.NewScanner(r, bufio.ScanWords)
-		sc.Filter(startsWithH, endsWithW)
-
-		count := 0
-		for sc.Scan() {
-			if !(startsWithH(sc.Bytes()) && endsWithW(sc.Bytes())) {
-				t.Fatal("variadic scanner filter was not applied")
-			}
-			count++
-		}
-
-		if count != 1 {
-			t.Fatalf("variadic scanner filter should have found 1 result, got %d", count)
-		}
-	}
 }
 
 func TestScannerTransformIsApplied(t *testing.T) {
-	text := "Hello, 世界, I enjoy Açaí in Örebro."
+	text := "Hello, 世界, I am enjoying cups of Açaí in Örebro."
 	r := strings.NewReader(text)
 	sc := iterators.NewScanner(r, bufio.ScanWords)
-	sc.Transform(transformer.Lower, transformer.Diacritics)
+	sc.Transform(transformer.Lower, transformer.Diacritics, stemmer.English)
 
 	var tokens [][]byte
 	for sc.Scan() {
@@ -90,30 +72,18 @@ func TestScannerTransformIsApplied(t *testing.T) {
 
 	{
 		got := tokens[4]
+		expected := []byte("enjoy")
+		if !bytes.Equal(expected, got) {
+			t.Fatalf("stemmer was not applied, expected %q, got %q", expected, got)
+		}
+	}
+
+	{
+		got := tokens[7]
 		expected := []byte("acai")
 		if !bytes.Equal(expected, got) {
 			t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
 		}
 	}
 
-	{
-		got := tokens[6]
-		expected := []byte("orebro.")
-		if !bytes.Equal(expected, got) {
-			t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
-		}
-	}
-}
-
-func TestScannerErrorOnTransformCall(t *testing.T) {
-	text := "Hello, 世界, I enjoy Açaí in Örebro."
-	r := strings.NewReader(text)
-	sc := iterators.NewScanner(r, bufio.ScanWords)
-
-	sc.Scan()
-	sc.Transform(transformer.Lower, transformer.Diacritics)
-
-	if sc.Err() == nil {
-		t.Fatal("should have gotten ErrorScanCalled when calling Transform after Scan")
-	}
 }
