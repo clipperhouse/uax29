@@ -39,21 +39,22 @@ func (seg *Segmenter) SetText(data []byte) {
 	seg.err = nil
 }
 
-// Filter applies one or more filters (predicates) to all tokens, returning only those
-// where all filters evaluate true. Calling Filter will overwrite previous filters, so call it
-// once (it's variadic, you can add multiple).
-func (seg *Segmenter) Filter(filters filter.Func) {
-	seg.filter = filters
+// Filter applies a filter (predicate) to all tokens, returning only those
+// where all filters evaluate true. Calling Filter will overwrite the previous
+// filter.
+func (seg *Segmenter) Filter(filter filter.Func) {
+	seg.filter = filter
 }
 
-// Transform applies one or more transforms to all tokens. Calling Transform will overwrite
-// previous transforms, so call it once (it's variadic, you can add multiple).
+// Transform applies one or more transforms to all tokens. Calling Transform
+// will overwrite previous transforms, so call it once
+// (it's variadic, you can add multiple, which will be applied in order).
 func (seg *Segmenter) Transform(transformers ...transform.Transformer) {
 	seg.transformer = transform.Chain(transformers...)
 }
 
-var ErrAdvanceNegative = errors.New("SplitFunc returned a negative advance")
-var ErrAdvanceTooFar = errors.New("SplitFunc advanced beyond the end of the data")
+var ErrAdvanceNegative = errors.New("SplitFunc returned a negative advance, this is likely a bug in the SplitFunc")
+var ErrAdvanceTooFar = errors.New("SplitFunc advanced beyond the end of the data, this is likely a bug in the SplitFunc")
 
 // Next advances Segmenter to the next token (segment). It returns false when there
 // are no remaining segments, or an error occurred.

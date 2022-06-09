@@ -9,6 +9,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/clipperhouse/stemmer"
 	"github.com/clipperhouse/uax29/iterators"
 	"github.com/clipperhouse/uax29/iterators/filter"
 	"github.com/clipperhouse/uax29/iterators/transformer"
@@ -107,11 +108,11 @@ func TestSegmenterFilterIsApplied(t *testing.T) {
 }
 
 func TestSegmenterTransformIsApplied(t *testing.T) {
-	text := "Hello, 世界, I enjoy Açaí in Örebro."
+	text := "Hello, 世界, I am enjoying cups of Açaí in Örebro."
 
 	seg := iterators.NewSegmenter(bufio.ScanWords)
 	seg.SetText([]byte(text))
-	seg.Transform(transformer.Lower, transformer.Diacritics)
+	seg.Transform(transformer.Lower, transformer.Diacritics, stemmer.English)
 
 	var tokens [][]byte
 	for seg.Next() {
@@ -120,15 +121,15 @@ func TestSegmenterTransformIsApplied(t *testing.T) {
 
 	{
 		got := tokens[4]
-		expected := []byte("acai")
+		expected := []byte("enjoy")
 		if !bytes.Equal(expected, got) {
-			t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
+			t.Fatalf("stemmer was not applied, expected %q, got %q", expected, got)
 		}
 	}
 
 	{
-		got := tokens[6]
-		expected := []byte("orebro.")
+		got := tokens[7]
+		expected := []byte("acai")
 		if !bytes.Equal(expected, got) {
 			t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
 		}
