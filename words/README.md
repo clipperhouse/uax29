@@ -134,10 +134,11 @@ if segments.Err() != nil {
 	log.Fatal(segments.Err())
 }
 ```
-
 Here are a [few more examples](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/transformer).
 
 We use the [`x/text/transform`](https://pkg.go.dev/golang.org/x/text/transform) package. We can accept anything that implements the `transform.Transformer` interface. Many things in `x/text` do that, such as [runes](https://pkg.go.dev/golang.org/x/text/runes), [normalization](https://pkg.go.dev/golang.org/x/text/unicode/norm), [casing](https://pkg.go.dev/golang.org/x/text/cases), and [encoding](https://pkg.go.dev/golang.org/x/text/encoding).
+
+See also [this stemming package](https://pkg.go.dev/github.com/clipperhouse/stemmer).
 
 ### Limitations
 
