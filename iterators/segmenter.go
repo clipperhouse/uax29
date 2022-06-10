@@ -1,3 +1,4 @@
+// Package iterators is a support (base types) package for other packages in UAX29.
 package iterators
 
 import (
@@ -133,6 +134,9 @@ func (seg *Segmenter) Text() string {
 // These extensive comments are here because someone is gonna be surprised
 // by some SplitFunc, and it will be an annoying bug, so let's spell it all out.
 
+// If you're just using a Segmenter from the words, sentences, or graphemes
+// sub-package, what follows is irrelevant, carry on.
+
 // For Start and End, we are taking some assumptions below. The SplitFunc interface
 // allows ambiguity -- it doesn't return an explicit start or end. The SplitFunc
 // could skip bytes before or after a token, and we won't know. We've found that
@@ -140,7 +144,7 @@ func (seg *Segmenter) Text() string {
 
 // The SplitFuncs in the words, sentences, and graphemes packages adhere to this
 // assumption, and in fact skip no bytes at all. This Segmenter is designed for
-// use with those, otherwsie caveat emptor.
+// use with those, otherwise caveat emptor.
 
 // If a SplitFunc skips bytes before *and* after a token, then there is unlikely to
 // be a knowable right answer. Maybe the imprecision is OK for a given application.
