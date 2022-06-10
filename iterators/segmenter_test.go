@@ -82,11 +82,6 @@ var startsWithH = func(token []byte) bool {
 	return unicode.ToLower(r) == 'h'
 }
 
-var endsWithW = func(token []byte) bool {
-	r, _ := utf8.DecodeLastRune(token)
-	return unicode.ToLower(r) == 'w'
-}
-
 func TestSegmenterFilterIsApplied(t *testing.T) {
 	text := "Hello, 世界, how are you? Nice dog aha! 👍🐶"
 
