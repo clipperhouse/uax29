@@ -91,9 +91,8 @@ next:
 		}
 
 		if seg.transformer != nil {
-			seg.token, _, err = transform.Bytes(seg.transformer, seg.token)
-			if err != nil {
-				seg.err = err
+			seg.token, _, seg.err = transform.Bytes(seg.transformer, seg.token)
+			if seg.err != nil {
 				return false
 			}
 		}
