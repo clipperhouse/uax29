@@ -142,7 +142,7 @@ See also [this stemming package](https://pkg.go.dev/github.com/clipperhouse/stem
 
 ### Limitations
 
-This package follows the basic UAX #29 specification. For more effective or idiomatic treatment of words across languages, there is more that can be done, scroll down to the [“Notes:” section of the standard](https://unicode.org/reports/tr29/#Word_Boundary_Rules):
+This package follows the basic UAX #29 specification. For more idiomatic treatment of words across languages, there is more that can be done, scroll down to the [“Notes:” section of the standard](https://unicode.org/reports/tr29/#Word_Boundary_Rules):
 
 > It is not possible to provide a uniform set of rules that resolves all issues across languages or that handles all ambiguous situations within a given language. The goal for the specification presented in this annex is to provide a workable default; tailored implementations can be more sophisticated.
 
