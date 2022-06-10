@@ -136,14 +136,29 @@ func TestSegmenterStart(t *testing.T) {
 
 	{
 		seg := words.NewSegmenter(text)
+		seg.SetText(text)
 		expected := []int{0, 5, 6}
 		var got []int
 		for seg.Next() {
 			got = append(got, seg.Start())
 		}
 		if !reflect.DeepEqual(got, expected) {
-			t.Log(got)
-			t.Fatal("starts failed")
+			t.Fatalf("start failed for words.SplitFunc, expected %v, got %v", expected, got)
+		}
+	}
+
+	{
+		// ScanWords is not really supported, but this test
+		// is here to test our assumptions
+		seg := iterators.NewSegmenter(bufio.ScanWords)
+		seg.SetText(text)
+		expected := []int{0, 6}
+		var got []int
+		for seg.Next() {
+			got = append(got, seg.Start())
+		}
+		if !reflect.DeepEqual(got, expected) {
+			t.Fatalf("start failed for bufio.ScanWords, expected %v, got %v", expected, got)
 		}
 	}
 
@@ -156,8 +171,7 @@ func TestSegmenterStart(t *testing.T) {
 			got = append(got, seg.Start())
 		}
 		if !reflect.DeepEqual(got, expected) {
-			t.Log(got)
-			t.Fatal("filtered starts failed")
+			t.Fatalf("start failed for filter.AlphaNumeric, expected %v, got %v", expected, got)
 		}
 	}
 }
@@ -174,11 +188,24 @@ func TestSegmenterEnd(t *testing.T) {
 			got = append(got, seg.End())
 		}
 		if !reflect.DeepEqual(got, expected) {
-			t.Log(got)
-			t.Fatal("ends failed")
+			t.Fatalf("end failed for words.SplitFunc, expected %v, got %v", expected, got)
 		}
 	}
 
+	{
+		// ScanWords is not really supported, but this test
+		// is here to test our assumptions
+		seg := iterators.NewSegmenter(bufio.ScanWords)
+		seg.SetText(text)
+		expected := []int{5, len(text)}
+		var got []int
+		for seg.Next() {
+			got = append(got, seg.End())
+		}
+		if !reflect.DeepEqual(got, expected) {
+			t.Fatalf("end failed for bufio.ScanWords, expected %v, got %v", expected, got)
+		}
+	}
 	{
 		seg := words.NewSegmenter(text)
 		seg.Filter(filter.AlphaNumeric)
@@ -189,9 +216,7 @@ func TestSegmenterEnd(t *testing.T) {
 			got = append(got, seg.End())
 		}
 		if !reflect.DeepEqual(got, expected) {
-			t.Log(got)
-			t.Fatal("filtered ends failed")
+			t.Fatalf("end failed for filter.AlphaNumeric, expected %v, got %v", expected, got)
 		}
 	}
-
 }
