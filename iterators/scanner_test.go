@@ -6,7 +6,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/clipperhouse/stemmer"
 	"github.com/clipperhouse/uax29/iterators"
 	"github.com/clipperhouse/uax29/iterators/transformer"
 	"github.com/clipperhouse/uax29/words"
@@ -59,7 +58,7 @@ func TestScannerTransformIsApplied(t *testing.T) {
 	text := "Hello, 世界, I am enjoying cups of Açaí in Örebro."
 	r := strings.NewReader(text)
 	sc := iterators.NewScanner(r, bufio.ScanWords)
-	sc.Transform(transformer.Lower, transformer.Diacritics, stemmer.English)
+	sc.Transform(transformer.Lower, transformer.Diacritics)
 
 	var tokens [][]byte
 	for sc.Scan() {
@@ -71,19 +70,10 @@ func TestScannerTransformIsApplied(t *testing.T) {
 	}
 
 	{
-		got := tokens[4]
-		expected := []byte("enjoy")
-		if !bytes.Equal(expected, got) {
-			t.Fatalf("stemmer was not applied, expected %q, got %q", expected, got)
-		}
-	}
-
-	{
 		got := tokens[7]
 		expected := []byte("acai")
 		if !bytes.Equal(expected, got) {
 			t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
 		}
 	}
-
 }
