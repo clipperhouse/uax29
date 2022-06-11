@@ -30,6 +30,10 @@ type Segmenter struct {
 
 // NewSegmenter creates a new segmenter given a SplitFunc. To use the new segmenter,
 // call SetText() and then iterate while Next() is true.
+//
+// Note that Segmenter is designed for use with the SplitFuncs in the various uax29
+// sub-packages, and relies on assumptions about their behavior. Caveat emptor when
+// bringing your own SplitFunc.
 func NewSegmenter(split bufio.SplitFunc) *Segmenter {
 	return &Segmenter{
 		split: split,
@@ -131,11 +135,11 @@ func (seg *Segmenter) Text() string {
 	return string(seg.token)
 }
 
-// These extensive comments are here because someone is gonna be surprised
-// by some SplitFunc, and it will be an annoying bug, so let's spell it all out.
+// These extensive comments are here because someone is gonna be surprised by
+// some custom SplitFunc, and it will be an annoying bug, so let's spell it all out.
 
 // If you're just using a Segmenter from the words, sentences, or graphemes
-// sub-package, what follows is irrelevant, carry on.
+// sub-packages, what follows is irrelevant, carry on.
 
 // For Start and End, we are taking some assumptions below. The SplitFunc interface
 // allows ambiguity -- it doesn't return an explicit start or end. The SplitFunc
@@ -153,12 +157,6 @@ func (seg *Segmenter) Text() string {
 // to make start and end explicit.
 
 // Start returns the position (byte index) of the current token in the original text.
-//
-// Note: Start assumes that the SplitFunc does not skip any bytes before the token.
-// We've found that to be unconventional, but if you find it to be the case, consider
-// trying your own calculation such as:
-//
-// start := segmenter.End() - len(segmenter.Bytes())
 func (seg *Segmenter) Start() int {
 	return seg.start
 }
@@ -167,18 +165,8 @@ func (seg *Segmenter) Start() int {
 // in the original text.
 //
 // In other words, segmenter.Bytes() == original[segmenter.Start():segmenter.End()]
-//
-// Note: SplitFunc's can and do skip bytes after the token. As such, this calculation
-// should *not* be assumed to be the start of the next token.
 func (seg *Segmenter) End() int {
 	return seg.start + len(seg.token)
-}
-
-// Pos returns the position (byte index) where the segmenter will
-// resume, the next time you call Next(). Think of it as a cursor.
-// It might or might not be equivalent to End(), depending on the SplitFunc.
-func (seg *Segmenter) Pos() int {
-	return seg.pos
 }
 
 // All will iterate through all tokens and collect them into a [][]byte. It is a
