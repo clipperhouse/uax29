@@ -20,14 +20,14 @@ import (
 )
 
 var letter filter.Func = func(token []byte) bool {
-	return filter.AlphaNumeric(token) && !words.Numeric(token)
+	return filter.AlphaNumeric(token) && !words.BleveNumeric(token)
 }
 
-var number filter.Func = words.Numeric
-var ideo filter.Func = words.Ideographic
+var number filter.Func = words.BleveNumeric
+var ideo filter.Func = words.BleveIdeographic
 
 var none filter.Func = func(token []byte) bool {
-	return !filter.AlphaNumeric(token) && !words.Numeric(token) && !words.Ideographic(token)
+	return !filter.AlphaNumeric(token) && !words.BleveNumeric(token) && !words.BleveIdeographic(token)
 }
 
 func TestAdhocSegmentsWithType(t *testing.T) {
@@ -73,6 +73,19 @@ func TestAdhocSegmentsWithType(t *testing.T) {
 				[]byte("3.5"),
 			},
 			outputTypes: []filter.Func{
+				number,
+			},
+		},
+		{
+			input: []byte("age 25"),
+			output: [][]byte{
+				[]byte("age"),
+				[]byte(" "),
+				[]byte("25"),
+			},
+			outputTypes: []filter.Func{
+				letter,
+				none,
 				number,
 			},
 		},
@@ -171,13 +184,13 @@ func TestAdhocSegmentsWithType(t *testing.T) {
 		}
 
 		for i, f := range test.outputTypes {
-			output := test.output[i]
-			if !f(output) {
-				t.Logf("input: %q, output: %q\n", test.input, output)
-				t.Logf("Letter: %t\n", letter(output))
-				t.Logf("Ideo: %t\n", ideo(output))
-				t.Logf("Number: %t\n", number(output))
-				t.Logf("None: %t\n", none(output))
+			expected := test.output[i]
+			if !f(expected) {
+				t.Logf("input: %q, expected: %q\n", test.input, expected)
+				t.Logf("Letter: %t\n", letter(expected))
+				t.Logf("Ideo: %t\n", ideo(expected))
+				t.Logf("Number: %t\n", number(expected))
+				t.Logf("None: %t\n", none(expected))
 				t.Fatal("nope")
 			}
 		}
@@ -205,7 +218,7 @@ func TestAdhocSegmentsWithType(t *testing.T) {
 		for i, f := range test.outputTypes {
 			output := test.output[i]
 			if !f(output) {
-				t.Logf("input: %q, output: %q\n", test.input, output)
+				t.Logf("input: %q, expected: %q\n", test.input, output)
 				t.Logf("Letter: %t\n", letter(output))
 				t.Logf("Ideo: %t\n", ideo(output))
 				t.Logf("Number: %t\n", number(output))
