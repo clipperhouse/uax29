@@ -31,6 +31,9 @@ func FuzzWords(f *testing.F) {
 		f.Add(line)
 	}
 
+	// add some random
+	f.Add(getRandomBytes())
+
 	// known invalid utf-8
 	badUTF8, err := ioutil.ReadFile("testdata/UTF-8-test.txt")
 	if err != nil {
@@ -49,7 +52,7 @@ func FuzzWords(f *testing.F) {
 			t.Error(seg.Err())
 		}
 
-		var roundtrip []byte
+		roundtrip := make([]byte, 0, len(original))
 		for _, s := range segs {
 			roundtrip = append(roundtrip, s...)
 		}
