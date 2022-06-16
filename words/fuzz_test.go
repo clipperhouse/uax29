@@ -10,12 +10,19 @@ import (
 )
 
 func FuzzWords(f *testing.F) {
+
+	// start with the unicode test suite
+	for _, test := range unicodeTests {
+		f.Add(test.input)
+	}
+
+	// add multi-lingual text
 	file, err := ioutil.ReadFile("testdata/sample.txt")
 	if err != nil {
 		f.Error(err)
 	}
 
-	// add a large one
+	// add as a large one
 	f.Add(file)
 
 	// add a bunch of small ones
@@ -24,6 +31,7 @@ func FuzzWords(f *testing.F) {
 		f.Add(line)
 	}
 
+	// known invalid utf-8
 	badUTF8, err := ioutil.ReadFile("testdata/UTF-8-test.txt")
 	if err != nil {
 		f.Error(err)
