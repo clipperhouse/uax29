@@ -13,14 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Set up Go 1.17.10
+    - name: Set up Go
       uses: actions/setup-go@v3
-      with:
-        go-version: 1.17.10
       id: go
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v3
 
-    - name: Test
-      run: go test ./... -benchmem -bench .
+    - name: Fuzz
+      run: go test -fuzz=. -fuzztime=60s github.com/clipperhouse/uax29/words
