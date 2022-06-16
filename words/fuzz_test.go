@@ -1,3 +1,5 @@
+//go:build go1.18
+
 package words_test
 
 import (
