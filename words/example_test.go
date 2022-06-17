@@ -26,6 +26,13 @@ func ExampleNewScanner() {
 	if err := sc.Err(); err != nil {
 		log.Fatal(err)
 	}
+	// Output: "Hello"
+	//"世"
+	//"界"
+	//"Nice"
+	//"dog"
+	//"👍"
+	//"🐶"
 }
 
 func ExampleNewSegmenter() {
@@ -44,6 +51,13 @@ func ExampleNewSegmenter() {
 	if err := seg.Err(); err != nil {
 		log.Fatal(err)
 	}
+	// Output: "Hello"
+	//"世"
+	//"界"
+	//"Nice"
+	//"dog"
+	//"👍"
+	//"🐶"
 }
 
 func ExampleSegmentAll() {
@@ -51,4 +65,5 @@ func ExampleSegmentAll() {
 
 	segments := words.SegmentAll(text)
 	fmt.Printf("%q\n", segments)
+	// Output: ["Hello" "," " " "世" "界" "." " " "Nice" " " "dog" "!" " " "👍" "🐶"]
 }
