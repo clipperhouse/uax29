@@ -64,7 +64,7 @@ func ExampleNewScanner() {
 
 	// Scan returns true until error or EOF
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+		fmt.Printf("%q\n", scanner.Text())
 	}
 
 	// Gotta check the error!
