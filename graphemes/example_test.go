@@ -22,6 +22,29 @@ func ExampleNewSegmenter() {
 	if err := segments.Err(); err != nil {
 		log.Fatal(err)
 	}
+	// Output: "H"
+	// "e"
+	// "l"
+	// "l"
+	// "o"
+	// ","
+	// " "
+	// "世"
+	// "界"
+	// "."
+	// " "
+	// "N"
+	// "i"
+	// "c"
+	// "e"
+	// " "
+	// "d"
+	// "o"
+	// "g"
+	// "!"
+	// " "
+	// "👍"
+	// "🐶"
 }
 
 func ExampleSegmentAll() {
@@ -29,6 +52,8 @@ func ExampleSegmentAll() {
 
 	segments := graphemes.SegmentAll(text)
 	fmt.Printf("%q\n", segments)
+
+	// Output: ["H" "e" "l" "l" "o" "," " " "世" "界" "." " " "N" "i" "c" "e" " " "d" "o" "g" "!" " " "👍" "🐶"]
 }
 
 func ExampleNewScanner() {
@@ -46,4 +71,27 @@ func ExampleNewScanner() {
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
+	// Output: "H"
+	// "e"
+	// "l"
+	// "l"
+	// "o"
+	// ","
+	// " "
+	// "世"
+	// "界"
+	// "."
+	// " "
+	// "N"
+	// "i"
+	// "c"
+	// "e"
+	// " "
+	// "d"
+	// "o"
+	// "g"
+	// "!"
+	// " "
+	// "👍"
+	// "🐶"
 }
