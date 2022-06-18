@@ -107,7 +107,7 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 }
 
 func BenchmarkSegmenter(b *testing.B) {
-	file, err := ioutil.ReadFile("../testdata/wikipedia.txt")
+	file, err := ioutil.ReadFile("../testdata/sample.txt")
 	if err != nil {
 		b.Error(err)
 	}

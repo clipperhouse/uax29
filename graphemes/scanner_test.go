@@ -158,7 +158,7 @@ func getRandomBytes() []byte {
 }
 
 func BenchmarkScanner(b *testing.B) {
-	file, err := ioutil.ReadFile("../testdata/wikipedia.txt")
+	file, err := ioutil.ReadFile("../testdata/sample.txt")
 
 	if err != nil {
 		b.Error(err)
