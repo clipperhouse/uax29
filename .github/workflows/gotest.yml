@@ -1,4 +1,4 @@
-name: Test
+name: Test & Benchmark
 
 on:
   push:
@@ -7,15 +7,13 @@ on:
     branches: [ master ]
 
 jobs:
-
-  build:
-    name: Build
+  test_and_benchmark:
+    name: Run all tests & benchmarks
     runs-on: ubuntu-latest
     steps:
-
     - name: Set up Go
       uses: actions/setup-go@v3
-    - name: Check out code into the Go module directory
+    - name: Check out code
       uses: actions/checkout@v3
     - name: Run test
       run: go test ./... -benchmem -bench .
