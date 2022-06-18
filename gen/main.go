@@ -16,6 +16,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/gen/triegen"
+	"golang.org/x/text/unicode/rangetable"
 )
 
 func main() {
@@ -126,6 +127,15 @@ func (p prop) generateTrie() error {
 			panic("didn't get emoji data; make sure it's loaded first")
 		}
 		runesByProperty[key] = extendedPictographic
+	}
+
+	if p.name == "Word" {
+		ideo := rangetable.Merge(unicode.Han, unicode.Katakana, unicode.Hiragana)
+		var runes []rune
+		rangetable.Visit(ideo, func(r rune) {
+			runes = append(runes, r)
+		})
+		runesByProperty["BleveIdeographic"] = runes
 	}
 
 	// Keep the order stable
