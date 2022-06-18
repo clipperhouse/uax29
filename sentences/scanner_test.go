@@ -74,7 +74,7 @@ func TestInvalidUTF8(t *testing.T) {
 
 	// Btw, don't edit UTF-8-test.txt: your editor might turn it into valid UTF-8!
 
-	input, err := ioutil.ReadFile("testdata/UTF-8-test.txt")
+	input, err := ioutil.ReadFile("../testdata/UTF-8-test.txt")
 	inlen := len(input)
 
 	if err != nil {
@@ -158,7 +158,7 @@ func getRandomBytes() []byte {
 }
 
 func BenchmarkScanner(b *testing.B) {
-	file, err := ioutil.ReadFile("testdata/wikipedia.txt")
+	file, err := ioutil.ReadFile("../testdata/wikipedia.txt")
 
 	if err != nil {
 		b.Error(err)

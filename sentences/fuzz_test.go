@@ -1,6 +1,6 @@
 //go:build go1.18
 
-package words_test
+package sentences_test
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/words"
+	"github.com/clipperhouse/uax29/sentences"
 )
 
 // FuzzValidShort fuzzes small, valid UTF8 strings. I suspect more, shorter
@@ -32,7 +32,7 @@ func FuzzValidShort(f *testing.F) {
 	f.Fuzz(func(t *testing.T, original []byte) {
 		var segs [][]byte
 		valid1 := utf8.Valid(original)
-		seg := words.NewSegmenter(original)
+		seg := sentences.NewSegmenter(original)
 		for seg.Next() {
 			segs = append(segs, seg.Bytes())
 		}
@@ -72,7 +72,7 @@ func FuzzValidLong(f *testing.F) {
 	f.Fuzz(func(t *testing.T, original []byte) {
 		var segs [][]byte
 		valid1 := utf8.Valid(original)
-		seg := words.NewSegmenter(original)
+		seg := sentences.NewSegmenter(original)
 		for seg.Next() {
 			segs = append(segs, seg.Bytes())
 		}
@@ -130,7 +130,7 @@ func FuzzInvalid(f *testing.F) {
 	f.Fuzz(func(t *testing.T, original []byte) {
 		var segs [][]byte
 		valid1 := utf8.Valid(original)
-		seg := words.NewSegmenter(original)
+		seg := sentences.NewSegmenter(original)
 		for seg.Next() {
 			segs = append(segs, seg.Bytes())
 		}
