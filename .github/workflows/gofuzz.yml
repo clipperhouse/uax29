@@ -7,8 +7,11 @@ on:
     branches: [ master ]
 
 jobs:
-  fuzz_valid_short:
-    name: FuzzValidShort
+  fuzz_all:
+    strategy:
+        matrix:
+          package: [words, sentences, graphemes]
+          fuzzer: [FuzzValidShort, FuzzValidLong, FuzzInvalid]
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go
@@ -16,35 +19,7 @@ jobs:
       with:
         go-version: '1.18'
         check-latest: true
-    - name: Check out code into the Go module directory
+    - name: Check out code
       uses: actions/checkout@v3
-    - name: FuzzValidShort
-      run: go test -fuzz=FuzzValidShort -fuzztime=60s github.com/clipperhouse/uax29/words
-
-  fuzz_valid_long:
-    name: FuzzValidLong
-    runs-on: ubuntu-latest
-    steps:
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: '1.18'
-        check-latest: true
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
-    - name: FuzzValidLong
-      run: go test -fuzz=FuzzValidLong -fuzztime=60s github.com/clipperhouse/uax29/words
-
-  fuzz_invalid:
-    name: FuzzInvalid
-    runs-on: ubuntu-latest
-    steps:
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: '1.18'
-        check-latest: true
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
-    - name: FuzzInvalid
-      run: go test -fuzz=FuzzInvalid -fuzztime=60s github.com/clipperhouse/uax29/words
+    - name: ${{ matrix.package }}.${{ matrix.fuzzer }}
+      run: go test -fuzz=${{ matrix.fuzzer }} -fuzztime=60s github.com/clipperhouse/uax29/${{ matrix.package }}
