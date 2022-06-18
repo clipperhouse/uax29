@@ -81,7 +81,7 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 
 	// Btw, don't edit UTF-8-test.txt: your editor might turn it into valid UTF-8!
 
-	input, err := ioutil.ReadFile("testdata/UTF-8-test.txt")
+	input, err := ioutil.ReadFile("../testdata/UTF-8-test.txt")
 
 	if err != nil {
 		t.Error(err)
@@ -107,7 +107,7 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 }
 
 func BenchmarkSegmenter(b *testing.B) {
-	file, err := ioutil.ReadFile("testdata/wikipedia.txt")
+	file, err := ioutil.ReadFile("../testdata/sample.txt")
 	if err != nil {
 		b.Error(err)
 	}
@@ -133,7 +133,7 @@ func BenchmarkSegmenter(b *testing.B) {
 }
 
 func BenchmarkSegmentAll(b *testing.B) {
-	file, err := ioutil.ReadFile("testdata/wikipedia.txt")
+	file, err := ioutil.ReadFile("../testdata/sample.txt")
 
 	if err != nil {
 		b.Error(err)
