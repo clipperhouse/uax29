@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  fuzz_all:
+  all:
     strategy:
         matrix:
           package: [words, sentences, graphemes]
