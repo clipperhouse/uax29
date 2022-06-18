@@ -1,4 +1,4 @@
-name: Test & Benchmark
+name: Test
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ master ]
 
 jobs:
-  test_and_benchmark:
-    name: Run all tests & benchmarks
+  all:
+    name: Run all
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go
