@@ -1,12 +1,5 @@
 package words
 
-import (
-	"unicode"
-
-	"github.com/clipperhouse/uax29/iterators/filter"
-	"golang.org/x/text/unicode/rangetable"
-)
-
 // BleveNumeric determines if a token is Numeric using the Bleve segmenter's.
 // definition, see: https://github.com/blevesearch/segment/blob/master/segment_words.rl#L199-L207
 // This API is experimental.
@@ -20,13 +13,13 @@ func BleveNumeric(token []byte) bool {
 		current, w = trie.lookup(token[pos:])
 
 		if pos == 0 {
+			// must start with Numeric|ExtendNumLet
 			if current.is(_Numeric | _ExtendNumLet) {
 				pos += w
 				continue
-			} else {
-				// definitely not Numeric, can move on
-				return false
 			}
+			// not numeric, can move on
+			return false
 		}
 
 		// WB8.   Numeric × Numeric
@@ -89,14 +82,38 @@ func BleveNumeric(token []byte) bool {
 	return true
 }
 
-var ideoRange = rangetable.Merge(unicode.Ideographic, unicode.Katakana, unicode.Hiragana)
-var ideographic = filter.Entirely(ideoRange) // would filter.Contains be better?
-
-// BleveIdeographic determines if a token is comprised entirely of ideographs, by the
-// Bleve segmenter's definition. It adds Katakana & Hiragana to unicode.Ideographic.
-// This API is experimental.
+// BleveIdeographic determines if a token is comprised ideographs, by the
+// Bleve segmenter's definition. It is the union of Han, Katakana, & Hiragana.
+// See https://github.com/blevesearch/segment/blob/master/segment_words.rl
+// ...and search for uses of "Ideo". This API is experimental.
 func BleveIdeographic(token []byte) bool {
-	return ideographic(token)
+	var pos int
+
+	for pos < len(token) {
+		current, w := trie.lookup(token[pos:])
+
+		ideo := current.is(_BleveIdeographic)
+		if pos == 0 {
+			// must start with ideo
+			if ideo {
+				pos += w
+				continue
+			}
+			// not ideo, can move on
+			return false
+		}
+
+		ignore := current.is(_Ignore)
+		if ideo || ignore {
+			pos += w
+			continue
+		}
+
+		// if we get here, none of the above rules apply
+		return false
+	}
+
+	return true
 }
 
 // On the complex topic of CJK & Unicode:
