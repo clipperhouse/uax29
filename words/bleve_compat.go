@@ -18,7 +18,7 @@ func BleveNumeric(token []byte) bool {
 				pos += w
 				continue
 			}
-			// definitely not Numeric, can move on
+			// not numeric, can move on
 			return false
 		}
 
@@ -99,6 +99,7 @@ func BleveIdeographic(token []byte) bool {
 				pos += w
 				continue
 			}
+			// not ideo, can move on
 			return false
 		}
 
