@@ -15,8 +15,25 @@ const (
 	_Ignore     = _Extend | _Format | _ZWJ
 )
 
+type options struct {
+	// Web will instuct the segmenter to consider 'web words',
+	// (such as #hashtag, @username, email@domain.com) as
+	// single tokens. By the baseline Unicode standard, they are
+	// by default considered multiple tokens.
+	// The segmenter's logic here is fairly naive,
+	// it basically just treats '@' and '#' as letters.
+	// The validity of (say) email addresses is out of
+	// scope.
+	Web bool
+}
+
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner.
 func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	return splitFuncOpts(data, atEOF, options{})
+}
+
+// splitFuncOpts bufio.SplitFunc implementation of word segmentation, with options
+func splitFuncOpts(data []byte, atEOF bool, opts options) (advance int, token []byte, err error) {
 	if len(data) == 0 {
 		return 0, nil, nil
 	}
@@ -96,6 +113,32 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			continue
 		}
 
+		// This is naive, hopefully good enough for most apps,
+		// but it may help to add tighter logic for each.
+		if opts.Web {
+			const _Web = _WebEmail | _WebTag | _WebUrl
+			if current.is(_Web) && last.is(_Web) {
+				pos += w
+
+				// Optimization: look for a run
+				for pos < len(data) {
+					current2, w2 := trie.lookup(data[pos:])
+
+					if !current2.is(_Web) {
+						break
+					}
+
+					// Update stateful vars
+					current = current2
+					w = w2
+
+					pos += w
+				}
+
+				continue
+			}
+		}
+
 		// WB4 applies to subsequent rules; there is an implied "ignoring Extend & Format & ZWJ"
 		// https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
 		// The previous/subsequent methods are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
@@ -104,28 +147,33 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// https://unicode.org/reports/tr29/#WB8
 		// https://unicode.org/reports/tr29/#WB9
 		// https://unicode.org/reports/tr29/#WB10
-		if current.is(_Numeric|_AHLetter) && last.is(_Numeric|_AHLetter|_Ignore) {
-			// Hot path: WB5/8/9/10 applies, and maybe a run
-			if last.is(_Numeric | _AHLetter) {
-				pos += w
-				for pos < len(data) {
-					lookup, w2 := trie.lookup(data[pos:])
+		// Combining rules into "adjacent_Numeric or _AHLetter", which I think is correct, tests pass
+		const ahnum = _Numeric | _AHLetter
+		if current.is(ahnum) && last.is(ahnum|_Ignore) {
 
-					if !lookup.is(_Numeric | _AHLetter) {
+			// Optimization: look for a run without _Ignore, seems likely
+			if last.is(ahnum) {
+				pos += w
+
+				for pos < len(data) {
+					current2, w2 := trie.lookup(data[pos:])
+
+					if !current2.is(ahnum) {
 						break
 					}
 
 					// Update stateful vars
-					current = lookup
+					current = current2
 					w = w2
 
 					pos += w
 				}
+
 				continue
 			}
 
 			// Otherwise, do proper lookback
-			if previous(_Numeric|_AHLetter, data[:pos]) {
+			if previous(ahnum, data[:pos]) {
 				pos += w
 				continue
 			}

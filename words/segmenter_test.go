@@ -51,6 +51,14 @@ func TestSegmenterUnicode(t *testing.T) {
 	}
 }
 
+func TestSegmenterWeb(t *testing.T) {
+	text := []byte("Hello pets.com and me@you.com and #hashtag and @handle plus http://foo.com/stuff?x=y&z=%20+a http://foo.com/stuff.")
+	seg := words.NewSegmenterWeb(text)
+	for seg.Next() {
+		t.Logf("%q", seg.Text())
+	}
+}
+
 // TestSegmenterRoundtrip tests that all input bytes are output after segmentation.
 // De facto, it also tests that we don't get infinite loops, or ever return an error.
 func TestSegmenterRoundtrip(t *testing.T) {

@@ -138,6 +138,46 @@ func (p prop) generateTrie() error {
 		runesByProperty["BleveIdeographic"] = runes
 	}
 
+	if p.name == "Word" {
+		var alpha []rune
+		for l := 'a'; l <= 'z'; l++ {
+			alpha = append(alpha, l)
+		}
+		for l := 'A'; l <= 'Z'; l++ {
+			alpha = append(alpha, l)
+		}
+
+		var num []rune
+		for l := '0'; l <= '9'; l++ {
+			num = append(num, l)
+		}
+
+		// #hashtags and @mentions
+		tag := []rune{'@', '#'}
+		tag = append(tag, alpha...)
+		tag = append(tag, num...)
+		runesByProperty["WebTag"] = tag
+
+		email := []rune{ //https://stackoverflow.com/a/2049510
+			'@',
+			'!', '#', '$', '%', '&', '\'',
+			'*', '.', '+', '-', '/', '=', '?',
+			'^', '_', '`', '{', '|', '}', '~',
+		}
+		email = append(email, alpha...)
+		email = append(email, num...)
+		runesByProperty["WebEmail"] = email
+
+		url := []rune{ // https://stackoverflow.com/a/7109208
+			'-', '.', '_', '~', ':', '/', '?', '#',
+			'[', ']', '@', '!', '$', '&', '\'', '(', ')',
+			'*', '+', ',', ';', '%', '=',
+		}
+		url = append(url, alpha...)
+		url = append(url, num...)
+		runesByProperty["WebUrl"] = url
+	}
+
 	// Keep the order stable
 	properties := make([]string, 0, len(runesByProperty))
 	for property := range runesByProperty {
