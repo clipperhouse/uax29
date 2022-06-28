@@ -92,10 +92,9 @@ func BleveIdeographic(token []byte) bool {
 	for pos < len(token) {
 		current, w := trie.lookup(token[pos:])
 
-		ideo := current.is(_BleveIdeographic)
 		if pos == 0 {
 			// must start with ideo
-			if ideo {
+			if current.is(_BleveIdeographic) {
 				pos += w
 				continue
 			}
@@ -103,8 +102,8 @@ func BleveIdeographic(token []byte) bool {
 			return false
 		}
 
-		ignore := current.is(_Ignore)
-		if ideo || ignore {
+		// approximates https://unicode.org/reports/tr29/#WB13
+		if current.is(_BleveIdeographic | _ExtendNumLet | _Ignore) {
 			pos += w
 			continue
 		}
