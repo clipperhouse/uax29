@@ -2,8 +2,8 @@ package words_test
 
 import (
 	"bytes"
-	"io/ioutil"
 	"math/rand"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -72,7 +72,7 @@ func TestInvalidUTF8(t *testing.T) {
 
 	// Btw, don't edit UTF-8-test.txt: your editor might turn it into valid UTF-8!
 
-	input, err := ioutil.ReadFile("../testdata/UTF-8-test.txt")
+	input, err := os.ReadFile("../testdata/UTF-8-test.txt")
 
 	if err != nil {
 		t.Error(err)
@@ -151,7 +151,7 @@ func getRandomBytes() []byte {
 }
 
 func BenchmarkScanner(b *testing.B) {
-	file, err := ioutil.ReadFile("../testdata/sample.txt")
+	file, err := os.ReadFile("../testdata/sample.txt")
 
 	if err != nil {
 		b.Error(err)
