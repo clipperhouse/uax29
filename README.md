@@ -14,7 +14,7 @@ Any time our code operates on individual words, we are tokenizing. Often, we do 
 
 We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
 
-![Go](https://github.com/clipperhouse/uax29/workflows/Go/badge.svg)
+![Go](https://github.com/clipperhouse/uax29/actions/workflows/gotest.yml/badge.svg)
 
 ### See also
 
