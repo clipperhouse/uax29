@@ -30,7 +30,7 @@ _For our purposes, “segment”, “sentence”, and “token” are used synon
 
 We use the Unicode [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
 
-![Go](https://github.com/clipperhouse/uax29/workflows/Go/badge.svg)
+![Go](https://github.com/clipperhouse/uax29/actions/workflows/gotest.yml/badge.svg)
 
 ## APIs
 
