@@ -3,15 +3,15 @@ package words
 import "unicode/utf8"
 
 // previousIndex works backward until it hits a rune in properties,
-// ignoring runes in the _Ignore property, and returns the index of the rune in the buffer.
-// It returns -1 if a properties rune is not found.
+// ignoring runes with the _Ignore property (per WB4), and returns
+// the index in data. It returns -1 if such a rune is not found.
 func previousIndex(properties property, data []byte) int {
 	// Start at the end of the buffer and move backwards
 	i := len(data)
 	for i > 0 {
 		_, w := utf8.DecodeLastRune(data[:i])
+
 		i -= w
-		// I think it's OK not to handle w == 0 here; will fall through to break
 
 		lookup, _ := trie.lookup(data[i:])
 		// I think it's OK to elide width here; will fall through to break
@@ -32,18 +32,20 @@ func previousIndex(properties property, data []byte) int {
 }
 
 // previous works backward in the buffer until it hits a rune in properties,
-// ignoring runes in the _Ignore property.
+// ignoring runes with the _Ignore property per WB4
 func previous(properties property, data []byte) bool {
 	return previousIndex(properties, data) != -1
 }
 
 // subsequent looks ahead in the buffer until it hits a rune in properties,
-// ignoring runes in the _Ignore property.
+// ignoring runes with the _Ignore property per WB4
 func subsequent(properties property, data []byte) bool {
 	i := 0
 	for i < len(data) {
 		lookup, w := trie.lookup(data[i:])
-		// I think it's OK not to handle w == 0 here; will fall through to break
+		if w == 0 {
+			break
+		}
 
 		if lookup.is(_Ignore) {
 			i += w

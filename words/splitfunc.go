@@ -101,17 +101,17 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// The previous/subsequent methods are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
 
 		// https://unicode.org/reports/tr29/#WB5
-		// https://unicode.org/reports/tr29/#WB8
-		// https://unicode.org/reports/tr29/#WB9
-		// https://unicode.org/reports/tr29/#WB10
-		if current.is(_Numeric|_AHLetter) && last.is(_Numeric|_AHLetter|_Ignore) {
-			// Hot path: WB5/8/9/10 applies, and maybe a run
-			if last.is(_Numeric | _AHLetter) {
+		if current.is(_AHLetter) && last.is(_AHLetter|_Ignore) {
+			// Optimization: maybe a run without ignored characters
+			if last.is(_AHLetter) {
 				pos += w
 				for pos < len(data) {
 					lookup, w2 := trie.lookup(data[pos:])
+					if !lookup.is(_AHLetter) {
+						break
+					}
 
-					if !lookup.is(_Numeric | _AHLetter) {
+					if w2 == 0 {
 						break
 					}
 
@@ -124,8 +124,8 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 				continue
 			}
 
-			// Otherwise, do proper lookback
-			if previous(_Numeric|_AHLetter, data[:pos]) {
+			// Otherwise, do proper lookback per WB4
+			if previous(_AHLetter, data[:pos]) {
 				pos += w
 				continue
 			}
@@ -188,6 +188,43 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 		}
 
+		// https://unicode.org/reports/tr29/#WB8
+		// https://unicode.org/reports/tr29/#WB9
+		// https://unicode.org/reports/tr29/#WB10
+		if current.is(_Numeric|_AHLetter) && last.is(_Numeric|_AHLetter|_Ignore) {
+			// Note: this logic de facto expresses WB5 as well, but harmless since WB5
+			// was already tested above
+
+			// Optimization: maybe a run without ignored characters
+			if last.is(_Numeric | _AHLetter) {
+				pos += w
+				for pos < len(data) {
+					lookup, w2 := trie.lookup(data[pos:])
+
+					if !lookup.is(_Numeric | _AHLetter) {
+						break
+					}
+
+					if w2 == 0 {
+						break
+					}
+
+					// Update stateful vars
+					current = lookup
+					w = w2
+
+					pos += w
+				}
+				continue
+			}
+
+			// Otherwise, do proper lookback per WB4
+			if previous(_Numeric|_AHLetter, data[:pos]) {
+				pos += w
+				continue
+			}
+		}
+
 		// Optimization: determine if WB11 can possibly apply
 		maybeWB11 := current.is(_Numeric) && last.is(_MidNum|_MidNumLetQ|_Ignore)
 
@@ -213,13 +250,16 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 		// https://unicode.org/reports/tr29/#WB13
 		if current.is(_Katakana) && last.is(_Katakana|_Ignore) {
-			// Hot path: WB13 applies, and maybe a run
+			// Optimization: maybe a run without ignored characters
 			if last.is(_Katakana) {
 				pos += w
 				for pos < len(data) {
 					lookup, w2 := trie.lookup(data[pos:])
-
 					if !lookup.is(_Katakana) {
+						break
+					}
+
+					if w2 == 0 {
 						break
 					}
 
@@ -232,7 +272,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 				continue
 			}
 
-			// Otherwise, do proper lookback
+			// Otherwise, do proper lookback per WB4
 			if previous(_Katakana, data[:pos]) {
 				pos += w
 				continue
@@ -275,6 +315,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 			for i > 0 {
 				_, w := utf8.DecodeLastRune(data[:i])
+				if w == 0 {
+					break
+				}
+
 				i -= w
 
 				lookup, _ := trie.lookup(data[i:])
