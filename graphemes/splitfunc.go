@@ -76,12 +76,8 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#GB4
-		if last.is(_Control | _CR | _LF) {
-			break
-		}
-
 		// https://unicode.org/reports/tr29/#GB5
-		if current.is(_Control | _CR | _LF) {
+		if (current | last).is(_Control | _CR | _LF) {
 			break
 		}
 
@@ -120,6 +116,13 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			pos += w
 			continue
 		}
+
+		// https://unicode.org/reports/tr29/#GB9c
+		// TODO(clipperhouse):
+		// It appears to be added in Unicode 15.1.0:
+		// https://unicode.org/versions/Unicode15.1.0/#Migration
+		// This package currently supports Unicode 15.0.0, so
+		// out of scope for now
 
 		// https://unicode.org/reports/tr29/#GB11
 		if current.is(_ExtendedPictographic) && last.is(_ZWJ) && previous(_ExtendedPictographic, data[:pos-lastw]) {
