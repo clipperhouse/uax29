@@ -189,7 +189,7 @@ main:
 		}
 
 		// Optimization: determine if SB11 can possibly apply
-		maybeSB11 := last.is(_SATerm | _Close | _Sp | _ParaSep | _Ignore)
+		maybeSB11 := lastExIgnore.is(_SATerm | _Close | _Sp | _ParaSep)
 
 		// https://unicode.org/reports/tr29/#SB11
 		if maybeSB11 {
