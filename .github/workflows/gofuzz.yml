@@ -15,11 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: '1.18'
-        check-latest: true
+      uses: actions/setup-go@v5
     - name: Check out code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: ${{ matrix.package }}.${{ matrix.fuzzer }}
       run: go test -fuzz=${{ matrix.fuzzer }} -fuzztime=60s github.com/clipperhouse/uax29/${{ matrix.package }}
