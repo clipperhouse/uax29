@@ -1,7 +1,5 @@
 package words
 
-import "unicode/utf8"
-
 var trie = newWordsTrie(0)
 
 // is determines if lookup intersects propert(ies)
@@ -27,6 +25,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 	var lastExIgnore property     // "last excluding ignored categories"
 	var lastLastExIgnore property // "the last one before that"
+	var regionalIndicatorCount int
 
 	// https://unicode.org/reports/tr29/#WB1
 	{
@@ -197,45 +196,15 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			continue
 		}
 
-		// Optimization: determine if WB15 or WB16 can possibly apply
-		maybeWB1516 := current.is(_RegionalIndicator) && last.is(_RegionalIndicator|_Ignore)
+		maybeWB1516 := current.is(_RegionalIndicator) && lastExIgnore.is(_RegionalIndicator)
 
 		// https://unicode.org/reports/tr29/#WB15 and
 		// https://unicode.org/reports/tr29/#WB16
 		if maybeWB1516 {
-			// WB15: Odd number of RI before hitting start of text
-			// WB16: Odd number of RI before hitting [^RI], aka "not RI"
+			regionalIndicatorCount++
 
-			i := pos
-			count := 0
-
-			for i > 0 {
-				_, w := utf8.DecodeLastRune(data[:i])
-				if w == 0 {
-					break
-				}
-
-				i -= w
-
-				lookup, _ := trie.lookup(data[i:])
-
-				if lookup.is(_Ignore) {
-					continue
-				}
-
-				if !lookup.is(_RegionalIndicator) {
-					// It's WB16
-					break
-				}
-
-				count++
-			}
-
-			// If i == 0, we fell through and hit sot (start of text), so WB15 applies
-			// If i > 0, we hit a non-RI, so WB16 applies
-
-			oddRI := count%2 == 1
-			if oddRI {
+			odd := regionalIndicatorCount%2 == 1
+			if odd {
 				pos += w
 				continue
 			}
