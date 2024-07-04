@@ -23,6 +23,12 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	var pos, w int
 	var current property
 
+	var lastExIgnore property     // "last excluding ignored categories"
+	var lastLastExIgnore property // "last one before that"
+	var lastExIgnoreSp property
+	var lastExIgnoreClose property
+	var lastExIgnoreSpClose property
+
 	// https://unicode.org/reports/tr29/#SB1
 	{
 		// start of text always advances
@@ -54,6 +60,23 @@ main:
 		// to the right of the ×, from which we look back or forward
 
 		last := current
+
+		if !last.is(_Ignore) {
+			lastLastExIgnore = lastExIgnore
+			lastExIgnore = last
+		}
+
+		if !lastExIgnore.is(_Sp) {
+			lastExIgnoreSp = lastExIgnore
+		}
+
+		if !lastExIgnore.is(_Close) {
+			lastExIgnoreClose = lastExIgnore
+		}
+
+		if !lastExIgnoreSp.is(_Close) {
+			lastExIgnoreSpClose = lastExIgnoreSp
+		}
 
 		current, w = trie.lookup(data[pos:])
 		if w == 0 {
@@ -93,11 +116,8 @@ main:
 		// https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
 		// The previous/subsequent methods are shorthand for "seek a property but skip over Extend & Format on the way"
 
-		// Optimization: determine if SB6 can possibly apply
-		maybeSB6 := current.is(_Numeric) && last.is(_ATerm|_Ignore)
-
 		// https://unicode.org/reports/tr29/#SB6
-		if maybeSB6 {
+		if current.is(_Numeric) && lastExIgnore.is(_ATerm) {
 			if previous(_ATerm, data[:pos]) {
 				pos += w
 				continue
@@ -105,7 +125,7 @@ main:
 		}
 
 		// Optimization: determine if SB7 can possibly apply
-		maybeSB7 := current.is(_Upper) && last.is(_ATerm|_Ignore)
+		maybeSB7 := current.is(_Upper) && last.is(_ATerm|_Ignore) && lastLastExIgnore.is(_Upper|_Lower)
 
 		// https://unicode.org/reports/tr29/#SB7
 		if maybeSB7 {
@@ -117,7 +137,7 @@ main:
 		}
 
 		// Optimization: determine if SB8 can possibly apply
-		maybeSB8 := last.is(_ATerm | _Close | _Sp | _Ignore)
+		maybeSB8 := lastExIgnoreSpClose.is(_ATerm)
 
 		// https://unicode.org/reports/tr29/#SB8
 		if maybeSB8 {
@@ -145,130 +165,27 @@ main:
 			}
 
 			if subsequent(_Lower, data[p:]) {
-				p2 := pos
-
-				// Zero or more Sp
-				sp := pos
-				for {
-					sp = previousIndex(_Sp, data[:sp])
-					if sp < 0 {
-						break
-					}
-					p2 = sp
-				}
-
-				// Zero or more Close
-				close := p2
-				for {
-					close = previousIndex(_Close, data[:close])
-					if close < 0 {
-						break
-					}
-					p2 = close
-				}
-
-				// Having looked back past Sp's, Close's, and intervening Extend|Format,
-				// is there an ATerm?
-				if previous(_ATerm, data[:p2]) {
-					pos += w
-					continue
-				}
+				pos += w
+				continue
 			}
 		}
-
-		// Optimization: determine if SB8a can possibly apply
-		maybeSB8a := current.is(_SContinue|_SATerm) && last.is(_SATerm|_Close|_Sp|_Ignore)
 
 		// https://unicode.org/reports/tr29/#SB8a
-		if maybeSB8a {
-			p := pos
-
-			// Zero or more Sp
-			sp := p
-			for {
-				sp = previousIndex(_Sp, data[:sp])
-				if sp < 0 {
-					break
-				}
-				p = sp
-			}
-
-			// Zero or more Close
-			close := p
-			for {
-				close = previousIndex(_Close, data[:close])
-				if close < 0 {
-					break
-				}
-				p = close
-			}
-
-			// Having looked back past Sp, Close, and intervening Extend|Format,
-			// is there an SATerm?
-			if previous(_SATerm, data[:p]) {
-				pos += w
-				continue
-			}
+		if current.is(_SContinue|_SATerm) && lastExIgnoreSpClose.is(_SATerm) {
+			pos += w
+			continue
 		}
-
-		// Optimization: determine if SB9 can possibly apply
-		maybeSB9 := current.is(_Close|_Sp|_ParaSep) && last.is(_SATerm|_Close|_Ignore)
 
 		// https://unicode.org/reports/tr29/#SB9
-		if maybeSB9 {
-			p := pos
-
-			// Zero or more Close's
-			close := p
-			for {
-				close = previousIndex(_Close, data[:close])
-				if close < 0 {
-					break
-				}
-				p = close
-			}
-
-			// Having looked back past Close's and intervening Extend|Format,
-			// is there an SATerm?
-			if previous(_SATerm, data[:p]) {
-				pos += w
-				continue
-			}
+		if current.is(_Close|_Sp|_ParaSep) && lastExIgnoreClose.is(_SATerm) {
+			pos += w
+			continue
 		}
 
-		// Optimization: determine if SB10 can possibly apply
-		maybeSB10 := current.is(_Sp|_ParaSep) && last.is(_SATerm|_Close|_Sp|_Ignore)
-
 		// https://unicode.org/reports/tr29/#SB10
-		if maybeSB10 {
-			p := pos
-
-			// Zero or more Sp's
-			sp := p
-			for {
-				sp = previousIndex(_Sp, data[:sp])
-				if sp < 0 {
-					break
-				}
-				p = sp
-			}
-
-			// Zero or more Close's
-			close := p
-			for {
-				close = previousIndex(_Close, data[:close])
-				if close < 0 {
-					break
-				}
-				p = close
-			}
-
-			// Having looked back past Sp's, Close's, and intervening Extend|Format,
-			// is there an SATerm?
-			if previous(_SATerm, data[:p]) {
-				pos += w
-				continue
-			}
+		if current.is(_Sp|_ParaSep) && lastExIgnoreSpClose.is(_SATerm) {
+			pos += w
+			continue
 		}
 
 		// Optimization: determine if SB11 can possibly apply
