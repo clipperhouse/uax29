@@ -28,10 +28,12 @@ We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#
 
 ### Other language implementations
 
+[C#](https://github.com/clipperhouse/uax29.net) (also by me)
+
 [JavaScript](https://github.com/tc39/proposal-intl-segmenter)
 
 [Rust](https://unicode-rs.github.io/unicode-segmentation/unicode_segmentation/trait.UnicodeSegmentation.html)
 
-[Java](https://lucene.apache.org/core/3_5_0/api/core/org/apache/lucene/analysis/standard/StandardTokenizerImpl.html)
+[Java](https://lucene.apache.org/core/6_5_0/core/org/apache/lucene/analysis/standard/StandardTokenizer.html)
 
 [Python](https://uniseg-python.readthedocs.io/en/latest/)
