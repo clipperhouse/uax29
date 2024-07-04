@@ -1,7 +1,5 @@
 package graphemes
 
-import "unicode/utf8"
-
 var trie = newGraphemesTrie(0)
 
 // is determines if lookup intersects propert(ies)
@@ -20,6 +18,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	// These vars are stateful across loop iterations
 	var pos, w int
 	var current property
+	var regionalIndicatorCount int
 
 	// https://unicode.org/reports/tr29/#GB1
 	{
@@ -130,31 +129,13 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			continue
 		}
 
-		// https://unicode.org/reports/tr29/#GB12 and
+		// https://unicode.org/reports/tr29/#GB12
 		// https://unicode.org/reports/tr29/#GB13
 		if (current & last).is(_RegionalIndicator) {
-			i := pos
-			count := 0
+			regionalIndicatorCount++
 
-			for i > 0 {
-				_, w := utf8.DecodeLastRune(data[:i])
-				i -= w
-
-				lookup, _ := trie.lookup(data[i:])
-
-				if !lookup.is(_RegionalIndicator) {
-					// It's GB13
-					break
-				}
-
-				count++
-			}
-
-			// If i == 0, we fell through and hit sot (start of text), so GB12 applies
-			// If i > 0, we hit a non-RI, so GB13 applies
-
-			oddRI := count%2 == 1
-			if oddRI {
+			odd := regionalIndicatorCount%2 == 1
+			if odd {
 				pos += w
 				continue
 			}
