@@ -25,8 +25,14 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	var pos, w int
 	var current property
 
+	// https://unicode.org/reports/tr29/#WB1
+	{
+		// start of text always advances
+		current, w = trie.lookup(data[pos:])
+		pos += w
+	}
+
 	for {
-		sot := pos == 0         // "start of text"
 		eot := pos == len(data) // "end of text"
 
 		if eot {
@@ -53,12 +59,6 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 			// Rune extends past current data, request more
 			return 0, nil, nil
-		}
-
-		// https://unicode.org/reports/tr29/#WB1
-		if sot {
-			pos += w
-			continue
 		}
 
 		// Optimization: no rule can possibly apply
