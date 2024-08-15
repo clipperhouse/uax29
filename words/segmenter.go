@@ -12,6 +12,12 @@ func NewSegmenter(data []byte) *iterators.Segmenter {
 	return seg
 }
 
+func NewSegmenterConfig(data []byte, c *Config) *iterators.Segmenter {
+	seg := iterators.NewSegmenter(c.SplitFunc)
+	seg.SetText(data)
+	return seg
+}
+
 // SegmentAll will iterate through all tokens and collect them into a [][]byte.
 // This is a convenience method -- if you will be allocating such a slice anyway,
 // this will save you some code. The downside is that this allocation is
@@ -21,7 +27,8 @@ func SegmentAll(data []byte) [][]byte {
 	// Optimization: guesstimate that the average word is 3 bytes,
 	// allocate a large enough array to avoid resizing
 	result := make([][]byte, 0, len(data)/3)
+	c := Config{}
 
-	_ = iterators.All(data, &result, SplitFunc) // can elide the error, see tests
+	_ = iterators.All(data, &result, c.SplitFunc) // can elide the error, see tests
 	return result
 }
