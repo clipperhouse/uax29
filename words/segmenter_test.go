@@ -88,6 +88,15 @@ func TestSegmenterWordlike(t *testing.T) {
 	}
 }
 
+func TestSegmenterHandles(t *testing.T) {
+	c := words.NewConfig('@', '/')
+	text := []byte("Hello, 世界. @clipperhouse Ni@ce dog! 👍🐶 3/4 tcp/ip")
+	seg := words.NewSegmenterConfig(text, c)
+	for seg.Next() {
+		t.Logf("%q\n", seg.Bytes())
+	}
+}
+
 func TestSegmenterInvalidUTF8(t *testing.T) {
 	// For background, see testdata/UTF-8-test.txt, or:
 	// https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt

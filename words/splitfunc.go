@@ -13,8 +13,10 @@ const (
 	_Ignore     = _Extend | _Format | _ZWJ
 )
 
+var SplitFunc = empty.SplitFunc
+
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner.
-func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
+func (c *Config) SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if len(data) == 0 {
 		return 0, nil, nil
 	}
@@ -31,6 +33,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	{
 		// start of text always advances
 		current, w = trie.lookup(data[pos:])
+		if c != nil && c.joiners != nil {
+			if _, found := c.joiners[data[pos]]; found {
+				current |= _AHLetter
+			}
+		}
 		pos += w
 	}
 
@@ -105,6 +112,12 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// WB4 applies to subsequent rules; there is an implied "ignoring Extend & Format & ZWJ"
 		// https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
 		// The previous/subsequent methods are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
+
+		if c != nil && c.joiners != nil {
+			if _, found := c.joiners[data[pos]]; found {
+				current |= _AHLetter
+			}
+		}
 
 		// https://unicode.org/reports/tr29/#WB5
 		if current.is(_AHLetter) && lastExIgnore.is(_AHLetter) {
