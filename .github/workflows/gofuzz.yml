@@ -10,7 +10,7 @@ jobs:
   all:
     strategy:
         matrix:
-          package: [words, sentences, graphemes]
+          package: [words, sentences, graphemes, phrases]
           fuzzer: [FuzzValidShort, FuzzValidLong, FuzzInvalid]
     runs-on: ubuntu-latest
     steps:
