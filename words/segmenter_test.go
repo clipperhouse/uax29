@@ -5,6 +5,7 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"time"
 	"unicode"
 	"unicode/utf8"
 
@@ -126,8 +127,47 @@ func BenchmarkSegmenter(b *testing.B) {
 	}
 
 	b.ResetTimer()
+	bytes := len(file)
+	b.SetBytes(int64(bytes))
+	seg := words.NewSegmenter(file)
+
+	c := 0
+	start := time.Now()
+
+	for i := 0; i < b.N; i++ {
+		seg.SetText(file)
+
+		for seg.Next() {
+			c++
+		}
+
+		if err := seg.Err(); err != nil {
+			b.Error(err)
+		}
+	}
+
+	elapsed := time.Since(start)
+	n := float64(b.N)
+
+	tokensPerOp := float64(c) / n
+	nsPerOp := float64(elapsed.Nanoseconds()) / n
+
+	b.ReportMetric(1e3*tokensPerOp/nsPerOp, "MMtokens/s")
+	b.ReportMetric(tokensPerOp, "tokens/op")
+	b.ReportMetric(float64(bytes)/tokensPerOp, "B/token")
+}
+
+func BenchmarkSegmenterFilter(b *testing.B) {
+	file, err := os.ReadFile("../testdata/sample.txt")
+
+	if err != nil {
+		b.Error(err)
+	}
+
+	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 	seg := words.NewSegmenter(file)
+	seg.Filter(filter.Wordlike)
 
 	for i := 0; i < b.N; i++ {
 		seg.SetText(file)
