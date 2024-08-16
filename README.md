@@ -6,6 +6,8 @@ This package tokenizes (splits) words, sentences and graphemes, based on [Unicod
 
 [uax29/graphemes](https://github.com/clipperhouse/uax29/tree/master/graphemes)
 
+[uax29/phrases](https://github.com/clipperhouse/uax29/tree/master/phrases)
+
 ### Why tokenize?
 
 Any time our code operates on individual words, we are tokenizing. Often, we do it ad hoc, such as splitting on spaces, which gives inconsistent results. The Unicode standard is better: it is multi-lingual, and handles punctuation, special characters, etc.
