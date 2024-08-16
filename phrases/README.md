@@ -1,4 +1,6 @@
-An implementation of phrase boundaries from [Unicode text segmentation](https://unicode.org/reports/tr29/#phrase_Boundaries) (UAX 29), for Unicode version 15.0.0.
+An implementation of “phrase boundaries”, a variation on words boundaries from [Unicode text segmentation](https://unicode.org/reports/tr29/#Word_Boundaries) (UAX 29).
+
+“Phrases” are not a Unicode standard, it is our definition that we think may be useful. We define it as “a series of words separated only by spaces”. Punctuation breaks phrases. Emojis are treated as words.
 
 ## Quick start
 
@@ -7,30 +9,43 @@ go get "github.com/clipperhouse/uax29/phrases"
 ```
 
 ```go
-import "github.com/clipperhouse/uax29/phrases"
+text := []byte("Hello, 世界. Nice — and totally adorable — dog; perhaps the “best one”! 🏆 🐶")
 
-text := []byte("Hello, 世界. Nice dog! 👍🐶")
+phrase := phrases.NewSegmenter(text)
 
-segments := phrases.NewSegmenter(text)            // A segmenter is an iterator over the phrases
-
-for segments.Next() {                           // Next() returns true until end of data or error
-	fmt.Printf("%q\n", segments.Bytes())        // Do something with the current token
+// Next returns true until error or end of data
+for phrase.Next() {
+	// Do something with the phrase
+	fmt.Printf("%q\n", phrase.Bytes())
 }
 
-if segments.Err() != nil {                      // Check the error
-	log.Fatal(segments.Err())
+// Gotta check the error!
+if err := phrase.Err(); err != nil {
+	log.Fatal(err)
 }
+// Output: "Hello"
+// ","
+// " "
+// "世"
+// "界"
+// "."
+// " Nice "
+// "—"
+// " and totally adorable "
+// "—"
+// " dog"
+// ";"
+// " perhaps the "
+// "“"
+// "best one"
+// "”"
+// "!"
+// " 🏆 🐶"
 ```
 
 [![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/phrases.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/phrases)
 
-_Note: this package will return all tokens, including whitespace and punctuation — it's not strictly “phrases” in the common sense. If you wish to omit things like whitespace and punctuation, you can use a filter (see below). For our purposes, “segment”, “phrase”, and “token” are used synonymously._
-
-## Conformance
-
-We use the Unicode [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
-
-![Go](https://github.com/clipperhouse/uax29/actions/workflows/gotest.yml/badge.svg)
+_Note: this package will return all tokens, including punctuation — it's not strictly “phrases” in the common sense. If you wish to omit things certain tokens, use a filter (see below). For our purposes, “segment”, “phrase”, and “token” are used synonymously._
 
 ## APIs
 
@@ -79,9 +94,13 @@ if scanner.Err() != nil {                       // Check the error
 
 ### Performance
 
-On a Mac laptop, we see around 100MB/s, which works out to around 30 million phrases (tokens, really) per second.
+On a Mac M2 laptop, we see around 240MB/s, which works out to around 30 million phrases (tokens, really) per second.
 
-You should see approximately constant memory when using `Segmenter` or `Scanner`, independent of data size. When using `SegmentAll()`, expect memory to be `O(n)` on the number of phrases (one slice per phrase, 24 bytes).
+You should see approximately constant memory when using `Segmenter` or `Scanner`, independent of data size. When using `SegmentAll()`, expect memory to be `O(n)` on the number of phrases (one slice per phrase).
+
+### Uses
+
+The uax29 module has 4 tokenizers. In decreasing granularity: sentences → phrases → words → graphemes. You can tokenize the tokens of other tokenizers! If you're doing embeddings, you might decide to split sentences, and embed the phrases or words within the sentence, as a way of chunking “meaningful units”.
 
 ### Invalid inputs
 
@@ -122,16 +141,16 @@ You might wish to lowercase all the phrases, for example:
 ```go
 text := []byte("Hello, 世界. Nice dog! 👍🐶")
 
-segments := phrases.NewSegmenter(text)
-segments.Transform(transformer.Lower)
+phrases := phrases.NewSegmenter(text)
+phrases.Transform(transformer.Lower)
 
-for segments.Next() {
+for phrases.Next() {
 	// Note that tokens come out lowercase
-	fmt.Printf("%q\n", segments.Bytes())
+	fmt.Printf("%q\n", phrases.Bytes())
 }
 
-if segments.Err() != nil {
-	log.Fatal(segments.Err())
+if phrases.Err() != nil {
+	log.Fatal(phrases.Err())
 }
 ```
 Here are a [few more examples](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/transformer).
@@ -142,8 +161,8 @@ See also [this stemming package](https://pkg.go.dev/github.com/clipperhouse/stem
 
 ### Limitations
 
-This package follows the basic UAX #29 specification. For more idiomatic treatment of phrases across languages, there is more that can be done, scroll down to the [“Notes:” section of the standard](https://unicode.org/reports/tr29/#phrase_Boundary_Rules):
+This package follows derives from the basic UAX #29 specification. For more idiomatic treatment of phrases across languages, there is more that can be done, scroll down to the [“Notes:” section of the standard](https://unicode.org/reports/tr29/#Word_Boundary_Rules):
 
 > It is not possible to provide a uniform set of rules that resolves all issues across languages or that handles all ambiguous situations within a given language. The goal for the specification presented in this annex is to provide a workable default; tailored implementations can be more sophisticated.
 
-I also found [this article](https://www.hathitrust.org/blogs/large-scale-search/multilingual-issues-part-1-phrase-segmentation) helpful.
+I also found [this article](https://www.hathitrust.org/blogs/large-scale-search/multilingual-issues-part-1-word-segmentation) helpful.

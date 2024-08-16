@@ -8,7 +8,7 @@ func (lookup property) is(properties property) bool {
 }
 
 const (
-	_AHLetter   = _ALetter | _HebrewLetter
+	_AHLetter   = _ALetter | _HebrewLetter | _WSegSpace | _ExtendedPictographic
 	_MidNumLetQ = _MidNumLet | _SingleQuote
 	_Ignore     = _Extend | _Format | _ZWJ
 )

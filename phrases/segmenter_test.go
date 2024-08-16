@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"os"
 	"testing"
+	"time"
 	"unicode"
 	"unicode/utf8"
 
@@ -37,7 +38,7 @@ func TestSegmenterRoundtrip(t *testing.T) {
 	}
 }
 
-func TestSegmenterphraselike(t *testing.T) {
+func TestSegmenterWordlike(t *testing.T) {
 	text := []byte("Hello, 世界. Nice dog! 👍🐶")
 	seg := phrases.NewSegmenter(text)
 	seg.Filter(filter.Entirely(unicode.Punct))
@@ -86,13 +87,16 @@ func BenchmarkSegmenter(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	b.SetBytes(int64(len(file)))
+	bytes := len(file)
+	b.SetBytes(int64(bytes))
 	seg := phrases.NewSegmenter(file)
+
+	c := 0
+	start := time.Now()
 
 	for i := 0; i < b.N; i++ {
 		seg.SetText(file)
 
-		c := 0
 		for seg.Next() {
 			c++
 		}
@@ -100,9 +104,17 @@ func BenchmarkSegmenter(b *testing.B) {
 		if err := seg.Err(); err != nil {
 			b.Error(err)
 		}
-
-		b.ReportMetric(float64(c), "tokens")
 	}
+
+	elapsed := time.Since(start)
+	n := float64(b.N)
+
+	tokensPerOp := float64(c) / n
+	nsPerOp := float64(elapsed.Nanoseconds()) / n
+
+	b.ReportMetric(1e3*tokensPerOp/nsPerOp, "MMtokens/s")
+	b.ReportMetric(tokensPerOp, "tokens/op")
+	b.ReportMetric(float64(bytes)/tokensPerOp, "B/token")
 }
 
 func BenchmarkSegmentAll(b *testing.B) {
