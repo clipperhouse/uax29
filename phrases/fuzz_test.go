@@ -15,11 +15,6 @@ import (
 // FuzzValidShort fuzzes small, valid UTF8 strings. I suspect more, shorter
 // strings in the corpus lead to more mutation and coverage. True?
 func FuzzValidShort(f *testing.F) {
-	// unicode test suite
-	for _, test := range unicodeTests {
-		f.Add(test.input)
-	}
-
 	// multi-lingual text, as small-ish lines
 	file, err := os.ReadFile("../testdata/sample.txt")
 	if err != nil {

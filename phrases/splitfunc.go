@@ -1,6 +1,6 @@
 package phrases
 
-var trie = newphrasesTrie(0)
+var trie = newPhrasesTrie(0)
 
 // is determines if lookup intersects propert(ies)
 func (lookup property) is(properties property) bool {

@@ -4,41 +4,12 @@ import (
 	"bytes"
 	"math/rand"
 	"os"
-	"reflect"
 	"testing"
 	"time"
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/phrases"
 )
-
-func TestScannerUnicode(t *testing.T) {
-	// From the Unicode test suite; see the gen/ folder.
-	var passed, failed int
-	for _, test := range unicodeTests {
-		var scanned [][]byte
-		scanner := phrases.NewScanner(bytes.NewReader(test.input))
-		for scanner.Scan() {
-			scanned = append(scanned, scanner.Bytes())
-		}
-
-		if err := scanner.Err(); err != nil {
-			t.Fatal(err)
-		}
-
-		if !reflect.DeepEqual(scanned, test.expected) {
-			failed++
-			t.Errorf(`
-	for input %v
-	expected  %v
-	got       %v
-	spec      %s`, test.input, test.expected, scanned, test.comment)
-		} else {
-			passed++
-		}
-	}
-	t.Logf("%d tests: passed %d, failed %d", len(unicodeTests), passed, failed)
-}
 
 // TestScannerRoundtrip tests that all input bytes are output after segmentation.
 // De facto, it also tests that we don't get infinite loops, or ever return an error.
@@ -156,34 +127,6 @@ func BenchmarkScanner(b *testing.B) {
 	if err != nil {
 		b.Error(err)
 	}
-
-	b.ResetTimer()
-	b.SetBytes(int64(len(file)))
-
-	r := bytes.NewReader(file)
-
-	for i := 0; i < b.N; i++ {
-		r.Reset(file)
-		sc := phrases.NewScanner(r)
-
-		c := 0
-		for sc.Scan() {
-			c++
-		}
-		if err := sc.Err(); err != nil {
-			b.Error(err)
-		}
-
-		b.ReportMetric(float64(c), "tokens")
-	}
-}
-
-func BenchmarkUnicodeSegments(b *testing.B) {
-	var buf bytes.Buffer
-	for _, test := range unicodeTests {
-		buf.Write(test.input)
-	}
-	file := buf.Bytes()
 
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))

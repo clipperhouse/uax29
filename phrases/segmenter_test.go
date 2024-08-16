@@ -3,7 +3,6 @@ package phrases_test
 import (
 	"bytes"
 	"os"
-	"reflect"
 	"testing"
 	"unicode"
 	"unicode/utf8"
@@ -11,45 +10,6 @@ import (
 	"github.com/clipperhouse/uax29/iterators/filter"
 	"github.com/clipperhouse/uax29/phrases"
 )
-
-func TestSegmenterUnicode(t *testing.T) {
-	// From the Unicode test suite; see the gen/ folder.
-	var passed, failed int
-	for _, test := range unicodeTests {
-		test := test
-
-		var segmented [][]byte
-		segmenter := phrases.NewSegmenter(test.input)
-		for segmenter.Next() {
-			segmented = append(segmented, segmenter.Bytes())
-		}
-
-		if err := segmenter.Err(); err != nil {
-			t.Fatal(err)
-		}
-
-		if !reflect.DeepEqual(segmented, test.expected) {
-			failed++
-			t.Errorf(`
-	for input %v
-	expected  %v
-	got       %v
-	spec      %s`, test.input, test.expected, segmented, test.comment)
-		} else {
-			passed++
-		}
-
-		// Test SegmentAll while we're here
-		all := phrases.SegmentAll(test.input)
-		if !reflect.DeepEqual(all, segmented) {
-			t.Error("calling SegmentAll should be identical to iterating Segmenter")
-		}
-	}
-
-	if len(unicodeTests) != passed+failed {
-		t.Errorf("Incomplete %d tests: passed %d, failed %d", len(unicodeTests), passed, failed)
-	}
-}
 
 // TestSegmenterRoundtrip tests that all input bytes are output after segmentation.
 // De facto, it also tests that we don't get infinite loops, or ever return an error.
@@ -161,33 +121,6 @@ func BenchmarkSegmentAll(b *testing.B) {
 		c := 0
 		for range segs {
 			c++
-		}
-
-		b.ReportMetric(float64(c), "tokens")
-	}
-}
-
-func BenchmarkUnicodeTests(b *testing.B) {
-	var buf bytes.Buffer
-	for _, test := range unicodeTests {
-		buf.Write(test.input)
-	}
-	file := buf.Bytes()
-
-	b.ResetTimer()
-	b.SetBytes(int64(len(file)))
-
-	seg := phrases.NewSegmenter(file)
-
-	for i := 0; i < b.N; i++ {
-		seg.SetText(file)
-
-		c := 0
-		for seg.Next() {
-			c++
-		}
-		if err := seg.Err(); err != nil {
-			b.Error(err)
 		}
 
 		b.ReportMetric(float64(c), "tokens")

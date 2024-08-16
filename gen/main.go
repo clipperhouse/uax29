@@ -30,6 +30,9 @@ func main() {
 			name: "Word",
 		},
 		{
+			name: "Phrase",
+		},
+		{
 			name: "Grapheme",
 		},
 		{
@@ -58,6 +61,10 @@ type prop struct {
 func (p prop) URL() string {
 	if p.url != "" {
 		return p.url
+	}
+
+	if p.name == "Phrase" {
+		p.name = "Word"
 	}
 
 	return fmt.Sprintf("%s/%sBreakProperty.txt", baseURL, p.name)
@@ -122,7 +129,7 @@ func (p prop) generateTrie() error {
 		// We don't need to generate emoji package
 		return nil
 	}
-	if p.name == "Word" || p.name == "Grapheme" {
+	if p.name == "Word" || p.name == "Phrase" || p.name == "Grapheme" {
 		if len(extendedPictographic) == 0 {
 			panic("didn't get emoji data; make sure it's loaded first")
 		}
@@ -171,6 +178,14 @@ func (p prop) generateTrie() error {
 		return err
 	}
 
+	if p.name == "Phrase" {
+		// Write to phrases package as well
+		err = writeTrie(p, trie, iotasByProperty)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -182,6 +197,9 @@ type unicodeTest struct {
 
 func (p prop) generateTests() error {
 	if p.name == "Emoji" {
+		return nil
+	}
+	if p.name == "Phrase" {
 		return nil
 	}
 	fmt.Println(p.TestURL())
