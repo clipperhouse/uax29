@@ -178,14 +178,6 @@ func (p prop) generateTrie() error {
 		return err
 	}
 
-	if p.name == "Phrase" {
-		// Write to phrases package as well
-		err = writeTrie(p, trie, iotasByProperty)
-		if err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 
