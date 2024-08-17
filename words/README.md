@@ -79,7 +79,7 @@ if scanner.Err() != nil {                       // Check the error
 
 ### Performance
 
-On a Mac laptop, we see around 100MB/s, which works out to around 30 million words (tokens, really) per second.
+On a Mac M2 laptop, we see around 160MB/s, which works out to around 40 million words (tokens, really) per second.
 
 You should see approximately constant memory when using `Segmenter` or `Scanner`, independent of data size. When using `SegmentAll()`, expect memory to be `O(n)` on the number of words (one slice per word, 24 bytes).
 

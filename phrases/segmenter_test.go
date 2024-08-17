@@ -1,63 +1,23 @@
-package words_test
+package phrases_test
 
 import (
 	"bytes"
 	"os"
-	"reflect"
 	"testing"
 	"time"
 	"unicode"
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/iterators/filter"
-	"github.com/clipperhouse/uax29/words"
+	"github.com/clipperhouse/uax29/phrases"
 )
-
-func TestSegmenterUnicode(t *testing.T) {
-	// From the Unicode test suite; see the gen/ folder.
-	var passed, failed int
-	for _, test := range unicodeTests {
-		test := test
-
-		var segmented [][]byte
-		segmenter := words.NewSegmenter(test.input)
-		for segmenter.Next() {
-			segmented = append(segmented, segmenter.Bytes())
-		}
-
-		if err := segmenter.Err(); err != nil {
-			t.Fatal(err)
-		}
-
-		if !reflect.DeepEqual(segmented, test.expected) {
-			failed++
-			t.Errorf(`
-	for input %v
-	expected  %v
-	got       %v
-	spec      %s`, test.input, test.expected, segmented, test.comment)
-		} else {
-			passed++
-		}
-
-		// Test SegmentAll while we're here
-		all := words.SegmentAll(test.input)
-		if !reflect.DeepEqual(all, segmented) {
-			t.Error("calling SegmentAll should be identical to iterating Segmenter")
-		}
-	}
-
-	if len(unicodeTests) != passed+failed {
-		t.Errorf("Incomplete %d tests: passed %d, failed %d", len(unicodeTests), passed, failed)
-	}
-}
 
 // TestSegmenterRoundtrip tests that all input bytes are output after segmentation.
 // De facto, it also tests that we don't get infinite loops, or ever return an error.
 func TestSegmenterRoundtrip(t *testing.T) {
 	const runs = 2000
 
-	seg := words.NewSegmenter(nil)
+	seg := phrases.NewSegmenter(nil)
 
 	for i := 0; i < runs; i++ {
 		input := getRandomBytes()
@@ -80,7 +40,7 @@ func TestSegmenterRoundtrip(t *testing.T) {
 
 func TestSegmenterWordlike(t *testing.T) {
 	text := []byte("Hello, 世界. Nice dog! 👍🐶")
-	seg := words.NewSegmenter(text)
+	seg := phrases.NewSegmenter(text)
 	seg.Filter(filter.Entirely(unicode.Punct))
 
 	for seg.Next() {
@@ -104,7 +64,7 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 		t.Error("input file should not be valid utf8")
 	}
 
-	sc := words.NewSegmenter(input)
+	sc := phrases.NewSegmenter(input)
 
 	var output []byte
 	for sc.Next() {
@@ -129,7 +89,7 @@ func BenchmarkSegmenter(b *testing.B) {
 	b.ResetTimer()
 	bytes := len(file)
 	b.SetBytes(int64(bytes))
-	seg := words.NewSegmenter(file)
+	seg := phrases.NewSegmenter(file)
 
 	c := 0
 	start := time.Now()
@@ -157,34 +117,6 @@ func BenchmarkSegmenter(b *testing.B) {
 	b.ReportMetric(float64(bytes)/tokensPerOp, "B/token")
 }
 
-func BenchmarkSegmenterFilter(b *testing.B) {
-	file, err := os.ReadFile("../testdata/sample.txt")
-
-	if err != nil {
-		b.Error(err)
-	}
-
-	b.ResetTimer()
-	b.SetBytes(int64(len(file)))
-	seg := words.NewSegmenter(file)
-	seg.Filter(filter.Wordlike)
-
-	for i := 0; i < b.N; i++ {
-		seg.SetText(file)
-
-		c := 0
-		for seg.Next() {
-			c++
-		}
-
-		if err := seg.Err(); err != nil {
-			b.Error(err)
-		}
-
-		b.ReportMetric(float64(c), "tokens")
-	}
-}
-
 func BenchmarkSegmentAll(b *testing.B) {
 	file, err := os.ReadFile("../testdata/sample.txt")
 
@@ -196,38 +128,11 @@ func BenchmarkSegmentAll(b *testing.B) {
 	b.SetBytes(int64(len(file)))
 
 	for i := 0; i < b.N; i++ {
-		segs := words.SegmentAll(file)
+		segs := phrases.SegmentAll(file)
 
 		c := 0
 		for range segs {
 			c++
-		}
-
-		b.ReportMetric(float64(c), "tokens")
-	}
-}
-
-func BenchmarkUnicodeTests(b *testing.B) {
-	var buf bytes.Buffer
-	for _, test := range unicodeTests {
-		buf.Write(test.input)
-	}
-	file := buf.Bytes()
-
-	b.ResetTimer()
-	b.SetBytes(int64(len(file)))
-
-	seg := words.NewSegmenter(file)
-
-	for i := 0; i < b.N; i++ {
-		seg.SetText(file)
-
-		c := 0
-		for seg.Next() {
-			c++
-		}
-		if err := seg.Err(); err != nil {
-			b.Error(err)
 		}
 
 		b.ReportMetric(float64(c), "tokens")
