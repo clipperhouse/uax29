@@ -88,10 +88,11 @@ func TestSegmenterWordlike(t *testing.T) {
 	}
 }
 
-func TestSegmenterHandles(t *testing.T) {
-	c := words.NewConfig('@', '/')
-	text := []byte("Hello, 世界. @clipperhouse Ni@ce dog! 👍🐶 3/4 tcp/ip")
-	seg := words.NewSegmenterConfig(text, c)
+var config = words.NewConfig().JoinMiddleCharacters("@-/").JoinLeadingCharacters("#.")
+
+func TestSegmenterConfig(t *testing.T) {
+	text := []byte("Hello, 世界. Tell me about your .com. I'm .01% interested and 3/4 of a mile away. Email me at foo@example.biz. #winning")
+	seg := words.NewSegmenterConfig(text, config)
 	for seg.Next() {
 		t.Logf("%q\n", seg.Bytes())
 	}
