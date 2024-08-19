@@ -9,6 +9,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/clipperhouse/uax29/iterators"
 	"github.com/clipperhouse/uax29/iterators/filter"
 	"github.com/clipperhouse/uax29/words"
 )
@@ -88,13 +89,64 @@ func TestSegmenterWordlike(t *testing.T) {
 	}
 }
 
-var config = words.NewConfig().JoinMiddleCharacters("@-/").JoinLeadingCharacters("#.")
+func TestSegmenterJoiners(t *testing.T) {
+	var config = words.NewConfig().JoinMiddleChars("@-/").JoinLeadingChars("#.")
 
-func TestSegmenterConfig(t *testing.T) {
-	text := []byte("Hello, 世界. Tell me about your .com. I'm .01% interested and 3/4 of a mile away. Email me at foo@example.biz. #winning")
-	seg := words.NewSegmenterConfig(text, config)
-	for seg.Next() {
-		t.Logf("%q\n", seg.Bytes())
+	set := func(seg *iterators.Segmenter) map[string]struct{} {
+		founds := make(map[string]struct{})
+		for seg.Next() {
+			founds[string(seg.Bytes())] = struct{}{}
+		}
+		return founds
+	}
+
+	text := []byte("Hello, 世界. Tell me about your super-cool .com. I'm .01% interested and 3/4 of a mile away. Email me at foo@example.biz. #winning")
+
+	seg1 := words.NewSegmenter(text)
+	founds1 := set(seg1)
+
+	seg2 := words.NewSegmenterConfig(text, config)
+	founds2 := set(seg2)
+
+	type test struct {
+		input string
+		// word should be found in standard, no-config segmenter
+		found1 bool
+		// word should be found in segmenter configured with joiners
+		found2 bool
+	}
+
+	tests := []test{
+		{"Hello", true, true},
+		{"世", true, true},
+		{"super", true, false},
+		{"-", true, false},
+		{"cool", true, false},
+		{"super-cool", false, true},
+		{"com", true, false}, // ".com" should usually be split, but joined with config
+		{".com", false, true},
+		{"01", true, false},
+		{".01", false, true},
+		{"3", true, false},
+		{"3/4", false, true},
+		{"foo", true, false},
+		{"@", true, false},
+		{"example.biz", true, false},
+		{"foo@example.biz", false, true},
+		{"#", true, false},
+		{"winning", true, false},
+		{"#winning", false, true},
+	}
+
+	for _, test := range tests {
+		_, found1 := founds1[test.input]
+		if found1 != test.found1 {
+			t.Fatalf("For %q, expected %t for found in non-config segmenter, but got %t", test.input, test.found1, found1)
+		}
+		_, found2 := founds2[test.input]
+		if found2 != test.found2 {
+			t.Fatalf("For %q, expected %t for found in segmenter with joiners, but got %t", test.input, test.found2, found2)
+		}
 	}
 }
 
