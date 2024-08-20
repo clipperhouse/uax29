@@ -1,6 +1,9 @@
 package words
 
-import "unicode/utf8"
+import (
+	"bufio"
+	"unicode/utf8"
+)
 
 var trie = newWordsTrie(0)
 
@@ -15,10 +18,11 @@ const (
 	_Ignore     = _Extend | _Format | _ZWJ
 )
 
-var SplitFunc = empty.SplitFunc
-
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner.
-func (c *Config) SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
+var SplitFunc bufio.SplitFunc = none.splitFunc
+
+// splitFunc is a bufio.splitFunc implementation of word segmentation, for use with bufio.Scanner.
+func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if len(data) == 0 {
 		return 0, nil, nil
 	}
@@ -31,13 +35,17 @@ func (c *Config) SplitFunc(data []byte, atEOF bool) (advance int, token []byte, 
 	var lastLastExIgnore property // "the last one before that"
 	var regionalIndicatorCount int
 
+	var r rune
+	if j != nil {
+		r, _ = utf8.DecodeRune(data[pos:])
+	}
+
 	// https://unicode.org/reports/tr29/#WB1
 	{
 		// start of text always advances
 		current, w = trie.lookup(data[pos:])
-		if c != nil && c.leadingJoiners != nil {
-			r, _ := utf8.DecodeRune(data[pos:])
-			if _, found := c.leadingJoiners[r]; found {
+		if j != nil && j.Leading != nil {
+			if runesContain(j.Leading, r) {
 				current |= _AHLetter
 			}
 		}
@@ -77,16 +85,16 @@ func (c *Config) SplitFunc(data []byte, atEOF bool) (advance int, token []byte, 
 			return 0, nil, nil
 		}
 
+		if j != nil && j.Mid != nil {
+			r, _ := utf8.DecodeRune(data[pos:])
+			if runesContain(j.Mid, r) {
+				current |= _MidNumLet
+			}
+		}
+
 		// Optimization: no rule can possibly apply
 		if current|last == 0 { // i.e. both are zero
 			break
-		}
-
-		if c != nil && c.midJoiners != nil {
-			r, _ := utf8.DecodeRune(data[pos:])
-			if _, found := c.midJoiners[r]; found {
-				current |= _MidNumLet
-			}
 		}
 
 		// https://unicode.org/reports/tr29/#WB3
