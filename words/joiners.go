@@ -1,0 +1,34 @@
+package words
+
+type Joiners struct {
+	// Mid specifies which characters (runes) should
+	// join words (tokens) where they would otherwise be split,
+	// in the middle of a word.
+	//
+	// For example, specifying "-" will join hypenated-words.
+	// Specifying "@" will ~preserve email addresses.
+	//
+	// Note that . (as in "example.com") and ' (as in "it's") are already mid-joiners,
+	// specifying them will be redundant and hurt performance.
+	Mid []rune
+
+	// Leading specifies which characters (runes) should
+	// join words (tokens) where they would otherwise be split,
+	// at the beginning of a word.
+	//
+	// For example, specifying "#" will join #hashtags.
+	// Specifying "." will preserve leading decimals like .01.
+	Leading []rune
+}
+
+var none *Joiners = nil
+
+func runesContain(runes []rune, rune rune) bool {
+	// Did some bechmarking, a map isn't faster for small numbers
+	for _, r := range runes {
+		if r == rune {
+			return true
+		}
+	}
+	return false
+}

@@ -2,6 +2,7 @@ package words_test
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"reflect"
 	"testing"
@@ -90,8 +91,6 @@ func TestSegmenterWordlike(t *testing.T) {
 }
 
 func TestSegmenterJoiners(t *testing.T) {
-	var config = words.NewConfig().JoinMiddleChars("@-/").JoinLeadingChars("#.")
-
 	set := func(seg *iterators.Segmenter) map[string]struct{} {
 		founds := make(map[string]struct{})
 		for seg.Next() {
@@ -105,7 +104,11 @@ func TestSegmenterJoiners(t *testing.T) {
 	seg1 := words.NewSegmenter(text)
 	founds1 := set(seg1)
 
-	seg2 := words.NewSegmenterConfig(text, config)
+	var joiners = &words.Joiners{
+		Mid:     []rune("@-/"),
+		Leading: []rune("#."),
+	}
+	seg2 := words.NewSegmenterJoiners(text, joiners)
 	founds2 := set(seg2)
 
 	type test struct {
@@ -181,6 +184,47 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 	}
 }
 
+var example = ", ;👍-@/.#"
+var searches = []rune{' ', 'x', '@', '👍'}
+
+func BenchmarkArray(b *testing.B) {
+	var array []rune
+	for _, r := range example {
+		array = append(array, r)
+	}
+
+	var found rune
+	for i := 0; i < b.N; i++ {
+		for _, s := range searches {
+			for j := range array {
+				if array[j] == s {
+					found = s
+				}
+			}
+		}
+	}
+
+	fmt.Println(found)
+}
+
+func BenchmarkMap(b *testing.B) {
+	m := make(map[rune]struct{})
+	for _, r := range example {
+		m[r] = struct{}{}
+	}
+
+	var found rune
+	for i := 0; i < b.N; i++ {
+		for _, s := range searches {
+			if _, ok := m[s]; ok {
+				found = s
+			}
+		}
+	}
+
+	fmt.Println(found)
+}
+
 func BenchmarkSegmenter(b *testing.B) {
 	file, err := os.ReadFile("../testdata/sample.txt")
 
@@ -231,6 +275,38 @@ func BenchmarkSegmenterFilter(b *testing.B) {
 	seg := words.NewSegmenter(file)
 	seg.Filter(filter.Wordlike)
 
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		seg.SetText(file)
+
+		c := 0
+		for seg.Next() {
+			c++
+		}
+
+		if err := seg.Err(); err != nil {
+			b.Error(err)
+		}
+
+		b.ReportMetric(float64(c), "tokens")
+	}
+}
+
+func BenchmarkSegmenterJoiners(b *testing.B) {
+	file, err := os.ReadFile("../testdata/sample.txt")
+
+	if err != nil {
+		b.Error(err)
+	}
+
+	b.SetBytes(int64(len(file)))
+	var joiners = &words.Joiners{
+		Mid:     []rune("@-/"),
+		Leading: []rune("#."),
+	}
+	seg := words.NewSegmenterJoiners(file, joiners)
+
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		seg.SetText(file)
 
