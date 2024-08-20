@@ -18,8 +18,8 @@ func NewSegmenter(data []byte) *Segmenter {
 	return seg
 }
 
-func NewSegmenterConfig(data []byte, c *Config) *iterators.Segmenter {
-	seg := iterators.NewSegmenter(c.SplitFunc)
+func NewSegmenterJoiners(data []byte, c *Joiners) *iterators.Segmenter {
+	seg := iterators.NewSegmenter(c.splitFunc)
 	seg.SetText(data)
 	return seg
 }
