@@ -66,6 +66,36 @@ func TestScannerRoundtrip(t *testing.T) {
 	}
 }
 
+func scanToSet(seg *words.Scanner) map[string]struct{} {
+	founds := make(map[string]struct{})
+	for seg.Scan() {
+		founds[string(seg.Bytes())] = struct{}{}
+	}
+	return founds
+}
+
+func TestScannerJoiners(t *testing.T) {
+	r1 := bytes.NewReader(joinersInput)
+	sc1 := words.NewScanner(r1)
+	founds1 := scanToSet(sc1)
+
+	r2 := bytes.NewReader(joinersInput)
+	seg2 := words.NewScanner(r2)
+	seg2.Joiners(joiners)
+	founds2 := scanToSet(seg2)
+
+	for _, test := range joinersTests {
+		_, found1 := founds1[test.input]
+		if found1 != test.found1 {
+			t.Fatalf("For %q, expected %t for found in non-config scanner, but got %t", test.input, test.found1, found1)
+		}
+		_, found2 := founds2[test.input]
+		if found2 != test.found2 {
+			t.Fatalf("For %q, expected %t for found in scanner with joiners, but got %t", test.input, test.found2, found2)
+		}
+	}
+}
+
 func TestInvalidUTF8(t *testing.T) {
 	// For background, see testdata/UTF-8-test.txt, or:
 	// https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
