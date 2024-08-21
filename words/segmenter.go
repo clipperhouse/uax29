@@ -18,12 +18,6 @@ func NewSegmenter(data []byte) *Segmenter {
 	return seg
 }
 
-func NewSegmenterJoiners(data []byte, c *Joiners) *iterators.Segmenter {
-	seg := iterators.NewSegmenter(c.splitFunc)
-	seg.SetText(data)
-	return seg
-}
-
 // SegmentAll will iterate through all tokens and collect them into a [][]byte.
 // This is a convenience method -- if you will be allocating such a slice anyway,
 // this will save you some code. The downside is that this allocation is
