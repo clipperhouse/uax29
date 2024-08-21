@@ -1,5 +1,8 @@
 package words
 
+// Joiners allows specification of characters (runes) which will join words (tokens)
+// rather than breaking them. For example, "@" breaks words by default,
+// but you might wish to join words into email addresses.
 type Joiners struct {
 	// Mid specifies which characters (runes) should
 	// join words (tokens) where they would otherwise be split,

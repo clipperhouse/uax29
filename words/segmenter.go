@@ -4,16 +4,16 @@ import (
 	"github.com/clipperhouse/uax29/iterators"
 )
 
-// NewSegmenter retuns a Segmenter, which is an iterator over the source text.
-// Iterate while Next() is true, and access the segmented words via Bytes().
-func NewSegmenter(data []byte) *iterators.Segmenter {
-	seg := iterators.NewSegmenter(SplitFunc)
-	seg.SetText(data)
-	return seg
+type Segmenter struct {
+	*iterators.Segmenter
 }
 
-func NewSegmenterJoiners(data []byte, c *Joiners) *iterators.Segmenter {
-	seg := iterators.NewSegmenter(c.splitFunc)
+// NewSegmenter retuns a Segmenter, which is an iterator over the source text.
+// Iterate while Next() is true, and access the segmented words via Bytes().
+func NewSegmenter(data []byte) *Segmenter {
+	seg := &Segmenter{
+		iterators.NewSegmenter(SplitFunc),
+	}
 	seg.SetText(data)
 	return seg
 }
@@ -31,4 +31,10 @@ func SegmentAll(data []byte) [][]byte {
 
 	_ = iterators.All(data, &result, c.splitFunc) // can elide the error, see tests
 	return result
+}
+
+// Joiners sets runes that should be treated like word characters, where
+// otherwsie words sill be split. See the [Joiners] type.
+func (seg *Segmenter) Joiners(j *Joiners) {
+	seg.Split(j.splitFunc)
 }

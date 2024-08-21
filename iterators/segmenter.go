@@ -49,6 +49,11 @@ func (seg *Segmenter) SetText(data []byte) {
 	seg.err = nil
 }
 
+// Split sets the SplitFunc for the Segmenter
+func (seg *Segmenter) Split(split bufio.SplitFunc) {
+	seg.split = split
+}
+
 // Filter applies a filter (predicate) to all tokens, returning only those
 // where all filters evaluate true. Calling Filter will overwrite the previous
 // filter.
