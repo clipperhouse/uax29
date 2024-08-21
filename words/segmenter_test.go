@@ -10,7 +10,6 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/iterators"
 	"github.com/clipperhouse/uax29/iterators/filter"
 	"github.com/clipperhouse/uax29/words"
 )
@@ -90,58 +89,23 @@ func TestSegmenterWordlike(t *testing.T) {
 	}
 }
 
+func segToSet(seg *words.Segmenter) map[string]struct{} {
+	founds := make(map[string]struct{})
+	for seg.Next() {
+		founds[string(seg.Bytes())] = struct{}{}
+	}
+	return founds
+}
+
 func TestSegmenterJoiners(t *testing.T) {
-	set := func(seg *iterators.Segmenter) map[string]struct{} {
-		founds := make(map[string]struct{})
-		for seg.Next() {
-			founds[string(seg.Bytes())] = struct{}{}
-		}
-		return founds
-	}
+	seg1 := words.NewSegmenter(joinersInput)
+	founds1 := segToSet(seg1)
 
-	text := []byte("Hello, 世界. Tell me about your super-cool .com. I'm .01% interested and 3/4 of a mile away. Email me at foo@example.biz. #winning")
+	seg2 := words.NewSegmenter(joinersInput)
+	seg2.Joiners(joiners)
+	founds2 := segToSet(seg2)
 
-	seg1 := words.NewSegmenter(text)
-	founds1 := set(seg1)
-
-	var joiners = &words.Joiners{
-		Mid:     []rune("@-/"),
-		Leading: []rune("#."),
-	}
-	seg2 := words.NewSegmenterJoiners(text, joiners)
-	founds2 := set(seg2)
-
-	type test struct {
-		input string
-		// word should be found in standard, no-config segmenter
-		found1 bool
-		// word should be found in segmenter configured with joiners
-		found2 bool
-	}
-
-	tests := []test{
-		{"Hello", true, true},
-		{"世", true, true},
-		{"super", true, false},
-		{"-", true, false},
-		{"cool", true, false},
-		{"super-cool", false, true},
-		{"com", true, false}, // ".com" should usually be split, but joined with config
-		{".com", false, true},
-		{"01", true, false},
-		{".01", false, true},
-		{"3", true, false},
-		{"3/4", false, true},
-		{"foo", true, false},
-		{"@", true, false},
-		{"example.biz", true, false},
-		{"foo@example.biz", false, true},
-		{"#", true, false},
-		{"winning", true, false},
-		{"#winning", false, true},
-	}
-
-	for _, test := range tests {
+	for _, test := range joinersTests {
 		_, found1 := founds1[test.input]
 		if found1 != test.found1 {
 			t.Fatalf("For %q, expected %t for found in non-config segmenter, but got %t", test.input, test.found1, found1)
@@ -230,7 +194,7 @@ func BenchmarkSegmenter(b *testing.B) {
 	benchSeg(b, seg)
 }
 
-func benchSeg(b *testing.B, seg *iterators.Segmenter) {
+func benchSeg(b *testing.B, seg *words.Segmenter) {
 	file, err := os.ReadFile("../testdata/sample.txt")
 	if err != nil {
 		b.Error(err)
@@ -277,7 +241,8 @@ func BenchmarkSegmenterJoiners(b *testing.B) {
 		Mid:     []rune("@-/"),
 		Leading: []rune("#."),
 	}
-	seg := words.NewSegmenterJoiners(nil, joiners)
+	seg := words.NewSegmenter(nil)
+	seg.Joiners(joiners)
 	benchSeg(b, seg)
 }
 

@@ -113,6 +113,25 @@ if segments.Err() != nil {
 
 You can write your own filters (predicates), with arbitrary logic, by implementing a `func([]byte) bool`. You can also create a filter based on Unicode categories with the [`filter.Contains`](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/filter#Contains) and [`filter.Entirely`](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/filter#Entirely) methods.
 
+### Joiners
+
+By default, the UAX #29 standard will split words on dots, hyphens, slashes, @ and other punctuation. You might wish those characters not to break words, by specifying joiners.
+
+```go
+text := "Hello, 世界. Tell me about your super-cool .com. I'm .01% interested and 3/4 of a mile away. Email me at foo@example.biz. #winning"
+joiners := &words.Joiners{
+	Mid:     []rune("@-/"), // appearing in the middle of a word
+	Leading: []rune("#."),  // appearing at the front of a word
+}
+
+seg := words.NewSegmenter([]byte(text))
+seg.Joiners(joiners)
+
+for seg.Next() {
+	fmt.Println(seg.Text())
+}
+```
+
 ### Transforms
 
 Tokens can be modified by adding a transformer to a `Scanner` or `Segmenter`.

@@ -67,3 +67,44 @@ func ExampleSegmentAll() {
 	fmt.Printf("%q\n", segments)
 	// Output: ["Hello" "," " " "世" "界" "." " " "Nice" " " "dog" "!" " " "👍" "🐶"]
 }
+
+// In the example below, the hyphen, the leading dot on .com, the leading decimal, the slash on the fraction, the email address
+// and the hashtag, would be split into two tokens by default, but are joined into single tokens using joiners.
+func ExampleJoiners() {
+	text := "Hello, 世界. Tell me about your super-cool .com. I'm .01% interested and 3/4 of a mile away. Email me at foo@example.biz. #winning"
+	joiners := &words.Joiners{
+		Mid:     []rune("@-/"), // appearing in the middle of a word
+		Leading: []rune("#."),  // appearing at the front of a word
+	}
+
+	seg := words.NewSegmenter([]byte(text))
+	seg.Joiners(joiners)
+	seg.Filter(filter.Wordlike)
+
+	for seg.Next() {
+		fmt.Println(seg.Text())
+	}
+	// Output: Hello
+	// 世
+	// 界
+	// Tell
+	// me
+	// about
+	// your
+	// super-cool
+	// .com
+	// I'm
+	// .01
+	// interested
+	// and
+	// 3/4
+	// of
+	// a
+	// mile
+	// away
+	// Email
+	// me
+	// at
+	// foo@example.biz
+	// #winning
+}
