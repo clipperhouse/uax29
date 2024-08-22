@@ -8,7 +8,7 @@ func (lookup property) is(properties property) bool {
 }
 
 const (
-	_AHLetter   = _ALetter | _HebrewLetter | _WSegSpace | _ExtendedPictographic
+	_AHLetter   = _ALetter | _HebrewLetter | _ExtendedPictographic // _ExtendedPictographic is added for phrases (vs words)
 	_MidNumLetQ = _MidNumLet | _SingleQuote
 	_Ignore     = _Extend | _Format | _ZWJ
 )
@@ -157,6 +157,17 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// https://unicode.org/reports/tr29/#WB9
 		// https://unicode.org/reports/tr29/#WB10
 		if current.is(_Numeric|_AHLetter) && lastExIgnore.is(_Numeric|_AHLetter) {
+			pos += w
+			continue
+		}
+
+		// These two rules are novel for phrases (vs words). Treat spaces that follow or precede words as non-breaking.
+		// Similar to https://unicode.org/reports/tr29/#WB8, 9, 10
+		if current.is(_WSegSpace) && lastExIgnore.is(_Numeric|_AHLetter) {
+			pos += w
+			continue
+		}
+		if current.is(_Numeric|_AHLetter) && lastExIgnore.is(_WSegSpace) {
 			pos += w
 			continue
 		}

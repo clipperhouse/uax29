@@ -12,11 +12,41 @@ This package tokenizes (splits) words, sentences and graphemes, based on [Unicod
 
 Any time our code operates on individual words, we are tokenizing. Often, we do it ad hoc, such as splitting on spaces, which gives inconsistent results. The Unicode standard is better: it is multi-lingual, and handles punctuation, special characters, etc.
 
+### Uses
+
+The uax29 module has 4 tokenizers. In decreasing granularity: sentences → phrases → words → graphemes. Words is the most common use.
+
+You might use this for inverted indexes, full-text search, TF-IDF, BM25, embeddings, etc. Anything that needs word boundaries.
+
+If you're doing embeddings, the definition of “meaningful unit” will depend on your application. You might choose sentences, phrases, words, or a combination.
+
 ### Conformance
 
-We use the official [test suites](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
+We use the official [Unicode test suites](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
 
 ![Go](https://github.com/clipperhouse/uax29/actions/workflows/gotest.yml/badge.svg)
+
+## Quick start
+
+```
+go get "github.com/clipperhouse/uax29/words"
+```
+
+```go
+import "github.com/clipperhouse/uax29/words"
+
+text := []byte("Hello, 世界. Nice dog! 👍🐶")
+
+segments := words.NewSegmenter(text)            // A segmenter is an iterator over the words
+
+for segments.Next() {                           // Next() returns true until end of data or error
+	fmt.Printf("%q\n", segments.Bytes())        // Do something with the current token
+}
+
+if segments.Err() != nil {                      // Check the error
+	log.Fatal(segments.Err())
+}
+```
 
 ### See also
 

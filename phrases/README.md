@@ -100,7 +100,11 @@ You should see approximately constant memory when using `Segmenter` or `Scanner`
 
 ### Uses
 
-The uax29 module has 4 tokenizers. In decreasing granularity: sentences → phrases → words → graphemes. You can tokenize the tokens of other tokenizers! If you're doing embeddings, you might decide to split sentences, and embed the phrases or words within the sentence, as a way of chunking “meaningful units”.
+The uax29 module has 4 tokenizers. In decreasing granularity: sentences → phrases → words → graphemes.
+
+For best results, you may wish to first [split sentences](https://github.com/clipperhouse/uax29/tree/master/sentences), and _then_ split phrases within those sentences.
+
+If you're doing embeddings, the definition of “meaningful unit” will depend on your application. You might choose sentences, phrases, words, or all of the above. You can tokenize the tokens of other tokenizers.
 
 ### Invalid inputs
 
@@ -112,7 +116,7 @@ Your pipeline should probably include a call to [`utf8.Valid()`](https://pkg.go.
 
 You can add a filter to a `Scanner` or `Segmenter`.
 
-For example, the Segmenter / Scanner returns _all_ tokens, split by phrase boundaries. This includes things like whitespace and punctuation, which may not be what one means by “phrases”. By using a filter, you can omit them.
+For example, the tokenizer returns _all_ tokens, split by phrase boundaries. This may includes things like punctuation, which may not be what one means by “phrases”. By using a filter, you can omit them.
 
 ```go
 text := []byte("Hello, 世界. Nice dog! 👍🐶")
@@ -121,7 +125,6 @@ segments := phrases.NewSegmenter(text)
 segments.Filter(filter.Wordlike)
 
 for segments.Next() {
-	// Note that whitespace and punctuation are omitted.
 	fmt.Printf("%q\n", segments.Bytes())
 }
 

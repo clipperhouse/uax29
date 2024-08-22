@@ -8,6 +8,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/clipperhouse/uax29/iterators"
 	"github.com/clipperhouse/uax29/iterators/filter"
 	"github.com/clipperhouse/uax29/phrases"
 )
@@ -76,6 +77,39 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 
 	if !bytes.Equal(output, input) {
 		t.Fatalf("input bytes are not the same as segmented bytes")
+	}
+}
+
+var exists = struct{}{}
+
+func segToSetTrimmed(seg *iterators.Segmenter) map[string]struct{} {
+	founds := make(map[string]struct{})
+	for seg.Next() {
+		key := bytes.TrimSpace(seg.Bytes())
+		founds[string(key)] = exists
+	}
+	return founds
+}
+
+func TestPhraseBoundaries(t *testing.T) {
+	input := []byte("This should break here. And then here. 世界. I think, perhaps you can understand that — aside 🏆 🐶 here — “a quote”.")
+	seg := phrases.NewSegmenter(input)
+	got := segToSetTrimmed(seg)
+	expecteds := map[string]struct{}{
+		"This should break here":          exists,
+		"And then here":                   exists,
+		"世":                               exists, // We don't have great logic for languages without spaces. Also true for words, see Notes: https://unicode.org/reports/tr29/#WB999
+		"I think":                         exists,
+		"perhaps you can understand that": exists,
+		"aside 🏆 🐶 here":                  exists,
+		"a quote":                         exists,
+	}
+
+	for phrase := range expecteds {
+		_, found := got[phrase]
+		if !found {
+			t.Fatalf("phrase %q was expected, not found", phrase)
+		}
 	}
 }
 
