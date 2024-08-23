@@ -156,18 +156,8 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// https://unicode.org/reports/tr29/#WB8
 		// https://unicode.org/reports/tr29/#WB9
 		// https://unicode.org/reports/tr29/#WB10
-		if current.is(_Numeric|_AHLetter) && lastExIgnore.is(_Numeric|_AHLetter) {
-			pos += w
-			continue
-		}
-
-		// These two rules are novel for phrases (vs words). Treat spaces that follow or precede words as non-breaking.
-		// Similar to https://unicode.org/reports/tr29/#WB8, 9, 10
-		if current.is(_WSegSpace) && lastExIgnore.is(_Numeric|_AHLetter) {
-			pos += w
-			continue
-		}
-		if current.is(_Numeric|_AHLetter) && lastExIgnore.is(_WSegSpace) {
+		// _WSegSpace is added for phrases: treat spaces adjacent to words as non-breaking.
+		if current.is(_Numeric|_AHLetter|_WSegSpace) && lastExIgnore.is(_Numeric|_AHLetter|_WSegSpace) {
 			pos += w
 			continue
 		}
