@@ -112,14 +112,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			continue
 		}
 
-		maybeWB6 := current.is(_MidLetter|_MidNumLetQ) && lastExIgnore.is(_AHLetter)
-
 		// https://unicode.org/reports/tr29/#WB6
-		if maybeWB6 {
-			if subsequent(_AHLetter, data[pos+w:]) {
-				pos += w
-				continue
-			}
+		if current.is(_MidLetter|_MidNumLetQ) && lastExIgnore.is(_AHLetter) && subsequent(_AHLetter, data[pos+w:]) {
+			pos += w
+			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB7
@@ -134,21 +130,14 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			continue
 		}
 
-		maybeWB7b := current.is(_DoubleQuote) && lastExIgnore.is(_HebrewLetter|_Ignore)
-
 		// https://unicode.org/reports/tr29/#WB7b
-		if maybeWB7b {
-			if subsequent(_HebrewLetter, data[pos+w:]) {
-				pos += w
-				continue
-			}
+		if current.is(_DoubleQuote) && lastExIgnore.is(_HebrewLetter|_Ignore) && subsequent(_HebrewLetter, data[pos+w:]) {
+			pos += w
+			continue
 		}
 
-		// Optimization: determine if WB7c can possibly apply
-		maybeWB7c := current.is(_HebrewLetter) && lastExIgnore.is(_DoubleQuote|_Ignore) && lastLastExIgnore.is(_HebrewLetter)
-
 		// https://unicode.org/reports/tr29/#WB7c
-		if maybeWB7c {
+		if current.is(_HebrewLetter) && lastExIgnore.is(_DoubleQuote|_Ignore) && lastLastExIgnore.is(_HebrewLetter) {
 			pos += w
 			continue
 		}
@@ -167,15 +156,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			continue
 		}
 
-		// Optimization: determine if WB12 can possibly apply
-		maybeWB12 := current.is(_MidNum|_MidNumLetQ) && lastExIgnore.is(_Numeric)
-
 		// https://unicode.org/reports/tr29/#WB12
-		if maybeWB12 {
-			if subsequent(_Numeric, data[pos+w:]) {
-				pos += w
-				continue
-			}
+		if current.is(_MidNum|_MidNumLetQ) && lastExIgnore.is(_Numeric) && subsequent(_Numeric, data[pos+w:]) {
+			pos += w
+			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB13
