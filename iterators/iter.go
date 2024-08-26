@@ -7,7 +7,7 @@ import (
 	"iter"
 )
 
-// All returns an iterator that yields the all of the tokens in the segmenter
+// All is an iterator that yields the all of the tokens in the segmenter, for use with range
 func (seg *Segmenter) All() iter.Seq[[]byte] {
 	return func(yield func([]byte) bool) {
 		for seg.Next() {
@@ -16,7 +16,7 @@ func (seg *Segmenter) All() iter.Seq[[]byte] {
 	}
 }
 
-// All returns an iterator that yields the all of the tokens in the scanner
+// All is an iterator that yields the all of the tokens in the scanner, for use with range
 func (sc *Scanner) All() iter.Seq2[[]byte, error] {
 	return func(yield func([]byte, error) bool) {
 		for sc.Scan() {
