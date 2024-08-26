@@ -11,9 +11,7 @@ import (
 func (seg *Segmenter) All() iter.Seq[[]byte] {
 	return func(yield func([]byte) bool) {
 		for seg.Next() {
-			if !yield(seg.Bytes()) {
-				return
-			}
+			yield(seg.Bytes())
 		}
 	}
 }
@@ -22,12 +20,10 @@ func (seg *Segmenter) All() iter.Seq[[]byte] {
 func (sc *Scanner) All() iter.Seq2[[]byte, error] {
 	return func(yield func([]byte, error) bool) {
 		for sc.Scan() {
-			if !yield(sc.Bytes(), nil) {
-				return
-			}
+			yield(sc.Bytes(), sc.Err()) // err should be nil here but yield anyway
 		}
-		if err := sc.Err(); err != nil {
-			yield(nil, err)
+		if sc.Err() != nil {
+			yield(sc.Bytes(), sc.Err()) // bytes should be irrelevant here but yield anyway
 		}
 	}
 }
