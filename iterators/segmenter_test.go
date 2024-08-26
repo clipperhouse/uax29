@@ -35,7 +35,6 @@ func TestSegmenterSameAsScanner(t *testing.T) {
 
 			for seg.Next() && sc.Scan() {
 				if !bytes.Equal(seg.Bytes(), sc.Bytes()) {
-
 					t.Fatalf(`
 					Scanner and Segmenter should give identical results
 					Scanner:   %q
