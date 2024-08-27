@@ -33,6 +33,16 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	{
 		// start of text always advances
 		current, w = trie.lookup(data[pos:])
+		if w == 0 {
+			if atEOF {
+				// Just return the bytes, we can't do anything with them
+				pos = len(data)
+				return pos, data[:pos], nil
+			}
+			// Rune extends past current data, request more
+			return 0, nil, nil
+		}
+
 		pos += w
 	}
 
@@ -113,7 +123,7 @@ main:
 		}
 
 		// SB5 applies to subsequent rules; there is an implied "ignoring Extend & Format"
-		// https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
+		// https://unicode.org/reports/tr29/#Sentence_Boundary_Rules
 		// The previous/subsequent methods are shorthand for "seek a property but skip over Extend & Format on the way"
 
 		// https://unicode.org/reports/tr29/#SB6
@@ -164,7 +174,14 @@ main:
 				p += w
 			}
 
-			if subsequent(_Lower, data[p:]) {
+			found, more := subsequent(_Lower, data[p:], atEOF)
+
+			if more {
+				// Rune or token extends past current data, request more
+				return 0, nil, nil
+			}
+
+			if found {
 				pos += w
 				continue
 			}
