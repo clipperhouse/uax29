@@ -2,7 +2,6 @@ package iterators
 
 import (
 	"bufio"
-	"errors"
 	"io"
 
 	"github.com/clipperhouse/uax29/iterators/filter"
@@ -57,8 +56,6 @@ func (sc *Scanner) Filter(filter filter.Func) {
 	sc.filter = filter
 }
 
-var ErrorScanCalled = errors.New("cannot call Transform after Scan has been called")
-
 // Transform applies one or more transformers to all tokens, in order. Calling Transform overwrites
 // previous transformers, so call it once (it's variadic, you can add multiple). Transformers are
 // applied before Filters.
@@ -73,7 +70,6 @@ func (sc *Scanner) Scan() bool {
 		return false
 	}
 
-scan:
 	for sc.s.Scan() {
 		sc.token = sc.s.Bytes()
 
@@ -85,7 +81,7 @@ scan:
 		}
 
 		if sc.filter != nil && !sc.filter(sc.Bytes()) {
-			continue scan
+			continue
 		}
 
 		return true

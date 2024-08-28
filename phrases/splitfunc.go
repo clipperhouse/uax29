@@ -29,8 +29,17 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 	// https://unicode.org/reports/tr29/#WB1
 	{
-		// start of text always advances
+		// Start of text always advances
 		current, w = trie.lookup(data[pos:])
+		if w == 0 {
+			if !atEOF {
+				// Rune extends past current data, request more
+				return 0, nil, nil
+			}
+			pos = len(data)
+			return pos, data[:pos], nil
+		}
+
 		pos += w
 	}
 
@@ -113,9 +122,18 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB6
-		if current.is(_MidLetter|_MidNumLetQ) && lastExIgnore.is(_AHLetter) && subsequent(_AHLetter, data[pos+w:]) {
-			pos += w
-			continue
+		if current.is(_MidLetter|_MidNumLetQ) && lastExIgnore.is(_AHLetter) {
+			found, more := subsequent(_AHLetter, data[pos+w:], atEOF)
+
+			if more {
+				// Token extends past current data, request more
+				return 0, nil, nil
+			}
+
+			if found {
+				pos += w
+				continue
+			}
 		}
 
 		// https://unicode.org/reports/tr29/#WB7
@@ -131,9 +149,18 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB7b
-		if current.is(_DoubleQuote) && lastExIgnore.is(_HebrewLetter|_Ignore) && subsequent(_HebrewLetter, data[pos+w:]) {
-			pos += w
-			continue
+		if current.is(_DoubleQuote) && lastExIgnore.is(_HebrewLetter|_Ignore) {
+			found, more := subsequent(_HebrewLetter, data[pos+w:], atEOF)
+
+			if more {
+				// Token extends past current data, request more
+				return 0, nil, nil
+			}
+
+			if found {
+				pos += w
+				continue
+			}
 		}
 
 		// https://unicode.org/reports/tr29/#WB7c
@@ -158,9 +185,18 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		}
 
 		// https://unicode.org/reports/tr29/#WB12
-		if current.is(_MidNum|_MidNumLetQ) && lastExIgnore.is(_Numeric) && subsequent(_Numeric, data[pos+w:]) {
-			pos += w
-			continue
+		if current.is(_MidNum|_MidNumLetQ) && lastExIgnore.is(_Numeric) {
+			found, more := subsequent(_Numeric, data[pos+w:], atEOF)
+
+			if more {
+				// Token extends past current data, request more
+				return 0, nil, nil
+			}
+
+			if found {
+				pos += w
+				continue
+			}
 		}
 
 		// https://unicode.org/reports/tr29/#WB13
