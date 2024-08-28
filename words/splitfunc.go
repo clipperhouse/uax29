@@ -35,11 +35,6 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 	var lastLastExIgnore property // "the last one before that"
 	var regionalIndicatorCount int
 
-	var r rune
-	if j != nil {
-		r, _ = utf8.DecodeRune(data[pos:])
-	}
-
 	// https://unicode.org/reports/tr29/#WB1
 	{
 		// Start of text always advances
