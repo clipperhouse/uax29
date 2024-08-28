@@ -11,7 +11,7 @@ import (
 	"github.com/clipperhouse/uax29/graphemes"
 )
 
-func TestSegmenterIter(t *testing.T) {
+func TestIterMatchesSegmenter(t *testing.T) {
 	file, err := os.ReadFile("../testdata/sample.txt")
 	if err != nil {
 		t.Fatal(err)
@@ -30,7 +30,7 @@ func TestSegmenterIter(t *testing.T) {
 	}
 
 	if len(got) == 0 || len(expected) != len(got) {
-		t.Fatal("graphemes iter and segmenter return different results")
+		t.Fatal("graphemes iter and segmenter return different lengths")
 	}
 
 	if !reflect.DeepEqual(expected, got) {
@@ -38,7 +38,7 @@ func TestSegmenterIter(t *testing.T) {
 	}
 }
 
-func TestScannerIter(t *testing.T) {
+func TestIterMatchesScanner(t *testing.T) {
 	file1, err := os.Open("../testdata/sample.txt")
 	if err != nil {
 		t.Fatal(err)
