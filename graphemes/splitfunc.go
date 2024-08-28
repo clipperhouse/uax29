@@ -18,6 +18,8 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	// These vars are stateful across loop iterations
 	var pos, w int
 	var current property
+	var lastExIgnore property = 0     // "last excluding ignored categories"
+	var lastLastExIgnore property = 0 // "last one before that"
 	var regionalIndicatorCount int
 
 	// https://unicode.org/reports/tr29/#GB1
@@ -59,7 +61,10 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// to the right of the ×, from which we look back or forward
 
 		last := current
-		lastw := w
+		if !last.is(_Ignore) {
+			lastLastExIgnore = lastExIgnore
+			lastExIgnore = last
+		}
 
 		current, w = trie.lookup(data[pos:])
 		if w == 0 {
@@ -133,7 +138,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// out of scope for now
 
 		// https://unicode.org/reports/tr29/#GB11
-		if current.is(_ExtendedPictographic) && last.is(_ZWJ) && previous(_ExtendedPictographic, data[:pos-lastw]) {
+		if current.is(_ExtendedPictographic) && last.is(_ZWJ) && lastLastExIgnore.is(_ExtendedPictographic) {
 			pos += w
 			continue
 		}
