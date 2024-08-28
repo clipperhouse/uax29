@@ -22,8 +22,17 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 	// https://unicode.org/reports/tr29/#GB1
 	{
-		// start of text always advances
+		// Start of text always advances
 		current, w = trie.lookup(data[pos:])
+		if w == 0 {
+			if !atEOF {
+				// Rune extends past current data, request more
+				return 0, nil, nil
+			}
+			pos = len(data)
+			return pos, data[:pos], nil
+		}
+
 		pos += w
 	}
 

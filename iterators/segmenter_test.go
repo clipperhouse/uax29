@@ -3,27 +3,30 @@ package iterators_test
 import (
 	"bufio"
 	"bytes"
-	"math/rand"
+	"crypto/rand"
 	"reflect"
 	"testing"
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/clipperhouse/uax29/graphemes"
 	"github.com/clipperhouse/uax29/iterators"
 	"github.com/clipperhouse/uax29/iterators/filter"
 	"github.com/clipperhouse/uax29/iterators/transformer"
+	"github.com/clipperhouse/uax29/phrases"
+	"github.com/clipperhouse/uax29/sentences"
 	"github.com/clipperhouse/uax29/words"
 )
 
 func getRandomBytes() []byte {
-	b := make([]byte, 5000)
+	b := make([]byte, 50000)
 	rand.Read(b)
 
 	return b
 }
 
 func TestSegmenterSameAsScanner(t *testing.T) {
-	splits := []bufio.SplitFunc{words.SplitFunc, bufio.ScanWords}
+	splits := []bufio.SplitFunc{words.SplitFunc, sentences.SplitFunc, graphemes.SplitFunc, phrases.SplitFunc}
 	for _, split := range splits {
 		for i := 0; i < 100; i++ {
 			text := getRandomBytes()
@@ -36,7 +39,12 @@ func TestSegmenterSameAsScanner(t *testing.T) {
 
 			for seg.Next() && sc.Scan() {
 				if !bytes.Equal(seg.Bytes(), sc.Bytes()) {
-					t.Fatal("Scanner and Segmenter should give identical results")
+
+					t.Fatalf(`
+					Scanner and Segmenter should give identical results
+					Scanner:   %q
+					Segmenter: %q
+					`, sc.Bytes(), seg.Bytes())
 				}
 			}
 			if seg.Err() != nil {

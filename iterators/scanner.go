@@ -73,7 +73,6 @@ func (sc *Scanner) Scan() bool {
 		return false
 	}
 
-scan:
 	for sc.s.Scan() {
 		sc.token = sc.s.Bytes()
 
@@ -85,7 +84,7 @@ scan:
 		}
 
 		if sc.filter != nil && !sc.filter(sc.Bytes()) {
-			continue scan
+			continue
 		}
 
 		return true
