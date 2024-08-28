@@ -2,7 +2,6 @@ package iterators
 
 import (
 	"bufio"
-	"errors"
 	"io"
 
 	"github.com/clipperhouse/uax29/iterators/filter"
@@ -56,8 +55,6 @@ func (sc *Scanner) Err() error {
 func (sc *Scanner) Filter(filter filter.Func) {
 	sc.filter = filter
 }
-
-var ErrorScanCalled = errors.New("cannot call Transform after Scan has been called")
 
 // Transform applies one or more transformers to all tokens, in order. Calling Transform overwrites
 // previous transformers, so call it once (it's variadic, you can add multiple). Transformers are
