@@ -31,6 +31,8 @@ var none filter.Func = func(token []byte) bool {
 }
 
 func TestAdhocSegmentsWithType(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		input       []byte
 		output      [][]byte

@@ -14,6 +14,8 @@ import (
 // TestScannerRoundtrip tests that all input bytes are output after segmentation.
 // De facto, it also tests that we don't get infinite loops, or ever return an error.
 func TestScannerRoundtrip(t *testing.T) {
+	t.Parallel()
+
 	const runs = 2000
 
 	for i := 0; i < runs; i++ {
@@ -38,6 +40,8 @@ func TestScannerRoundtrip(t *testing.T) {
 }
 
 func TestInvalidUTF8(t *testing.T) {
+	t.Parallel()
+
 	// For background, see testdata/UTF-8-test.txt, or:
 	// https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
 
@@ -71,6 +75,8 @@ func TestInvalidUTF8(t *testing.T) {
 }
 
 func TestNeverZeroAtEOF(t *testing.T) {
+	t.Parallel()
+
 	// SplitFunc should never return advance = 0 when atEOF. This test is redundant
 	// with the roundtrip test above, but nice to call out this invariant.
 
@@ -88,6 +94,8 @@ func TestNeverZeroAtEOF(t *testing.T) {
 }
 
 func TestNeverErr(t *testing.T) {
+	t.Parallel()
+
 	// SplitFunc should never return an error. This test is redundant
 	// with the roundtrip test above, but nice to call out this invariant.
 
