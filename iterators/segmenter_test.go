@@ -9,27 +9,23 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/graphemes"
 	"github.com/clipperhouse/uax29/iterators"
 	"github.com/clipperhouse/uax29/iterators/filter"
 	"github.com/clipperhouse/uax29/iterators/transformer"
-	"github.com/clipperhouse/uax29/phrases"
-	"github.com/clipperhouse/uax29/sentences"
 	"github.com/clipperhouse/uax29/words"
 )
 
-func getRandomBytes() []byte {
-	b := make([]byte, 50000)
-	rand.Read(b)
-
-	return b
-}
-
 func TestSegmenterSameAsScanner(t *testing.T) {
-	splits := []bufio.SplitFunc{words.SplitFunc, sentences.SplitFunc, graphemes.SplitFunc, phrases.SplitFunc}
+	t.Parallel()
+
+	text := make([]byte, 50000)
+
 	for _, split := range splits {
 		for i := 0; i < 100; i++ {
-			text := getRandomBytes()
+			_, err := rand.Read(text)
+			if err != nil {
+				t.Fatal(err)
+			}
 
 			seg := iterators.NewSegmenter(split)
 			seg.SetText(text)
@@ -58,13 +54,19 @@ func TestSegmenterSameAsScanner(t *testing.T) {
 }
 
 func TestSegmenterSameAsAll(t *testing.T) {
-	splits := []bufio.SplitFunc{words.SplitFunc, bufio.ScanWords}
+	t.Parallel()
+
+	text := make([]byte, 50000)
+
 	for _, split := range splits {
 		for i := 0; i < 100; i++ {
-			text := getRandomBytes()
+			_, err := rand.Read(text)
+			if err != nil {
+				t.Fatal(err)
+			}
 
 			var all [][]byte
-			err := iterators.All(text, &all, split)
+			err = iterators.All(text, &all, split)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -90,6 +92,8 @@ var startsWithH = func(token []byte) bool {
 }
 
 func TestSegmenterFilterIsApplied(t *testing.T) {
+	t.Parallel()
+
 	text := "Hello, 世界, how are you? Nice dog aha! 👍🐶"
 
 	seg := iterators.NewSegmenter(bufio.ScanWords)
@@ -110,6 +114,8 @@ func TestSegmenterFilterIsApplied(t *testing.T) {
 }
 
 func TestSegmenterTransformIsApplied(t *testing.T) {
+	t.Parallel()
+
 	text := "Hello, 世界, I am enjoying cups of Açaí in Örebro."
 
 	seg := iterators.NewSegmenter(bufio.ScanWords)
@@ -131,6 +137,8 @@ func TestSegmenterTransformIsApplied(t *testing.T) {
 }
 
 func TestSegmenterStart(t *testing.T) {
+	t.Parallel()
+
 	text := []byte("Hello world")
 
 	{
@@ -176,6 +184,8 @@ func TestSegmenterStart(t *testing.T) {
 }
 
 func TestSegmenterEnd(t *testing.T) {
+	t.Parallel()
+
 	text := []byte("Hello world")
 
 	{
