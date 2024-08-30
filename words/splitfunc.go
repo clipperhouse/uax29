@@ -159,7 +159,7 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 		}
 
 		// https://unicode.org/reports/tr29/#WB7
-		if current.is(_AHLetter) && lastExIgnore.is(_MidLetter|_MidNumLetQ|_Ignore) && lastLastExIgnore.is(_AHLetter) {
+		if current.is(_AHLetter) && lastExIgnore.is(_MidLetter|_MidNumLetQ) && lastLastExIgnore.is(_AHLetter) {
 			pos += w
 			continue
 		}
@@ -171,7 +171,7 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 		}
 
 		// https://unicode.org/reports/tr29/#WB7b
-		if current.is(_DoubleQuote) && lastExIgnore.is(_HebrewLetter|_Ignore) {
+		if current.is(_DoubleQuote) && lastExIgnore.is(_HebrewLetter) {
 			found, more := subsequent(_HebrewLetter, data[pos+w:], atEOF)
 
 			if more {
@@ -186,7 +186,7 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 		}
 
 		// https://unicode.org/reports/tr29/#WB7c
-		if current.is(_HebrewLetter) && lastExIgnore.is(_DoubleQuote|_Ignore) && lastLastExIgnore.is(_HebrewLetter) {
+		if current.is(_HebrewLetter) && lastExIgnore.is(_DoubleQuote) && lastLastExIgnore.is(_HebrewLetter) {
 			pos += w
 			continue
 		}

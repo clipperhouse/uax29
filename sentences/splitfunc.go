@@ -127,22 +127,14 @@ main:
 
 		// https://unicode.org/reports/tr29/#SB6
 		if current.is(_Numeric) && lastExIgnore.is(_ATerm) {
-			if previous(_ATerm, data[:pos]) {
-				pos += w
-				continue
-			}
+			pos += w
+			continue
 		}
 
-		// Optimization: determine if SB7 can possibly apply
-		maybeSB7 := current.is(_Upper) && last.is(_ATerm|_Ignore) && lastLastExIgnore.is(_Upper|_Lower)
-
 		// https://unicode.org/reports/tr29/#SB7
-		if maybeSB7 {
-			pi := previousIndex(_ATerm, data[:pos])
-			if pi >= 0 && previous(_Upper|_Lower, data[:pi]) {
-				pos += w
-				continue
-			}
+		if current.is(_Upper) && lastExIgnore.is(_ATerm) && lastLastExIgnore.is(_Upper|_Lower) {
+			pos += w
+			continue
 		}
 
 		// Optimization: determine if SB8 can possibly apply
