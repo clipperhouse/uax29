@@ -8,6 +8,8 @@ import (
 )
 
 func TestContains(t *testing.T) {
+	t.Parallel()
+
 	type test struct {
 		input    string
 		expected bool
@@ -33,6 +35,8 @@ func TestContains(t *testing.T) {
 }
 
 func TestEntirely(t *testing.T) {
+	t.Parallel()
+
 	type test struct {
 		input    string
 		expected bool

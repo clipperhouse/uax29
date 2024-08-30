@@ -15,6 +15,8 @@ import (
 )
 
 func TestSegmenterUnicode(t *testing.T) {
+	t.Parallel()
+
 	// From the Unicode test suite; see the gen/ folder.
 	var passed, failed int
 	for _, test := range unicodeTests {
@@ -56,6 +58,8 @@ func TestSegmenterUnicode(t *testing.T) {
 // TestSegmenterRoundtrip tests that all input bytes are output after segmentation.
 // De facto, it also tests that we don't get infinite loops, or ever return an error.
 func TestSegmenterRoundtrip(t *testing.T) {
+	t.Parallel()
+
 	const runs = 2000
 
 	seg := words.NewSegmenter(nil)
@@ -80,6 +84,8 @@ func TestSegmenterRoundtrip(t *testing.T) {
 }
 
 func TestSegmenterWordlike(t *testing.T) {
+	t.Parallel()
+
 	text := []byte("Hello, 世界. Nice dog! 👍🐶")
 	seg := words.NewSegmenter(text)
 	seg.Filter(filter.Entirely(unicode.Punct))
@@ -118,6 +124,8 @@ func TestSegmenterJoiners(t *testing.T) {
 }
 
 func TestSegmenterInvalidUTF8(t *testing.T) {
+	t.Parallel()
+
 	// For background, see testdata/UTF-8-test.txt, or:
 	// https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
 
