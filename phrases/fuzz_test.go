@@ -5,6 +5,7 @@ package phrases_test
 
 import (
 	"bytes"
+	mathrand "math/rand"
 	"os"
 	"testing"
 	"unicode/utf8"
@@ -103,7 +104,7 @@ func FuzzInvalid(f *testing.F) {
 	pos := 0
 	for {
 		// random smaller strings
-		ln := rnd.Intn(max-min) + min
+		ln := mathrand.Intn(max-min) + min
 
 		if pos+ln > len(random) {
 			break

@@ -2,11 +2,11 @@ package graphemes_test
 
 import (
 	"bytes"
-	"math/rand"
+	"crypto/rand"
+	mathrand "math/rand"
 	"os"
 	"reflect"
 	"testing"
-	"time"
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/graphemes"
@@ -153,14 +153,11 @@ func TestNeverErr(t *testing.T) {
 	}
 }
 
-var seed = time.Now().UnixNano()
-var rnd = rand.New(rand.NewSource(seed))
-
-const max = 10000
-const min = 1
-
 func getRandomBytes() []byte {
-	len := rnd.Intn(max-min) + min
+	const max = 10000
+	const min = 1
+
+	len := mathrand.Intn(max-min) + min
 	b := make([]byte, len)
 	rand.Read(b)
 
