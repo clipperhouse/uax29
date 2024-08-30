@@ -20,7 +20,7 @@ func TestSegmenterSameAsScanner(t *testing.T) {
 
 	text := make([]byte, 50000)
 
-	for _, split := range splits {
+	for _, split := range splitFuncs {
 		for i := 0; i < 100; i++ {
 			_, err := rand.Read(text)
 			if err != nil {
@@ -57,7 +57,7 @@ func TestSegmenterSameAsAll(t *testing.T) {
 
 	text := make([]byte, 50000)
 
-	for _, split := range splits {
+	for _, split := range splitFuncs {
 		for i := 0; i < 100; i++ {
 			_, err := rand.Read(text)
 			if err != nil {
