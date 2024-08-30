@@ -18,7 +18,7 @@ import (
 	"github.com/clipperhouse/uax29/words"
 )
 
-type iterSplitFunc func(data []byte) iter.Seq[[]byte]
+type iterSplitFunc func(data []byte) iter.Seq[iterators.Token]
 
 var iterSplitFuncs = []iterSplitFunc{words.Split, sentences.Split, graphemes.Split, phrases.Split}
 
@@ -48,7 +48,7 @@ func TestIterMatchesSegmenter(t *testing.T) {
 		iter := iterFunc(file)
 		var got [][]byte
 		for word := range iter {
-			got = append(got, word)
+			got = append(got, word.Value())
 		}
 
 		if len(got) == 0 || len(expected) != len(got) {
@@ -61,7 +61,7 @@ func TestIterMatchesSegmenter(t *testing.T) {
 	}
 }
 
-type iterScanFunc func(io.Reader) iter.Seq2[[]byte, error]
+type iterScanFunc func(io.Reader) iter.Seq2[iterators.Token, error]
 
 var iterScanFuncs = []iterScanFunc{words.Scan, sentences.Scan, graphemes.Scan, phrases.Scan}
 
@@ -100,7 +100,7 @@ func TestIterMatchesScanner(t *testing.T) {
 
 		var got [][]byte
 		for word, err := range iter {
-			got = append(got, word)
+			got = append(got, word.Value())
 			if err != nil {
 				t.Fatal(err)
 			}
