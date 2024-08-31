@@ -5,39 +5,22 @@ package iterators_test
 
 import (
 	"errors"
-	"io"
-	"iter"
 	"os"
 	"reflect"
 	"testing"
 
-	"github.com/clipperhouse/uax29/graphemes"
 	"github.com/clipperhouse/uax29/iterators"
-	"github.com/clipperhouse/uax29/phrases"
-	"github.com/clipperhouse/uax29/sentences"
-	"github.com/clipperhouse/uax29/words"
 )
-
-type iterSplitFunc func(data []byte) iter.Seq[iterators.Token]
-
-var iterSplitFuncs = []iterSplitFunc{words.Split, sentences.Split, graphemes.Split, phrases.Split}
 
 func TestIterMatchesSegmenter(t *testing.T) {
 	t.Parallel()
-
-	if len(splitFuncs) != len(iterSplitFuncs) {
-		t.Fatal("need equal number of splitFunc and iterSplitFunc")
-	}
 
 	file, err := os.ReadFile("../testdata/sample.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	for i := range iterSplitFuncs {
-		iterFunc := iterSplitFuncs[i]
-		splitFunc := splitFuncs[i]
-
+	for _, splitFunc := range splitFuncs {
 		seg1 := iterators.NewSegmenter(splitFunc)
 		seg1.SetText(file)
 		var expected [][]byte
@@ -45,37 +28,27 @@ func TestIterMatchesSegmenter(t *testing.T) {
 			expected = append(expected, seg1.Bytes())
 		}
 
-		iter := iterFunc(file)
+		seg2 := iterators.NewSegmenter(splitFunc)
+		seg2.SetText(file)
 		var got [][]byte
-		for word := range iter {
-			got = append(got, word.Value())
+		for token := range seg2.Iter() {
+			got = append(got, token.Value())
 		}
 
 		if len(got) == 0 || len(expected) != len(got) {
-			t.Fatal("iter and segmenter return different lengths")
+			t.Fatal("iter and segmenter returned different lengths")
 		}
 
 		if !reflect.DeepEqual(expected, got) {
-			t.Fatal("iter and segmenter return different results")
+			t.Fatal("iter and segmenter returned different results")
 		}
 	}
 }
 
-type iterScanFunc func(io.Reader) iter.Seq2[iterators.Token, error]
-
-var iterScanFuncs = []iterScanFunc{words.Scan, sentences.Scan, graphemes.Scan, phrases.Scan}
-
 func TestIterMatchesScanner(t *testing.T) {
 	t.Parallel()
 
-	if len(splitFuncs) != len(iterSplitFuncs) {
-		t.Fatal("need equal number of splitFunc and iterScanFunc")
-	}
-
-	for i := range iterSplitFuncs {
-		iterFunc := iterScanFuncs[i]
-		splitFunc := splitFuncs[i]
-
+	for _, splitFunc := range splitFuncs {
 		file1, err := os.Open("../testdata/sample.txt")
 		if err != nil {
 			t.Fatal(err)
@@ -96,10 +69,9 @@ func TestIterMatchesScanner(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		iter := iterFunc(file2)
-
+		sc2 := iterators.NewScanner(file2, splitFunc)
 		var got [][]byte
-		for word, err := range iter {
+		for word, err := range sc2.Iter() {
 			got = append(got, word.Value())
 			if err != nil {
 				t.Fatal(err)
@@ -131,12 +103,12 @@ func TestScannerIterErr(t *testing.T) {
 
 	sc := iterators.NewScanner(file1, split)
 
-	for _, err := range sc.All() {
+	for _, err := range sc.Iter() {
 		if err == nil {
 			t.Fatal("iter should have returned an error")
 		}
 		if err.Error() != e {
-			t.Fatalf("iter should have returned %q, got %q", e, err)
+			t.Fatalf("iter should have returned error %q, got %q", e, err)
 		}
 	}
 }

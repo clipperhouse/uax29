@@ -15,18 +15,17 @@ func (t Token) Value() []byte {
 	return t.value
 }
 
-// All is an iterator that yields the all of the tokens in the segmenter, for use with range
-func (seg *Segmenter) All() iter.Seq[Token] {
+// Iter is an iterator that yields the all of the tokens in the segmenter, for use with range
+func (seg *Segmenter) Iter() iter.Seq[Token] {
 	return func(yield func(Token) bool) {
 		for seg.Next() {
-			t := Token{seg.Bytes()}
-			yield(t)
+			yield(Token{seg.Bytes()})
 		}
 	}
 }
 
-// All is an iterator that yields the all of the tokens in the scanner, for use with range
-func (sc *Scanner) All() iter.Seq2[Token, error] {
+// Iter is an iterator that yields the all of the tokens in the scanner, for use with range
+func (sc *Scanner) Iter() iter.Seq2[Token, error] {
 	return func(yield func(Token, error) bool) {
 		for sc.Scan() {
 			yield(Token{sc.Bytes()}, sc.Err()) // err should be nil here but yield anyway
