@@ -81,7 +81,7 @@ if scanner.Err() != nil {                       // Check the error
 
 On a Mac M2 laptop, we see around 150MB/s, which works out to around 40 million words (tokens, really) per second.
 
-You should see approximately constant memory when using `Segmenter` or `Scanner`, independent of data size. When using `SegmentAll()`, expect memory to be `O(n)` on the number of words (one slice per word, 24 bytes).
+You should see approximately constant memory when using `Segmenter` or `Scanner`, independent of data size. When using `SegmentAll()`, expect memory to be `O(n)` on the number of words.
 
 ### Invalid inputs
 
@@ -115,12 +115,12 @@ You can write your own filters (predicates), with arbitrary logic, by implementi
 
 ### Joiners
 
-By default, the UAX #29 standard will split words on dots, hyphens, slashes, @ and other punctuation. You might wish those characters not to break words, by specifying joiners.
+By default, the UAX #29 standard will split words on hyphens, slashes, @ and other punctuation. You might wish those characters not to break words, by specifying joiners.
 
 ```go
 text := "Hello, 世界. Tell me about your super-cool .com. I'm .01% interested and 3/4 of a mile away. Email me at foo@example.biz. #winning"
 joiners := &words.Joiners{
-	Mid:     []rune("@-/"), // appearing in the middle of a word
+	Middle:  []rune("@-/"), // appearing in the middle of a word
 	Leading: []rune("#."),  // appearing at the front of a word
 }
 
