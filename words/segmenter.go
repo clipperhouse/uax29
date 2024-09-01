@@ -4,7 +4,12 @@ import (
 	"github.com/clipperhouse/uax29/iterators"
 )
 
+// Segmenter is an iterator for byte slices, which are segmented into tokens (segments).
+// To use it, you will define a SplitFunc, SetText with the bytes you wish to tokenize,
+// loop over Next until false, call Bytes to retrieve the current token, and check Err
+// after the loop.
 type Segmenter struct {
+	// made a words.Segmenter so we can attach the Joiners method just for words.
 	*iterators.Segmenter
 }
 
@@ -31,10 +36,4 @@ func SegmentAll(data []byte) [][]byte {
 
 	_ = iterators.All(data, &result, j.splitFunc) // can elide the error, see tests
 	return result
-}
-
-// Joiners sets runes that should be treated like word characters, where
-// otherwsie words sill be split. See the [Joiners] type.
-func (seg *Segmenter) Joiners(j *Joiners) {
-	seg.Split(j.splitFunc)
 }
