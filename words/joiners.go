@@ -4,16 +4,16 @@ package words
 // rather than breaking them. For example, "@" breaks words by default,
 // but you might wish to join words into email addresses.
 type Joiners struct {
-	// Mid specifies which characters (runes) should
+	// Middle specifies which characters (runes) should
 	// join words (tokens) where they would otherwise be split,
 	// in the middle of a word.
 	//
 	// For example, specifying "-" will join hypenated-words.
-	// Specifying "@" will ~preserve email addresses.
+	// Specifying "@" will preserve email addresses.
 	//
 	// Note that . (as in "example.com") and ' (as in "it's") are already mid-joiners,
 	// specifying them will be redundant and hurt performance.
-	Mid []rune
+	Middle []rune
 
 	// Leading specifies which characters (runes) should
 	// join words (tokens) where they would otherwise be split,

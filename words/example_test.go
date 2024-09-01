@@ -73,7 +73,7 @@ func ExampleSegmentAll() {
 func ExampleJoiners() {
 	text := "Hello, 世界. Tell me about your super-cool .com. I'm .01% interested and 3/4 of a mile away. Email me at foo@example.biz. #winning"
 	joiners := &words.Joiners{
-		Mid:     []rune("@-/"), // appearing in the middle of a word
+		Middle:  []rune("@-/"), // appearing in the middle of a word
 		Leading: []rune("#."),  // appearing at the front of a word
 	}
 

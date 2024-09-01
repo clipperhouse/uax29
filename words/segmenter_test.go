@@ -246,7 +246,7 @@ func BenchmarkSegmenterFilter(b *testing.B) {
 
 func BenchmarkSegmenterJoiners(b *testing.B) {
 	var joiners = &words.Joiners{
-		Mid:     []rune("@-/"),
+		Middle:  []rune("@-/"),
 		Leading: []rune("#."),
 	}
 	seg := words.NewSegmenter(nil)

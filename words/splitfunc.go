@@ -91,9 +91,9 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 			return 0, nil, nil
 		}
 
-		if j != nil && j.Mid != nil {
+		if j != nil && j.Middle != nil {
 			r, _ := utf8.DecodeRune(data[pos:])
-			if runesContain(j.Mid, r) {
+			if runesContain(j.Middle, r) {
 				current |= _MidNumLet
 			}
 		}
