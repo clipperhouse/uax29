@@ -79,9 +79,9 @@ if scanner.Err() != nil {                       // Check the error
 
 ### Performance
 
-On a Mac M2 laptop, we see around 160MB/s, which works out to around 40 million words (tokens, really) per second.
+On a Mac M2 laptop, we see around 150MB/s, which works out to around 40 million words (tokens, really) per second.
 
-You should see approximately constant memory when using `Segmenter` or `Scanner`, independent of data size. When using `SegmentAll()`, expect memory to be `O(n)` on the number of words (one slice per word, 24 bytes).
+You should see approximately constant memory when using `Segmenter` or `Scanner`, independent of data size. When using `SegmentAll()`, expect memory to be `O(n)` on the number of words.
 
 ### Invalid inputs
 
@@ -112,6 +112,25 @@ if segments.Err() != nil {
 ```
 
 You can write your own filters (predicates), with arbitrary logic, by implementing a `func([]byte) bool`. You can also create a filter based on Unicode categories with the [`filter.Contains`](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/filter#Contains) and [`filter.Entirely`](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/filter#Entirely) methods.
+
+### Joiners
+
+By default, the UAX #29 standard will split words on hyphens, slashes, @ and other punctuation. You might wish those characters not to break words, by specifying joiners.
+
+```go
+text := "Hello, 世界. Tell me about your super-cool .com. I'm .01% interested and 3/4 of a mile away. Email me at foo@example.biz. #winning"
+joiners := &words.Joiners{
+	Middle:  []rune("@-/"), // appearing in the middle of a word
+	Leading: []rune("#."),  // appearing at the front of a word
+}
+
+seg := words.NewSegmenter([]byte(text))
+seg.Joiners(joiners)
+
+for seg.Next() {
+	fmt.Println(seg.Text())
+}
+```
 
 ### Transforms
 

@@ -1,5 +1,10 @@
 package words
 
+import (
+	"bufio"
+	"unicode/utf8"
+)
+
 var trie = newWordsTrie(0)
 
 // is determines if lookup intersects propert(ies)
@@ -14,7 +19,10 @@ const (
 )
 
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner.
-func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
+var SplitFunc bufio.SplitFunc = none.splitFunc
+
+// splitFunc is a bufio.splitFunc implementation of word segmentation, for use with bufio.Scanner.
+func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if len(data) == 0 {
 		return 0, nil, nil
 	}
@@ -38,6 +46,13 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 			pos = len(data)
 			return pos, data[:pos], nil
+		}
+
+		if j != nil && j.Leading != nil {
+			r, _ := utf8.DecodeRune(data[pos:])
+			if runesContain(j.Leading, r) {
+				current |= _AHLetter
+			}
 		}
 
 		pos += w
@@ -74,6 +89,13 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			}
 			// Rune extends past current data, request more
 			return 0, nil, nil
+		}
+
+		if j != nil && j.Middle != nil {
+			r, _ := utf8.DecodeRune(data[pos:])
+			if runesContain(j.Middle, r) {
+				current |= _MidNumLet
+			}
 		}
 
 		// Optimization: no rule can possibly apply
