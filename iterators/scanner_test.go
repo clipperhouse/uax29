@@ -15,14 +15,14 @@ import (
 	"github.com/clipperhouse/uax29/words"
 )
 
-var splits = []bufio.SplitFunc{words.SplitFunc, sentences.SplitFunc, graphemes.SplitFunc, phrases.SplitFunc}
+var splitFuncs = []bufio.SplitFunc{words.SplitFunc, sentences.SplitFunc, graphemes.SplitFunc, phrases.SplitFunc}
 
 func TestScannerSameAsBufio(t *testing.T) {
 	t.Parallel()
 
 	text := make([]byte, 50000)
 
-	for _, split := range splits {
+	for _, split := range splitFuncs {
 		for i := 0; i < 100; i++ {
 			_, err := rand.Read(text)
 			if err != nil {
