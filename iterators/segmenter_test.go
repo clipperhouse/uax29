@@ -20,7 +20,7 @@ func TestSegmenterSameAsScanner(t *testing.T) {
 
 	text := make([]byte, 50000)
 
-	for _, split := range splits {
+	for _, split := range splitFuncs {
 		for i := 0; i < 100; i++ {
 			_, err := rand.Read(text)
 			if err != nil {
@@ -35,7 +35,6 @@ func TestSegmenterSameAsScanner(t *testing.T) {
 
 			for seg.Next() && sc.Scan() {
 				if !bytes.Equal(seg.Bytes(), sc.Bytes()) {
-
 					t.Fatalf(`
 					Scanner and Segmenter should give identical results
 					Scanner:   %q
@@ -58,7 +57,7 @@ func TestSegmenterSameAsAll(t *testing.T) {
 
 	text := make([]byte, 50000)
 
-	for _, split := range splits {
+	for _, split := range splitFuncs {
 		for i := 0; i < 100; i++ {
 			_, err := rand.Read(text)
 			if err != nil {
@@ -96,7 +95,7 @@ func TestSegmenterFilterIsApplied(t *testing.T) {
 
 	text := "Hello, 世界, how are you? Nice dog aha! 👍🐶"
 
-	seg := iterators.NewSegmenter(bufio.ScanWords)
+	seg := iterators.NewSegmenter(words.SplitFunc)
 	seg.SetText([]byte(text))
 	seg.Filter(startsWithH)
 
@@ -155,8 +154,6 @@ func TestSegmenterStart(t *testing.T) {
 	}
 
 	{
-		// ScanWords is not really supported, but this test
-		// is here to test our assumptions
 		seg := iterators.NewSegmenter(bufio.ScanWords)
 		seg.SetText(text)
 		expected := []int{0, 6}
@@ -202,8 +199,6 @@ func TestSegmenterEnd(t *testing.T) {
 	}
 
 	{
-		// ScanWords is not really supported, but this test
-		// is here to test our assumptions
 		seg := iterators.NewSegmenter(bufio.ScanWords)
 		seg.SetText(text)
 		expected := []int{5, len(text)}
