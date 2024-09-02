@@ -74,7 +74,6 @@ var ErrAdvanceTooFar = errors.New("SplitFunc advanced beyond the end of the data
 // Next advances Segmenter to the next token (segment). It returns false when there
 // are no remaining segments, or an error occurred.
 func (seg *Segmenter) Next() bool {
-next:
 	for seg.pos < len(seg.data) {
 		seg.start = seg.pos
 
@@ -115,7 +114,7 @@ next:
 		}
 
 		if seg.filter != nil && !seg.filter(seg.token) {
-			continue next
+			continue
 		}
 
 		return true
