@@ -20,30 +20,29 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	}
 
 	// These vars are stateful across loop iterations
-	var pos, w int
-	var current property
-
+	var pos int
 	var lastExIgnore property     // "last excluding ignored categories"
 	var lastLastExIgnore property // "last one before that"
 	var lastExIgnoreSp property
 	var lastExIgnoreClose property
 	var lastExIgnoreSpClose property
 
-	// https://unicode.org/reports/tr29/#SB1
-	{
-		// Start of text always advances
-		current, w = trie.lookup(data[pos:])
-		if w == 0 {
-			if !atEOF {
-				// Rune extends past current data, request more
-				return 0, nil, nil
-			}
-			pos = len(data)
-			return pos, data[:pos], nil
-		}
+	// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
+	// to the right of the ×, from which we look back or forward
 
-		pos += w
+	current, w := trie.lookup(data[pos:])
+	if w == 0 {
+		if !atEOF {
+			// Rune extends past current data, request more
+			return 0, nil, nil
+		}
+		pos = len(data)
+		return pos, data[:pos], nil
 	}
+
+	// https://unicode.org/reports/tr29/#SB1
+	// Start of text always advances
+	pos += w
 
 main:
 	for {
@@ -59,15 +58,7 @@ main:
 			break
 		}
 
-		/*
-			We've switched the evaluation order of SB1↓ and SB2↑. It's ok:
-			because we've checked for len(data) at the top of this function,
-			sot and eot are mutually exclusive, order doesn't matter.
-		*/
-
-		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
-		// to the right of the ×, from which we look back or forward
-
+		// Remember previous properties to avoid lookups/lookbacks
 		last := current
 
 		if !last.is(_Ignore) {

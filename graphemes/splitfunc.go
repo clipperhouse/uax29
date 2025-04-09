@@ -16,27 +16,27 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	}
 
 	// These vars are stateful across loop iterations
-	var pos, w int
-	var current property
+	var pos int
 	var lastExIgnore property = 0     // "last excluding ignored categories"
 	var lastLastExIgnore property = 0 // "last one before that"
 	var regionalIndicatorCount int
 
-	// https://unicode.org/reports/tr29/#GB1
-	{
-		// Start of text always advances
-		current, w = trie.lookup(data[pos:])
-		if w == 0 {
-			if !atEOF {
-				// Rune extends past current data, request more
-				return 0, nil, nil
-			}
-			pos = len(data)
-			return pos, data[:pos], nil
-		}
+	// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
+	// to the right of the ×, from which we look back or forward
 
-		pos += w
+	current, w := trie.lookup(data[pos:])
+	if w == 0 {
+		if !atEOF {
+			// Rune extends past current data, request more
+			return 0, nil, nil
+		}
+		pos = len(data)
+		return pos, data[:pos], nil
 	}
+
+	// https://unicode.org/reports/tr29/#GB1
+	// Start of text always advances
+	pos += w
 
 	for {
 		eot := pos == len(data) // "end of text"
@@ -60,6 +60,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 		// to the right of the ×, from which we look back or forward
 
+		// Remember previous properties to avoid lookups/lookbacks
 		last := current
 		if !last.is(_Ignore) {
 			lastLastExIgnore = lastExIgnore
