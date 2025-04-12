@@ -128,11 +128,8 @@ main:
 			continue
 		}
 
-		// Optimization: determine if SB8 can possibly apply
-		maybeSB8 := lastExIgnoreSpClose.is(_ATerm)
-
 		// https://unicode.org/reports/tr29/#SB8
-		if maybeSB8 {
+		if lastExIgnoreSpClose.is(_ATerm) {
 			p := pos
 
 			// ( ¬(OLetter | Upper | Lower | ParaSep | SATerm) )*
@@ -156,7 +153,7 @@ main:
 				p += w
 			}
 
-			found, more := subsequent(_Lower, data[p:], atEOF)
+			found, w2, more := subsequent(_Lower, data[p:], atEOF)
 
 			if more {
 				// Rune or token extends past current data, request more
@@ -164,7 +161,7 @@ main:
 			}
 
 			if found {
-				pos += w
+				pos = p + w2
 				continue
 			}
 		}

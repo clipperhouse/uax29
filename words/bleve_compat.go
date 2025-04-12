@@ -47,7 +47,7 @@ func BleveNumeric(token []byte) bool {
 		// Optimization: determine if WB12 can possibly apply
 		maybeWB12 := last.is(_Numeric|_Ignore) && current.is(_MidNum|_MidNumLetQ)
 		if maybeWB12 {
-			found, _ := subsequent(_Numeric, token[pos+w:], true)
+			found, _, _ := subsequent(_Numeric, token[pos+w:], true)
 			if found && previous(_Numeric, token[:pos]) {
 				pos += w
 				continue
