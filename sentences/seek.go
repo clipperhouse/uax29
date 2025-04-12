@@ -38,17 +38,17 @@ func previous(properties property, data []byte) bool {
 
 // subsequent looks ahead in the buffer until it hits a rune in properties,
 // ignoring runes in the _Ignore property per SB5
-func subsequent(properties property, data []byte, atEOF bool) (found bool, requestMore bool) {
+func subsequent(properties property, data []byte, atEOF bool) (found bool, pos int, requestMore bool) {
 	i := 0
 	for i < len(data) {
 		lookup, w := trie.lookup(data[i:])
 		if w == 0 {
 			if atEOF {
 				// Nothing more to evaluate
-				return false, false
+				return false, 0, false
 			}
 			// More to evaluate
-			return false, true
+			return false, 0, true
 		}
 
 		if lookup.is(_Ignore) {
@@ -58,17 +58,13 @@ func subsequent(properties property, data []byte, atEOF bool) (found bool, reque
 
 		if lookup.is(properties) {
 			// Found it
-			return true, false
+			return true, i + w, false
 		}
 
-		// If we get this far, it's not there
-		return false, false
+		// If we get this far, it's not immediately subsequent
+		return false, 0, false
 	}
 
-	if atEOF {
-		// Nothing more to evaluate
-		return false, false
-	}
-	// More to evaluate
-	return false, true
+	// If not eof, we need more
+	return false, 0, !atEOF
 }

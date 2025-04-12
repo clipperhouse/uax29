@@ -15,7 +15,12 @@ import (
 	"github.com/clipperhouse/uax29/words"
 )
 
-var splitFuncs = []bufio.SplitFunc{words.SplitFunc, sentences.SplitFunc, graphemes.SplitFunc, phrases.SplitFunc}
+var splitFuncs = map[string]bufio.SplitFunc{
+	"words":     words.SplitFunc,
+	"sentences": sentences.SplitFunc,
+	"graphemes": graphemes.SplitFunc,
+	"phrases":   phrases.SplitFunc,
+}
 
 func TestScannerSameAsBufio(t *testing.T) {
 	t.Parallel()

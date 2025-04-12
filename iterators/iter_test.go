@@ -48,7 +48,7 @@ func TestIterMatchesSegmenter(t *testing.T) {
 func TestIterMatchesScanner(t *testing.T) {
 	t.Parallel()
 
-	for _, splitFunc := range splitFuncs {
+	for pkg, splitFunc := range splitFuncs {
 		file1, err := os.Open("../testdata/sample.txt")
 		if err != nil {
 			t.Fatal(err)
@@ -60,6 +60,7 @@ func TestIterMatchesScanner(t *testing.T) {
 			expected = append(expected, sc1.Bytes())
 		}
 		if err := sc1.Err(); err != nil {
+			t.Logf("pkg: %s", pkg)
 			t.Fatal(err)
 		}
 		file1.Close()
