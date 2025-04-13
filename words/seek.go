@@ -62,14 +62,10 @@ func subsequent(properties property, data []byte, atEOF bool) (found bool, pos i
 			return true, i + w, false
 		}
 
-		// If we get this far, it's not there
+		// If we get this far, it's not immediately subsequent
 		return false, 0, false
 	}
 
-	if atEOF {
-		// Nothing more to evaluate
-		return false, 0, false
-	}
-	// More to evaluate
-	return false, 0, true
+	// If not eof, we need more
+	return false, 0, !atEOF
 }

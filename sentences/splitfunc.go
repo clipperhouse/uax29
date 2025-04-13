@@ -184,11 +184,8 @@ main:
 			continue
 		}
 
-		// Optimization: determine if SB11 can possibly apply
-		maybeSB11 := lastExIgnore.is(_SATerm | _Close | _Sp | _ParaSep)
-
 		// https://unicode.org/reports/tr29/#SB11
-		if maybeSB11 {
+		if lastExIgnore.is(_SATerm | _Close | _Sp | _ParaSep) {
 			p := pos
 
 			// Zero or one ParaSep
