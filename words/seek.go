@@ -67,7 +67,7 @@ func subsequent(properties property, data []byte, atEOF bool) (result int) {
 		}
 
 		// If we get this far, it's not immediately subsequent
-		return notfound
+		break
 	}
 
 	if atEOF {
