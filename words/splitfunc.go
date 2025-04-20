@@ -142,15 +142,15 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 
 		// https://unicode.org/reports/tr29/#WB6
 		if current.is(_MidLetter|_MidNumLetQ) && lastExIgnore.is(_AHLetter) {
-			found, w2, more := subsequent(_AHLetter, data[pos+w:], atEOF)
+			subseq := subsequent(_AHLetter, data[pos+w:], atEOF)
 
-			if more {
+			if subseq == more {
 				// Token extends past current data, request more
 				return 0, nil, nil
 			}
 
-			if found {
-				pos += w + w2
+			if subseq != notfound {
+				pos += w + subseq
 				continue
 			}
 		}
@@ -169,15 +169,15 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 
 		// https://unicode.org/reports/tr29/#WB7b
 		if current.is(_DoubleQuote) && lastExIgnore.is(_HebrewLetter) {
-			found, w2, more := subsequent(_HebrewLetter, data[pos+w:], atEOF)
+			subseq := subsequent(_HebrewLetter, data[pos+w:], atEOF)
 
-			if more {
+			if subseq == more {
 				// Token extends past current data, request more
 				return 0, nil, nil
 			}
 
-			if found {
-				pos += w + w2
+			if subseq != notfound {
+				pos += w + subseq
 				continue
 			}
 		}
@@ -204,15 +204,15 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 
 		// https://unicode.org/reports/tr29/#WB12
 		if current.is(_MidNum|_MidNumLetQ) && lastExIgnore.is(_Numeric) {
-			found, w2, more := subsequent(_Numeric, data[pos+w:], atEOF)
+			subseq := subsequent(_Numeric, data[pos+w:], atEOF)
 
-			if more {
+			if subseq == more {
 				// Token extends past current data, request more
 				return 0, nil, nil
 			}
 
-			if found {
-				pos += w + w2
+			if subseq != notfound {
+				pos += w + subseq
 				continue
 			}
 		}

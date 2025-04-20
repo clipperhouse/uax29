@@ -37,19 +37,23 @@ func previous(properties property, data []byte) bool {
 	return previousIndex(properties, data) != -1
 }
 
+const (
+	notfound = -1
+	more = 0
+)
 // subsequent looks ahead in the buffer until it hits a rune in properties,
 // ignoring runes with the _Ignore property per WB4
-func subsequent(properties property, data []byte, atEOF bool) (found bool, pos int, more bool) {
+func subsequent(properties property, data []byte, atEOF bool) (result int) {
 	i := 0
 	for i < len(data) {
 		lookup, w := trie.lookup(data[i:])
 		if w == 0 {
 			if atEOF {
 				// Nothing more to evaluate
-				return false, 0, false
+				return notfound
 			}
 			// More to evaluate
-			return false, 0, true
+			return more
 		}
 
 		if lookup.is(_Ignore) {
@@ -59,13 +63,18 @@ func subsequent(properties property, data []byte, atEOF bool) (found bool, pos i
 
 		if lookup.is(properties) {
 			// Found it
-			return true, i + w, false
+			return i + w
 		}
 
 		// If we get this far, it's not immediately subsequent
-		return false, 0, false
+		return notfound
 	}
 
-	// If not eof, we need more
-	return false, 0, !atEOF
+	if atEOF {
+		// Nothing more to evaluate
+		return notfound
+	}
+
+	// Need more
+	return more
 }
