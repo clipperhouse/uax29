@@ -95,9 +95,19 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 			}
 		}
 
-		// Optimization: no rule can possibly apply
-		if current|last == 0 { // i.e. both are zero
-			break
+		// https://unicode.org/reports/tr29/#WB5
+		// https://unicode.org/reports/tr29/#WB8
+		// https://unicode.org/reports/tr29/#WB9
+		// https://unicode.org/reports/tr29/#WB10
+		if current.is(_Numeric|_AHLetter) && lastExIgnore.is(_Numeric|_AHLetter) {
+			pos += w
+			continue
+		}
+
+		// https://unicode.org/reports/tr29/#WB3d
+		if (current & last).is(_WSegSpace) {
+			pos += w
+			continue
 		}
 
 		// https://unicode.org/reports/tr29/#WB3
@@ -118,12 +128,6 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 			continue
 		}
 
-		// https://unicode.org/reports/tr29/#WB3d
-		if (current & last).is(_WSegSpace) {
-			pos += w
-			continue
-		}
-
 		// https://unicode.org/reports/tr29/#WB4
 		if current.is(_Extend | _Format | _ZWJ) {
 			pos += w
@@ -133,12 +137,6 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 		// WB4 applies to subsequent rules; there is an implied "ignoring Extend & Format & ZWJ"
 		// https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
 		// The previous/subsequent funcs are shorthand for "seek a property but skip over Extend|Format|ZWJ on the way"
-
-		// https://unicode.org/reports/tr29/#WB5
-		if current.is(_AHLetter) && lastExIgnore.is(_AHLetter) {
-			pos += w
-			continue
-		}
 
 		// https://unicode.org/reports/tr29/#WB6
 		if current.is(_MidLetter|_MidNumLetQ) && lastExIgnore.is(_AHLetter) {
@@ -186,14 +184,6 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 
 		// https://unicode.org/reports/tr29/#WB7c
 		if current.is(_HebrewLetter) && lastExIgnore.is(_DoubleQuote) && lastLastExIgnore.is(_HebrewLetter) {
-			pos += w
-			continue
-		}
-
-		// https://unicode.org/reports/tr29/#WB8
-		// https://unicode.org/reports/tr29/#WB9
-		// https://unicode.org/reports/tr29/#WB10
-		if current.is(_Numeric|_AHLetter) && lastExIgnore.is(_Numeric|_AHLetter) {
 			pos += w
 			continue
 		}
