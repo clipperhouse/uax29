@@ -140,16 +140,16 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 
 		// https://unicode.org/reports/tr29/#WB6
 		if current.is(_MidLetter|_MidNumLetQ) && lastExIgnore.is(_AHLetter) {
-			subseq, more := subsequent(_AHLetter, data[pos+w:], atEOF)
+			advance, more := subsequent(_AHLetter, data[pos+w:], atEOF)
 
 			if more {
 				// Token extends past current data, request more
 				return 0, nil, nil
 			}
 
-			found := subseq != notfound
+			found := advance != notfound
 			if found {
-				pos += w + subseq
+				pos += w + advance
 				continue
 			}
 		}
@@ -227,11 +227,9 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 			continue
 		}
 
-		maybeWB1516 := current.is(_RegionalIndicator) && lastExIgnore.is(_RegionalIndicator)
-
 		// https://unicode.org/reports/tr29/#WB15 and
 		// https://unicode.org/reports/tr29/#WB16
-		if maybeWB1516 {
+		if current.is(_RegionalIndicator) && lastExIgnore.is(_RegionalIndicator) {
 			regionalIndicatorCount++
 
 			odd := regionalIndicatorCount%2 == 1
