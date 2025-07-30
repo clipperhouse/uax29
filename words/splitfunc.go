@@ -49,6 +49,8 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 	if j != nil && j.Leading != nil {
 		r, _ := utf8.DecodeRune(data[pos:])
 		if runesContain(j.Leading, r) {
+			// treat leading joiners as if they are letter,
+			// then depend on the existing logic below
 			current |= _AHLetter
 		}
 	}
@@ -91,6 +93,8 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 		if j != nil && j.Middle != nil {
 			r, _ := utf8.DecodeRune(data[pos:])
 			if runesContain(j.Middle, r) {
+				// treat middle joiners as if they are middle letters/numbers,
+				// then depend on the existing logic below
 				current |= _MidNumLet
 			}
 		}
