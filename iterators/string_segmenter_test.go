@@ -9,6 +9,7 @@ import (
 
 	"github.com/clipperhouse/uax29/graphemes"
 	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/iterators/filter"
 	"github.com/clipperhouse/uax29/iterators/transformer"
 	"github.com/clipperhouse/uax29/phrases"
 	"github.com/clipperhouse/uax29/sentences"
@@ -102,16 +103,12 @@ func TestStringSegmenterTransformIsApplied(t *testing.T) {
 	text := "Hello, 世界, I am enjoying cups of Açaí in Örebro."
 
 	seg := iterators.NewStringSegmenter(text, bufio.ScanWords)
-	seg.SetText(text)
 	seg.Transform(transformer.Lower, transformer.Diacritics)
 
 	var tokens []string
 	for seg.Next() {
 		tokens = append(tokens, seg.Text())
-		t.Log(seg.Text())
 	}
-
-	t.Log(tokens)
 
 	got := tokens[7]
 	expected := "acai"
@@ -178,5 +175,26 @@ func TestStringSegmenterEnd(t *testing.T) {
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("end failed for bufio.ScanWords, expected %v, got %v", expected, got)
 		}
+	}
+}
+
+func TestStringSegmenterFilterIsApplied(t *testing.T) {
+	t.Parallel()
+
+	text := "Hello, 世界, I am enjoying cups of Açaí in Örebro."
+
+	seg := iterators.NewStringSegmenter(text, words.SplitFunc)
+	seg.Filter(filter.AlphaNumeric)
+
+	var tokens []string
+	for seg.Next() {
+		tokens = append(tokens, seg.Text())
+	}
+
+	// Should only contain tokens with letters or numbers
+	// "Hello", "世", "界", "I", "am", "enjoying", "cups", "of", "Açaí", "in", "Örebro"
+	expected := []string{"Hello", "世", "界", "I", "am", "enjoying", "cups", "of", "Açaí", "in", "Örebro"}
+	if !reflect.DeepEqual(tokens, expected) {
+		t.Fatalf("filter was not applied correctly, expected %v, got %v", expected, tokens)
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"unsafe"
 
+	"github.com/clipperhouse/uax29/iterators/filter"
 	"golang.org/x/text/transform"
 )
 
@@ -12,6 +13,7 @@ import (
 // to []byte, then extracting the result as a string slice.
 type StringSegmenter struct {
 	split       bufio.SplitFunc
+	filter      filter.Func
 	transformer transform.Transformer
 	data        string
 	pos         int
@@ -42,6 +44,13 @@ func (seg *StringSegmenter) Split(split bufio.SplitFunc) {
 	seg.split = split
 }
 
+// Filter applies a filter (predicate) to all tokens, returning only those
+// where all filters evaluate true. Calling Filter will overwrite the previous
+// filter.
+func (seg *StringSegmenter) Filter(filter filter.Func) {
+	seg.filter = filter
+}
+
 // Transform applies one or more transforms to all tokens. Calling Transform
 // will overwrite previous transforms, so call it once
 // (it's variadic, you can add multiple, which will be applied in order).
@@ -52,38 +61,43 @@ func (seg *StringSegmenter) Transform(transformers ...transform.Transformer) {
 // Next advances the segmenter to the next token. It returns false when there
 // are no remaining tokens or an error occurred.
 func (seg *StringSegmenter) Next() bool {
-	if seg.pos >= len(seg.data) {
-		return false
-	}
+	for seg.pos < len(seg.data) {
+		seg.start = seg.pos
 
-	seg.start = seg.pos
+		b := stringToBytes(seg.data[seg.pos:])
 
-	b := stringToBytes(seg.data[seg.pos:])
-
-	advance, token, err := seg.split(b, true)
-	if err != nil {
-		seg.err = err
-		return false
-	}
-
-	if advance <= 0 {
-		return false
-	}
-
-	seg.pos += advance
-	seg.token = bytesToString(token)
-
-	// Apply transforms if any are set
-	if seg.transformer != nil {
-		transformed, _, err := transform.String(seg.transformer, seg.token)
+		advance, token, err := seg.split(b, true)
 		if err != nil {
 			seg.err = err
 			return false
 		}
-		seg.token = transformed
+
+		if advance <= 0 {
+			return false
+		}
+
+		seg.pos += advance
+		seg.token = bytesToString(token)
+
+		// Apply transforms if any are set
+		if seg.transformer != nil {
+			transformed, _, err := transform.String(seg.transformer, seg.token)
+			if err != nil {
+				seg.err = err
+				return false
+			}
+			seg.token = transformed
+		}
+
+		// Apply filter if any is set
+		if seg.filter != nil && !seg.filter(token) {
+			continue
+		}
+
+		return true
 	}
 
-	return true
+	return false
 }
 
 // stringToBytes converts a string to []byte without allocation using unsafe.
