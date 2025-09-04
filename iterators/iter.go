@@ -19,7 +19,9 @@ func (t Token) Value() []byte {
 func (seg *Segmenter) Iter() iter.Seq[Token] {
 	return func(yield func(Token) bool) {
 		for seg.Next() {
-			yield(Token{seg.Bytes()})
+			if !yield(Token{seg.Bytes()}) {
+				return
+			}
 		}
 	}
 }
@@ -28,7 +30,9 @@ func (seg *Segmenter) Iter() iter.Seq[Token] {
 func (sc *Scanner) Iter() iter.Seq2[Token, error] {
 	return func(yield func(Token, error) bool) {
 		for sc.Scan() {
-			yield(Token{sc.Bytes()}, sc.Err()) // err should be nil here but yield anyway
+			if !yield(Token{sc.Bytes()}, sc.Err()) { // err should be nil here but yield anyway
+				return
+			}
 		}
 		if sc.Err() != nil {
 			yield(Token{sc.Bytes()}, sc.Err()) // bytes should be irrelevant here but yield anyway

@@ -159,7 +159,7 @@ func getRandomBytes() []byte {
 
 	len := mathrand.Intn(max-min) + min
 	b := make([]byte, len)
-	rand.Read(b)
+	_, _ = rand.Read(b)
 
 	return b
 }
