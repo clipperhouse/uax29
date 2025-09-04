@@ -124,10 +124,7 @@ func TestSegmenterTransformIsApplied(t *testing.T) {
 	var tokens [][]byte
 	for seg.Next() {
 		tokens = append(tokens, seg.Bytes())
-		t.Log(seg.Text())
 	}
-
-	t.Log(tokens)
 
 	got := tokens[7]
 	expected := []byte("acai")
