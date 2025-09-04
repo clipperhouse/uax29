@@ -3,18 +3,21 @@ package iterators
 import (
 	"bufio"
 	"unsafe"
+
+	"golang.org/x/text/transform"
 )
 
 // StringSegmenter reuses the existing SplitFunc logic while achieving zero-copy behavior.
 // It works by converting only the portion of the string needed for boundary detection
 // to []byte, then extracting the result as a string slice.
 type StringSegmenter struct {
-	split bufio.SplitFunc
-	data  string
-	pos   int
-	start int
-	token string
-	err   error
+	split       bufio.SplitFunc
+	transformer transform.Transformer
+	data        string
+	pos         int
+	start       int
+	token       string
+	err         error
 }
 
 // NewStringSegmenter creates a new StringSegmenter for the given string and SplitFunc.
@@ -39,6 +42,13 @@ func (seg *StringSegmenter) Split(split bufio.SplitFunc) {
 	seg.split = split
 }
 
+// Transform applies one or more transforms to all tokens. Calling Transform
+// will overwrite previous transforms, so call it once
+// (it's variadic, you can add multiple, which will be applied in order).
+func (seg *StringSegmenter) Transform(transformers ...transform.Transformer) {
+	seg.transformer = transform.Chain(transformers...)
+}
+
 // Next advances the segmenter to the next token. It returns false when there
 // are no remaining tokens or an error occurred.
 func (seg *StringSegmenter) Next() bool {
@@ -48,12 +58,9 @@ func (seg *StringSegmenter) Next() bool {
 
 	seg.start = seg.pos
 
-	// Convert only the remaining portion to []byte for SplitFunc using unsafe
-	// This avoids the allocation that []byte(string) would cause
-	remaining := seg.data[seg.pos:]
-	remainingBytes := stringToBytes(remaining)
+	b := stringToBytes(seg.data[seg.pos:])
 
-	advance, _, err := seg.split(remainingBytes, true)
+	advance, token, err := seg.split(b, true)
 	if err != nil {
 		seg.err = err
 		return false
@@ -64,10 +71,17 @@ func (seg *StringSegmenter) Next() bool {
 	}
 
 	seg.pos += advance
+	seg.token = bytesToString(token)
 
-	// Extract the token as a string slice of the original string
-	// This is zero-copy since we're just slicing the original string
-	seg.token = seg.data[seg.start:seg.pos]
+	// Apply transforms if any are set
+	if seg.transformer != nil {
+		transformed, _, err := transform.String(seg.transformer, seg.token)
+		if err != nil {
+			seg.err = err
+			return false
+		}
+		seg.token = transformed
+	}
 
 	return true
 }
@@ -76,6 +90,12 @@ func (seg *StringSegmenter) Next() bool {
 // This is safe as long as the []byte is not modified and doesn't escape.
 func stringToBytes(s string) []byte {
 	return unsafe.Slice(unsafe.StringData(s), len(s))
+}
+
+// bytesToString converts a []byte to string without allocation using unsafe.
+// This is safe as long as the []byte is not modified and doesn't escape.
+func bytesToString(b []byte) string {
+	return unsafe.String(unsafe.SliceData(b), len(b))
 }
 
 // Text returns the current token as a string.

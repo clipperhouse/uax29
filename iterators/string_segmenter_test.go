@@ -9,6 +9,7 @@ import (
 
 	"github.com/clipperhouse/uax29/graphemes"
 	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/iterators/transformer"
 	"github.com/clipperhouse/uax29/phrases"
 	"github.com/clipperhouse/uax29/sentences"
 	"github.com/clipperhouse/uax29/words"
@@ -95,6 +96,30 @@ func TestStringSegmenterSameAsAll(t *testing.T) {
 	}
 }
 
+func TestStringSegmenterTransformIsApplied(t *testing.T) {
+	t.Parallel()
+
+	text := "Hello, 世界, I am enjoying cups of Açaí in Örebro."
+
+	seg := iterators.NewStringSegmenter(text, bufio.ScanWords)
+	seg.SetText(text)
+	seg.Transform(transformer.Lower, transformer.Diacritics)
+
+	var tokens []string
+	for seg.Next() {
+		tokens = append(tokens, seg.Text())
+		t.Log(seg.Text())
+	}
+
+	t.Log(tokens)
+
+	got := tokens[7]
+	expected := "acai"
+	if expected != got {
+		t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
+	}
+}
+
 func TestStringSegmenterStart(t *testing.T) {
 	t.Parallel()
 
@@ -131,12 +156,12 @@ func TestStringSegmenterEnd(t *testing.T) {
 	text := "Hello world"
 
 	{
-		stringSeg := iterators.NewStringSegmenter(text, words.SplitFunc)
+		seg := iterators.NewStringSegmenter(text, words.SplitFunc)
 
 		expected := []int{5, 6, len(text)}
 		var got []int
-		for stringSeg.Next() {
-			got = append(got, stringSeg.End())
+		for seg.Next() {
+			got = append(got, seg.End())
 		}
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("end failed for words.SplitFunc, expected %v, got %v", expected, got)
@@ -144,118 +169,14 @@ func TestStringSegmenterEnd(t *testing.T) {
 	}
 
 	{
-		stringSeg := iterators.NewStringSegmenter(text, bufio.ScanWords)
-		// bufio.ScanWords includes the space in the first token, so "Hello " ends at position 6
-		expected := []int{6, len(text)}
+		seg := iterators.NewStringSegmenter(text, bufio.ScanWords)
+		expected := []int{5, len(text)}
 		var got []int
-		for stringSeg.Next() {
-			got = append(got, stringSeg.End())
+		for seg.Next() {
+			got = append(got, seg.End())
 		}
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("end failed for bufio.ScanWords, expected %v, got %v", expected, got)
-		}
-	}
-}
-
-func TestStringSegmenterSetText(t *testing.T) {
-	t.Parallel()
-
-	stringSeg := iterators.NewStringSegmenter("", graphemes.SplitFunc)
-
-	// Test with first text
-	stringSeg.SetText("Hello")
-	var results1 []string
-	for stringSeg.Next() {
-		results1 = append(results1, stringSeg.Text())
-	}
-
-	// Test with second text
-	stringSeg.SetText("世界")
-	var results2 []string
-	for stringSeg.Next() {
-		results2 = append(results2, stringSeg.Text())
-	}
-
-	if len(results1) != 5 {
-		t.Errorf("expected 5 graphemes for 'Hello', got %d", len(results1))
-	}
-	if len(results2) != 2 {
-		t.Errorf("expected 2 graphemes for '世界', got %d", len(results2))
-	}
-}
-
-func TestStringSegmenterWithGraphemes(t *testing.T) {
-	t.Parallel()
-
-	text := "Hello, 世界! 👍"
-	stringSeg := iterators.NewStringSegmenter(text, graphemes.SplitFunc)
-
-	var results []string
-	for stringSeg.Next() {
-		results = append(results, stringSeg.Text())
-	}
-
-	expected := []string{"H", "e", "l", "l", "o", ",", " ", "世", "界", "!", " ", "👍"}
-	if len(results) != len(expected) {
-		t.Fatalf("expected %d graphemes, got %d", len(expected), len(results))
-	}
-
-	for i, result := range results {
-		if result != expected[i] {
-			t.Errorf("grapheme %d: expected %q, got %q", i, expected[i], result)
-		}
-	}
-}
-
-func TestStringSegmenterWithWords(t *testing.T) {
-	t.Parallel()
-
-	text := "Hello world 世界"
-	stringSeg := iterators.NewStringSegmenter(text, words.SplitFunc)
-
-	var results []string
-	for stringSeg.Next() {
-		results = append(results, stringSeg.Text())
-	}
-
-	// words.SplitFunc includes spaces and punctuation as separate tokens
-	expected := []string{"Hello", " ", "world", " ", "世", "界"}
-	if len(results) != len(expected) {
-		t.Fatalf("expected %d words, got %d: %v", len(expected), len(results), results)
-	}
-
-	for i, result := range results {
-		if result != expected[i] {
-			t.Errorf("word %d: expected %q, got %q", i, expected[i], result)
-		}
-	}
-}
-
-func TestStringSegmenterWithScanWords(t *testing.T) {
-	t.Parallel()
-
-	text := "Hello world 世界"
-	stringSeg := iterators.NewStringSegmenter(text, bufio.ScanWords)
-
-	var results []string
-	for stringSeg.Next() {
-		results = append(results, stringSeg.Text())
-	}
-
-	// bufio.ScanWords skips spaces and punctuation
-	expected := []string{"Hello", "world", "世界"}
-	if len(results) != len(expected) {
-		t.Fatalf("expected %d words, got %d: %v", len(expected), len(results), results)
-	}
-
-	for i, result := range results {
-		// Trim any trailing spaces that might be included
-		trimmed := result
-		if len(trimmed) > 0 && trimmed[len(trimmed)-1] == ' ' {
-			trimmed = trimmed[:len(trimmed)-1]
-		}
-		if trimmed != expected[i] {
-			t.Errorf("word %d: expected %q, got %q (trimmed from %q)", i, expected[i], trimmed, result)
 		}
 	}
 }

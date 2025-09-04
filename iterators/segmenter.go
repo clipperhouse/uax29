@@ -107,10 +107,12 @@ func (seg *Segmenter) Next() bool {
 		}
 
 		if seg.transformer != nil {
-			seg.token, _, seg.err = transform.Bytes(seg.transformer, seg.token)
-			if seg.err != nil {
+			transformed, _, err := transform.Bytes(seg.transformer, seg.token)
+			if err != nil {
+				seg.err = err
 				return false
 			}
+			seg.token = transformed
 		}
 
 		if seg.filter != nil && !seg.filter(seg.token) {
