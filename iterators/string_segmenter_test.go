@@ -40,7 +40,8 @@ func TestStringSegmenterSameAsSegmenter(t *testing.T) {
 			seg.SetText(text)
 
 			// Test with string segmenter
-			stringSeg := iterators.NewStringSegmenter(string(text), split)
+			stringSeg := iterators.NewStringSegmenter(split)
+			stringSeg.SetText(string(text))
 
 			for seg.Next() && stringSeg.Next() {
 				segBytes := seg.Bytes()
@@ -81,17 +82,18 @@ func TestStringSegmenterSameAsAll(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			stringSeg := iterators.NewStringSegmenter(string(text), split)
+			seg := iterators.NewStringSegmenter(split)
+			seg.SetText(string(text))
 
-			for i := 0; stringSeg.Next(); i++ {
+			for i := 0; seg.Next(); i++ {
 				expected := all[i]
-				got := []byte(stringSeg.Text())
+				got := []byte(seg.Text())
 				if !bytes.Equal(expected, got) {
 					t.Fatal("All and StringSegmenter should give identical results")
 				}
 			}
-			if stringSeg.Err() != nil {
-				t.Fatal(stringSeg.Err())
+			if seg.Err() != nil {
+				t.Fatal(seg.Err())
 			}
 		}
 	}
@@ -102,7 +104,8 @@ func TestStringSegmenterTransformIsApplied(t *testing.T) {
 
 	text := "Hello, 世界, I am enjoying cups of Açaí in Örebro."
 
-	seg := iterators.NewStringSegmenter(text, bufio.ScanWords)
+	seg := iterators.NewStringSegmenter(bufio.ScanWords)
+	seg.SetText(text)
 	seg.Transform(transformer.Lower, transformer.Diacritics)
 
 	var tokens []string
@@ -123,11 +126,12 @@ func TestStringSegmenterStart(t *testing.T) {
 	text := "Hello world"
 
 	{
-		stringSeg := iterators.NewStringSegmenter(text, words.SplitFunc)
+		seg := iterators.NewStringSegmenter(words.SplitFunc)
+		seg.SetText(text)
 		expected := []int{0, 5, 6}
 		var got []int
-		for stringSeg.Next() {
-			got = append(got, stringSeg.Start())
+		for seg.Next() {
+			got = append(got, seg.Start())
 		}
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("start failed for words.SplitFunc, expected %v, got %v", expected, got)
@@ -135,11 +139,12 @@ func TestStringSegmenterStart(t *testing.T) {
 	}
 
 	{
-		stringSeg := iterators.NewStringSegmenter(text, bufio.ScanWords)
+		seg := iterators.NewStringSegmenter(bufio.ScanWords)
+		seg.SetText(text)
 		expected := []int{0, 6}
 		var got []int
-		for stringSeg.Next() {
-			got = append(got, stringSeg.Start())
+		for seg.Next() {
+			got = append(got, seg.Start())
 		}
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("start failed for bufio.ScanWords, expected %v, got %v", expected, got)
@@ -153,7 +158,8 @@ func TestStringSegmenterEnd(t *testing.T) {
 	text := "Hello world"
 
 	{
-		seg := iterators.NewStringSegmenter(text, words.SplitFunc)
+		seg := iterators.NewStringSegmenter(words.SplitFunc)
+		seg.SetText(text)
 
 		expected := []int{5, 6, len(text)}
 		var got []int
@@ -166,7 +172,8 @@ func TestStringSegmenterEnd(t *testing.T) {
 	}
 
 	{
-		seg := iterators.NewStringSegmenter(text, bufio.ScanWords)
+		seg := iterators.NewStringSegmenter(bufio.ScanWords)
+		seg.SetText(text)
 		expected := []int{5, len(text)}
 		var got []int
 		for seg.Next() {
@@ -183,7 +190,8 @@ func TestStringSegmenterFilterIsApplied(t *testing.T) {
 
 	text := "Hello, 世界, I am enjoying cups of Açaí in Örebro."
 
-	seg := iterators.NewStringSegmenter(text, words.SplitFunc)
+	seg := iterators.NewStringSegmenter(words.SplitFunc)
+	seg.SetText(text)
 	seg.Filter(filter.AlphaNumeric)
 
 	var tokens []string

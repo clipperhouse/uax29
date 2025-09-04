@@ -23,10 +23,9 @@ type StringSegmenter struct {
 }
 
 // NewStringSegmenter creates a new StringSegmenter for the given string and SplitFunc.
-func NewStringSegmenter(s string, split bufio.SplitFunc) *StringSegmenter {
+func NewStringSegmenter(split bufio.SplitFunc) *StringSegmenter {
 	return &StringSegmenter{
 		split: split,
-		data:  s,
 	}
 }
 
