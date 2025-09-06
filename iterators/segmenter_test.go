@@ -6,11 +6,8 @@ import (
 	"crypto/rand"
 	"reflect"
 	"testing"
-	"unicode"
-	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/iterators"
-	"github.com/clipperhouse/uax29/iterators/filter"
 	"github.com/clipperhouse/uax29/words"
 )
 
@@ -84,33 +81,6 @@ func TestSegmenterSameAsAll(t *testing.T) {
 	}
 }
 
-var startsWithH = func(token []byte) bool {
-	r, _ := utf8.DecodeRune(token)
-	return unicode.ToLower(r) == 'h'
-}
-
-func TestSegmenterFilterIsApplied(t *testing.T) {
-	t.Parallel()
-
-	text := "Hello, 世界, how are you? Nice dog aha! 👍🐶"
-
-	seg := iterators.NewSegmenter(words.SplitFunc)
-	seg.SetText([]byte(text))
-	seg.Filter(startsWithH)
-
-	count := 0
-	for seg.Next() {
-		if !startsWithH(seg.Bytes()) {
-			t.Fatal("segmenter filter was not applied")
-		}
-		count++
-	}
-
-	if count != 2 {
-		t.Fatalf("segmenter filter should have found 2 results, got %d", count)
-	}
-}
-
 func TestSegmenterStart(t *testing.T) {
 	t.Parallel()
 
@@ -139,19 +109,6 @@ func TestSegmenterStart(t *testing.T) {
 		}
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("start failed for bufio.ScanWords, expected %v, got %v", expected, got)
-		}
-	}
-
-	{
-		seg := words.NewSegmenter(text)
-		seg.Filter(filter.AlphaNumeric)
-		expected := []int{0, 6}
-		var got []int
-		for seg.Next() {
-			got = append(got, seg.Start())
-		}
-		if !reflect.DeepEqual(got, expected) {
-			t.Fatalf("start failed for filter.AlphaNumeric, expected %v, got %v", expected, got)
 		}
 	}
 }
@@ -184,19 +141,6 @@ func TestSegmenterEnd(t *testing.T) {
 		}
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("end failed for bufio.ScanWords, expected %v, got %v", expected, got)
-		}
-	}
-	{
-		seg := words.NewSegmenter(text)
-		seg.Filter(filter.AlphaNumeric)
-
-		expected := []int{5, len(text)}
-		var got []int
-		for seg.Next() {
-			got = append(got, seg.End())
-		}
-		if !reflect.DeepEqual(got, expected) {
-			t.Fatalf("end failed for filter.AlphaNumeric, expected %v, got %v", expected, got)
 		}
 	}
 }

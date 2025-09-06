@@ -7,10 +7,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
-	"unicode"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/iterators/filter"
 	"github.com/clipperhouse/uax29/words"
 )
 
@@ -80,18 +78,6 @@ func TestSegmenterRoundtrip(t *testing.T) {
 		if !bytes.Equal(output, input) {
 			t.Fatal("input bytes are not the same as segmented bytes")
 		}
-	}
-}
-
-func TestSegmenterWordlike(t *testing.T) {
-	t.Parallel()
-
-	text := []byte("Hello, 世界. Nice dog! 👍🐶")
-	seg := words.NewSegmenter(text)
-	seg.Filter(filter.Entirely(unicode.Punct))
-
-	for seg.Next() {
-		t.Logf("%q\n", seg.Bytes())
 	}
 }
 
@@ -236,12 +222,6 @@ func benchSeg(b *testing.B, seg *words.Segmenter) {
 	b.ReportMetric(1e3*tokensPerOp/nsPerOp, "Mtok/s")
 	b.ReportMetric(tokensPerOp, "tok/op")
 	b.ReportMetric(float64(bytes)/tokensPerOp, "B/tok")
-}
-
-func BenchmarkSegmenterFilter(b *testing.B) {
-	seg := words.NewSegmenter(nil)
-	seg.Filter(filter.Wordlike)
-	benchSeg(b, seg)
 }
 
 func BenchmarkSegmenterJoiners(b *testing.B) {

@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/rand"
-	"strings"
 	"testing"
 
 	"github.com/clipperhouse/uax29/graphemes"
@@ -44,30 +43,6 @@ func TestScannerSameAsBufio(t *testing.T) {
 					t.Fatal("Scanner and bufio.Scanner should give identical results")
 				}
 			}
-		}
-	}
-}
-
-func TestScannerFilterIsApplied(t *testing.T) {
-	t.Parallel()
-
-	text := "Hello, 世界, how are you? Nice dog aha! 👍🐶"
-
-	{
-		r := strings.NewReader(text)
-		sc := iterators.NewScanner(r, bufio.ScanWords)
-		sc.Filter(startsWithH)
-
-		count := 0
-		for sc.Scan() {
-			if !startsWithH(sc.Bytes()) {
-				t.Fatal("filter was not applied")
-			}
-			count++
-		}
-
-		if count != 2 {
-			t.Fatalf("scanner filter should have found 2 results, got %d", count)
 		}
 	}
 }

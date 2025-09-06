@@ -4,8 +4,6 @@ package iterators
 import (
 	"bufio"
 	"errors"
-
-	"github.com/clipperhouse/uax29/iterators/filter"
 )
 
 // Segmenter is an iterator for byte slices, which are segmented into tokens (segments).
@@ -17,13 +15,12 @@ import (
 // sub-packages, and relies on assumptions about their behavior. Caveat emptor when
 // bringing your own SplitFunc.
 type Segmenter struct {
-	split  bufio.SplitFunc
-	filter filter.Func
-	data   []byte
-	token  []byte
-	start  int
-	pos    int
-	err    error
+	split bufio.SplitFunc
+	data  []byte
+	token []byte
+	start int
+	pos   int
+	err   error
 }
 
 // NewSegmenter creates a new segmenter given a SplitFunc. To use the new segmenter,
@@ -52,59 +49,48 @@ func (seg *Segmenter) Split(split bufio.SplitFunc) {
 	seg.split = split
 }
 
-// Filter applies a filter (predicate) to all tokens, returning only those
-// where all filters evaluate true. Calling Filter will overwrite the previous
-// filter.
-func (seg *Segmenter) Filter(filter filter.Func) {
-	seg.filter = filter
-}
-
 var ErrAdvanceNegative = errors.New("SplitFunc returned a negative advance, this is likely a bug in the SplitFunc")
 var ErrAdvanceTooFar = errors.New("SplitFunc advanced beyond the end of the data, this is likely a bug in the SplitFunc")
 
 // Next advances Segmenter to the next token (segment). It returns false when there
 // are no remaining segments, or an error occurred.
 func (seg *Segmenter) Next() bool {
-	for seg.pos < len(seg.data) {
-		seg.start = seg.pos
-
-		advance, token, err := seg.split(seg.data[seg.pos:], true)
-		seg.pos += advance
-		seg.token = token
-		seg.err = err
-
-		if seg.err != nil {
-			return false
-		}
-
-		// Guardrails
-		if advance < 0 {
-			seg.err = ErrAdvanceNegative
-			return false
-		}
-		if seg.pos > len(seg.data) {
-			seg.err = ErrAdvanceTooFar
-			return false
-		}
-
-		// Interpret as EOF
-		if advance == 0 {
-			return false
-		}
-
-		// Interpret as EOF
-		if len(seg.token) == 0 {
-			return false
-		}
-
-		if seg.filter != nil && !seg.filter(seg.token) {
-			continue
-		}
-
-		return true
+	if seg.pos >= len(seg.data) {
+		return false
 	}
 
-	return false
+	seg.start = seg.pos
+
+	advance, token, err := seg.split(seg.data[seg.pos:], true)
+	seg.pos += advance
+	seg.token = token
+	seg.err = err
+
+	if seg.err != nil {
+		return false
+	}
+
+	// Guardrails
+	if advance < 0 {
+		seg.err = ErrAdvanceNegative
+		return false
+	}
+	if seg.pos > len(seg.data) {
+		seg.err = ErrAdvanceTooFar
+		return false
+	}
+
+	// Interpret as EOF
+	if advance == 0 {
+		return false
+	}
+
+	// Interpret as EOF
+	if len(seg.token) == 0 {
+		return false
+	}
+
+	return true
 }
 
 // Err indicates an error occured when calling Next; Next will return false

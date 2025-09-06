@@ -5,11 +5,9 @@ import (
 	"os"
 	"testing"
 	"time"
-	"unicode"
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/iterators"
-	"github.com/clipperhouse/uax29/iterators/filter"
 	"github.com/clipperhouse/uax29/phrases"
 )
 
@@ -38,18 +36,6 @@ func TestSegmenterRoundtrip(t *testing.T) {
 		if !bytes.Equal(output, input) {
 			t.Fatal("input bytes are not the same as segmented bytes")
 		}
-	}
-}
-
-func TestSegmenterWordlike(t *testing.T) {
-	t.Parallel()
-
-	text := []byte("Hello, 世界. Nice dog! 👍🐶")
-	seg := phrases.NewSegmenter(text)
-	seg.Filter(filter.Entirely(unicode.Punct))
-
-	for seg.Next() {
-		t.Logf("%q\n", seg.Bytes())
 	}
 }
 

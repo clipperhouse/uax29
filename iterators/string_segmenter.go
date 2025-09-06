@@ -3,21 +3,18 @@ package iterators
 import (
 	"bufio"
 	"unsafe"
-
-	"github.com/clipperhouse/uax29/iterators/filter"
 )
 
 // StringSegmenter reuses the existing SplitFunc logic while achieving zero-copy behavior.
 // It works by converting only the portion of the string needed for boundary detection
 // to []byte, then extracting the result as a string slice.
 type StringSegmenter struct {
-	split  bufio.SplitFunc
-	filter filter.Func
-	data   string
-	pos    int
-	start  int
-	token  string
-	err    error
+	split bufio.SplitFunc
+	data  string
+	pos   int
+	start int
+	token string
+	err   error
 }
 
 // NewStringSegmenter creates a new StringSegmenter for the given string and SplitFunc.
@@ -41,43 +38,31 @@ func (seg *StringSegmenter) Split(split bufio.SplitFunc) {
 	seg.split = split
 }
 
-// Filter applies a filter (predicate) to all tokens, returning only those
-// where all filters evaluate true. Calling Filter will overwrite the previous
-// filter.
-func (seg *StringSegmenter) Filter(filter filter.Func) {
-	seg.filter = filter
-}
-
 // Next advances the segmenter to the next token. It returns false when there
 // are no remaining tokens or an error occurred.
 func (seg *StringSegmenter) Next() bool {
-	for seg.pos < len(seg.data) {
-		seg.start = seg.pos
-
-		b := stringToBytes(seg.data[seg.pos:])
-
-		advance, token, err := seg.split(b, true)
-		if err != nil {
-			seg.err = err
-			return false
-		}
-
-		if advance <= 0 {
-			return false
-		}
-
-		seg.pos += advance
-		seg.token = bytesToString(token)
-
-		// Apply filter if any is set
-		if seg.filter != nil && !seg.filter(token) {
-			continue
-		}
-
-		return true
+	if seg.pos >= len(seg.data) {
+		return false
 	}
 
-	return false
+	seg.start = seg.pos
+
+	b := stringToBytes(seg.data[seg.pos:])
+
+	advance, token, err := seg.split(b, true)
+	if err != nil {
+		seg.err = err
+		return false
+	}
+
+	if advance <= 0 {
+		return false
+	}
+
+	seg.pos += advance
+	seg.token = bytesToString(token)
+
+	return true
 }
 
 // stringToBytes converts a string to []byte without allocation using unsafe.
