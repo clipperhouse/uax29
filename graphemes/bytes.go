@@ -4,12 +4,20 @@ import (
 	"github.com/clipperhouse/uax29/internal/iterators"
 )
 
-// NewSegmenter returns a Segmenter, which is an iterator over the source text.
-// Iterate while Next() is true, and access the grapheme via Bytes().
-func NewSegmenter(data []byte) *iterators.Segmenter {
-	seg := iterators.NewSegmenter(SplitFunc)
-	seg.SetText(data)
-	return seg
+// BytesIterator is an iterator for grapheme clusters. Iterate while Next() is
+// true, and access the grapheme via Bytes().
+type BytesIterator struct {
+	*iterators.BytesIterator
+}
+
+// FromBytes returns an iterator for the grapheme clusters in the input bytes.
+// Iterate while Next() is true, and access the grapheme cluster via Bytes().
+func FromBytes(data []byte) *BytesIterator {
+	iter := &BytesIterator{
+		iterators.NewBytesIterator(SplitFunc),
+	}
+	iter.SetText(data)
+	return iter
 }
 
 // SegmentAll will iterate through all graphemes and collect them into a [][]byte.

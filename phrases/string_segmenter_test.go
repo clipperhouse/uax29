@@ -59,7 +59,7 @@ func TestStringSegmenterInvalidUTF8(t *testing.T) {
 		t.Error("input file should not be valid utf8")
 	}
 
-	sc := phrases.NewSegmenter(input)
+	sc := phrases.FromBytes(input)
 
 	var output []byte
 	for sc.Next() {

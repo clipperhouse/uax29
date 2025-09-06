@@ -39,7 +39,7 @@ func TestSegmenterSameAsAll(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			seg := iterators.NewSegmenter(split)
+			seg := iterators.NewBytesIterator(split)
 			seg.SetText(text)
 
 			for i := 0; seg.Next(); i++ {
@@ -60,7 +60,7 @@ func TestSegmenterStart(t *testing.T) {
 	text := []byte("Hello world")
 
 	{
-		seg := words.NewSegmenter(text)
+		seg := words.FromBytes(text)
 		seg.SetText(text)
 		expected := []int{0, 5, 6}
 		var got []int
@@ -73,7 +73,7 @@ func TestSegmenterStart(t *testing.T) {
 	}
 
 	{
-		seg := iterators.NewSegmenter(bufio.ScanWords)
+		seg := iterators.NewBytesIterator(bufio.ScanWords)
 		seg.SetText(text)
 		expected := []int{0, 6}
 		var got []int
@@ -92,7 +92,7 @@ func TestSegmenterEnd(t *testing.T) {
 	text := []byte("Hello world")
 
 	{
-		seg := words.NewSegmenter(text)
+		seg := words.FromBytes(text)
 
 		expected := []int{5, 6, len(text)}
 		var got []int
@@ -105,7 +105,7 @@ func TestSegmenterEnd(t *testing.T) {
 	}
 
 	{
-		seg := iterators.NewSegmenter(bufio.ScanWords)
+		seg := iterators.NewBytesIterator(bufio.ScanWords)
 		seg.SetText(text)
 		expected := []int{5, len(text)}
 		var got []int

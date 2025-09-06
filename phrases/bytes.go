@@ -4,12 +4,20 @@ import (
 	"github.com/clipperhouse/uax29/internal/iterators"
 )
 
-// NewSegmenter returns a Segmenter, which is an iterator over the source text.
+// BytesIterator is an iterator for phrases. Iterate while Next() is true,
+// and access the phrase via Bytes().
+type BytesIterator struct {
+	*iterators.BytesIterator
+}
+
+// FromBytes returns an iterator for the phrases in the input bytes.
 // Iterate while Next() is true, and access the phrase via Bytes().
-func NewSegmenter(data []byte) *iterators.Segmenter {
-	seg := iterators.NewSegmenter(SplitFunc)
-	seg.SetText(data)
-	return seg
+func FromBytes(data []byte) *BytesIterator {
+	iter := &BytesIterator{
+		iterators.NewBytesIterator(SplitFunc),
+	}
+	iter.SetText(data)
+	return iter
 }
 
 // SegmentAll will iterate through all phrases and collect them into a [][]byte.

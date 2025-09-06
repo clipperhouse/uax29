@@ -2,7 +2,7 @@ package words
 
 // Joiners sets runes that should be treated like word characters, where
 // otherwise words will be split. See the [Joiners] type.
-func (seg *Segmenter) Joiners(j *Joiners) {
+func (seg *BytesIterator) Joiners(j *Joiners) {
 	seg.Split(j.splitFunc)
 }
 

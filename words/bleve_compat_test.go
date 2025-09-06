@@ -167,7 +167,7 @@ func TestAdhocSegmentsWithType(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		segmenter := words.NewSegmenter(test.input)
+		segmenter := words.FromBytes(test.input)
 
 		i := 0
 		for segmenter.Next() {

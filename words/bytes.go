@@ -4,23 +4,20 @@ import (
 	"github.com/clipperhouse/uax29/internal/iterators"
 )
 
-// Segmenter is an iterator for byte slices, which are segmented into tokens (segments).
-// To use it, you will define a SplitFunc, SetText with the bytes you wish to tokenize,
-// loop over Next until false, call Bytes to retrieve the current token, and check Err
-// after the loop.
-type Segmenter struct {
-	// made a words.Segmenter so we can attach the Joiners method just for words.
-	*iterators.Segmenter
+// BytesIterator is an iterator for words. Iterate while Next() is true,
+// and access the word via Bytes().
+type BytesIterator struct {
+	*iterators.BytesIterator
 }
 
-// NewSegmenter returns a Segmenter, which is an iterator over the source text.
+// FromBytes returns an iterator for the words in the input bytes.
 // Iterate while Next() is true, and access the word via Bytes().
-func NewSegmenter(data []byte) *Segmenter {
-	seg := &Segmenter{
-		iterators.NewSegmenter(SplitFunc),
+func FromBytes(data []byte) *BytesIterator {
+	iter := &BytesIterator{
+		iterators.NewBytesIterator(SplitFunc),
 	}
-	seg.SetText(data)
-	return seg
+	iter.SetText(data)
+	return iter
 }
 
 // SegmentAll will iterate through all words and collect them into a [][]byte.

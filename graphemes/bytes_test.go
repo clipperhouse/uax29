@@ -1,16 +1,56 @@
-package phrases_test
+package graphemes_test
 
 import (
 	"bytes"
 	"os"
+	"reflect"
 	"testing"
-	"time"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/internal/iterators"
+	"github.com/clipperhouse/uax29/graphemes"
 	"github.com/clipperhouse/uax29/internal/testdata"
-	"github.com/clipperhouse/uax29/phrases"
 )
+
+func TestSegmenterUnicode(t *testing.T) {
+	t.Parallel()
+
+	// From the Unicode test suite; see the gen/ folder.
+	var passed, failed int
+	for _, test := range unicodeTests {
+		test := test
+
+		var segmented [][]byte
+		segmenter := graphemes.FromBytes(test.input)
+		for segmenter.Next() {
+			segmented = append(segmented, segmenter.Bytes())
+		}
+
+		if err := segmenter.Err(); err != nil {
+			t.Fatal(err)
+		}
+
+		if !reflect.DeepEqual(segmented, test.expected) {
+			failed++
+			t.Errorf(`
+	for input %v
+	expected  %v
+	got       %v
+	spec      %s`, test.input, test.expected, segmented, test.comment)
+		} else {
+			passed++
+		}
+
+		// Test SegmentAll while we're here
+		all := graphemes.SegmentAll(test.input)
+		if !reflect.DeepEqual(all, segmented) {
+			t.Error("calling SegmentAll should be identical to iterating Segmenter")
+		}
+	}
+
+	if len(unicodeTests) != passed+failed {
+		t.Errorf("Incomplete %d tests: passed %d, failed %d", len(unicodeTests), passed, failed)
+	}
+}
 
 // TestSegmenterRoundtrip tests that all input bytes are output after segmentation.
 // De facto, it also tests that we don't get infinite loops, or ever return an error.
@@ -19,7 +59,7 @@ func TestSegmenterRoundtrip(t *testing.T) {
 
 	const runs = 2000
 
-	seg := phrases.NewSegmenter(nil)
+	seg := graphemes.FromBytes(nil)
 
 	for i := 0; i < runs; i++ {
 		input := getRandomBytes()
@@ -58,7 +98,7 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 		t.Error("input file should not be valid utf8")
 	}
 
-	sc := phrases.NewSegmenter(input)
+	sc := graphemes.FromBytes(input)
 
 	var output []byte
 	for sc.Next() {
@@ -73,59 +113,20 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 	}
 }
 
-var exists = struct{}{}
-
-func segToSetTrimmed(seg *iterators.Segmenter) map[string]struct{} {
-	founds := make(map[string]struct{})
-	for seg.Next() {
-		key := bytes.TrimSpace(seg.Bytes())
-		founds[string(key)] = exists
-	}
-	return founds
-}
-
-func TestPhraseBoundaries(t *testing.T) {
-	t.Parallel()
-
-	input := []byte("This should break here. And then here. 世界. I think, perhaps you can understand that — aside 🏆 🐶 here — “a quote”.")
-	seg := phrases.NewSegmenter(input)
-	got := segToSetTrimmed(seg)
-	expecteds := map[string]struct{}{
-		"This should break here":          exists,
-		"And then here":                   exists,
-		"世":                               exists, // We don't have great logic for languages without spaces. Also true for words, see Notes: https://unicode.org/reports/tr29/#WB999
-		"I think":                         exists,
-		"perhaps you can understand that": exists,
-		"aside 🏆 🐶 here":                  exists,
-		"a quote":                         exists,
-	}
-
-	for phrase := range expecteds {
-		_, found := got[phrase]
-		if !found {
-			t.Fatalf("phrase %q was expected, not found", phrase)
-		}
-	}
-}
-
 func BenchmarkSegmenter(b *testing.B) {
 	file, err := testdata.Sample()
-
 	if err != nil {
 		b.Error(err)
 	}
 
 	b.ResetTimer()
-	bytes := len(file)
-	b.SetBytes(int64(bytes))
-	seg := phrases.NewSegmenter(file)
-
-	c := 0
-	start := time.Now()
+	b.SetBytes(int64(len(file)))
+	seg := graphemes.FromBytes(file)
 
 	for i := 0; i < b.N; i++ {
 		seg.SetText(file)
 
+		c := 0
 		for seg.Next() {
 			c++
 		}
@@ -133,17 +134,9 @@ func BenchmarkSegmenter(b *testing.B) {
 		if err := seg.Err(); err != nil {
 			b.Error(err)
 		}
+
+		b.ReportMetric(float64(c), "tokens")
 	}
-
-	elapsed := time.Since(start)
-	n := float64(b.N)
-
-	tokensPerOp := float64(c) / n
-	nsPerOp := float64(elapsed.Nanoseconds()) / n
-
-	b.ReportMetric(1e3*tokensPerOp/nsPerOp, "MMtokens/s")
-	b.ReportMetric(tokensPerOp, "tokens/op")
-	b.ReportMetric(float64(bytes)/tokensPerOp, "B/token")
 }
 
 func BenchmarkSegmentAll(b *testing.B) {
@@ -153,15 +146,39 @@ func BenchmarkSegmentAll(b *testing.B) {
 		b.Error(err)
 	}
 
+	c := len(graphemes.SegmentAll(file))
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 
 	for i := 0; i < b.N; i++ {
-		segs := phrases.SegmentAll(file)
+		_ = graphemes.SegmentAll(file)
+	}
+
+	b.ReportMetric(float64(c), "tokens")
+	b.Logf("tokens %d, len %d, avg %d", c, len(file), len(file)/c)
+}
+
+func BenchmarkUnicodeTests(b *testing.B) {
+	var buf bytes.Buffer
+	for _, test := range unicodeTests {
+		buf.Write(test.input)
+	}
+	file := buf.Bytes()
+
+	b.ResetTimer()
+	b.SetBytes(int64(len(file)))
+
+	seg := graphemes.FromBytes(file)
+
+	for i := 0; i < b.N; i++ {
+		seg.SetText(file)
 
 		c := 0
-		for range segs {
+		for seg.Next() {
 			c++
+		}
+		if err := seg.Err(); err != nil {
+			b.Error(err)
 		}
 
 		b.ReportMetric(float64(c), "tokens")

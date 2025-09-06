@@ -27,7 +27,7 @@ func FuzzValidShort(f *testing.F) {
 	f.Fuzz(func(t *testing.T, original []byte) {
 		var segs [][]byte
 		valid1 := utf8.Valid(original)
-		seg := phrases.NewSegmenter(original)
+		seg := phrases.FromBytes(original)
 		for seg.Next() {
 			segs = append(segs, seg.Bytes())
 		}
@@ -67,7 +67,7 @@ func FuzzValidLong(f *testing.F) {
 	f.Fuzz(func(t *testing.T, original []byte) {
 		var segs [][]byte
 		valid1 := utf8.Valid(original)
-		seg := phrases.NewSegmenter(original)
+		seg := phrases.FromBytes(original)
 		for seg.Next() {
 			segs = append(segs, seg.Bytes())
 		}
@@ -125,7 +125,7 @@ func FuzzInvalid(f *testing.F) {
 	f.Fuzz(func(t *testing.T, original []byte) {
 		var segs [][]byte
 		valid1 := utf8.Valid(original)
-		seg := phrases.NewSegmenter(original)
+		seg := phrases.FromBytes(original)
 		for seg.Next() {
 			segs = append(segs, seg.Bytes())
 		}

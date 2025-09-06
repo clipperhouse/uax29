@@ -34,7 +34,7 @@ func TestStringSegmenterSameAsSegmenter(t *testing.T) {
 			}
 
 			// Test with []byte segmenter
-			seg := iterators.NewSegmenter(split)
+			seg := iterators.NewBytesIterator(split)
 			seg.SetText(text)
 
 			// Test with string segmenter

@@ -6,15 +6,7 @@ import (
 	"errors"
 )
 
-// Segmenter is an iterator for byte slices, which are segmented into tokens (segments).
-// To use it, you will define a SplitFunc, SetText with the bytes you wish to tokenize,
-// loop over Next until false, call Bytes to retrieve the current token, and check Err
-// after the loop.
-//
-// Note that Segmenter is designed for use with the SplitFuncs in the various uax29
-// sub-packages, and relies on assumptions about their behavior. Caveat emptor when
-// bringing your own SplitFunc.
-type Segmenter struct {
+type BytesIterator struct {
 	split bufio.SplitFunc
 	data  []byte
 	token []byte
@@ -23,38 +15,34 @@ type Segmenter struct {
 	err   error
 }
 
-// NewSegmenter creates a new segmenter given a SplitFunc. To use the new segmenter,
-// call SetText() and then iterate while Next() is true.
-//
-// Note that Segmenter is designed for use with the SplitFuncs in the various uax29
-// sub-packages, and relies on assumptions about their behavior. Caveat emptor when
-// bringing your own SplitFunc.
-func NewSegmenter(split bufio.SplitFunc) *Segmenter {
-	return &Segmenter{
+func NewBytesIterator(split bufio.SplitFunc) *BytesIterator {
+	return &BytesIterator{
 		split: split,
 	}
 }
 
-// SetText sets the text for the segmenter to operate on, and resets
+// SetText sets the text for the BytesIterator to operate on, and resets
 // all state.
-func (seg *Segmenter) SetText(data []byte) {
+func (seg *BytesIterator) SetText(data []byte) {
 	seg.data = data
 	seg.token = nil
 	seg.pos = 0
 	seg.err = nil
 }
 
-// Split sets the SplitFunc for the Segmenter
-func (seg *Segmenter) Split(split bufio.SplitFunc) {
+// Split sets the SplitFunc for the BytesIterator
+func (seg *BytesIterator) Split(split bufio.SplitFunc) {
 	seg.split = split
 }
 
 var ErrAdvanceNegative = errors.New("SplitFunc returned a negative advance, this is likely a bug in the SplitFunc")
 var ErrAdvanceTooFar = errors.New("SplitFunc advanced beyond the end of the data, this is likely a bug in the SplitFunc")
 
-// Next advances Segmenter to the next token (segment). It returns false when there
-// are no remaining segments, or an error occurred.
-func (seg *Segmenter) Next() bool {
+// Next advances BytesIterator to the next token (segment). It returns false
+// when there are no remaining segments, or an error occurred.
+//
+// Always check Err() after Next() returns false.
+func (seg *BytesIterator) Next() bool {
 	if seg.pos >= len(seg.data) {
 		return false
 	}
@@ -93,26 +81,26 @@ func (seg *Segmenter) Next() bool {
 	return true
 }
 
-// Err indicates an error occured when calling Next; Next will return false
+// Err indicates an error occured when calling Next; Next() will return false
 // when an error occurs.
-func (seg *Segmenter) Err() error {
+func (seg *BytesIterator) Err() error {
 	return seg.err
 }
 
 // Bytes returns the current token.
-func (seg *Segmenter) Bytes() []byte {
+func (seg *BytesIterator) Bytes() []byte {
 	return seg.token
 }
 
 // Text returns the current token as a newly-allocated string.
-func (seg *Segmenter) Text() string {
+func (seg *BytesIterator) Text() string {
 	return string(seg.token)
 }
 
 // These extensive comments are here because someone is gonna be surprised by
 // some custom SplitFunc, and it will be an annoying bug, so let's spell it all out.
 
-// If you're just using a Segmenter from the words, sentences, or graphemes
+// If you're just using a BytesIterator from the words, sentences, or graphemes
 // sub-packages, what follows is irrelevant, carry on.
 
 // For Start and End, we are taking some assumptions below. The SplitFunc interface
@@ -121,7 +109,7 @@ func (seg *Segmenter) Text() string {
 // skipping bytes at the beginning is unconventional, so we make that assumption.
 
 // The SplitFuncs in the words, sentences, and graphemes packages adhere to this
-// assumption, and in fact skip no bytes at all. This Segmenter is designed for
+// assumption, and in fact skip no bytes at all. This BytesIterator is designed for
 // use with those, otherwise caveat emptor.
 
 // If a SplitFunc skips bytes before *and* after a token, then there is unlikely to
@@ -131,7 +119,7 @@ func (seg *Segmenter) Text() string {
 // to make start and end explicit.
 
 // Start returns the position (byte index) of the current token in the original text.
-func (seg *Segmenter) Start() int {
+func (seg *BytesIterator) Start() int {
 	return seg.start
 }
 
@@ -139,13 +127,13 @@ func (seg *Segmenter) Start() int {
 // in the original text.
 //
 // In other words, segmenter.Bytes() == original[segmenter.Start():segmenter.End()]
-func (seg *Segmenter) End() int {
+func (seg *BytesIterator) End() int {
 	return seg.start + len(seg.token)
 }
 
 // All iterates through all tokens and collect them into a [][]byte. It is a
 // convenience method. The downside is that it allocates, and can do so unbounded:
-// O(n) on the number of tokens (24 bytes per token). Prefer Segmenter for constant
+// O(n) on the number of tokens (24 bytes per token). Prefer BytesIterator for constant
 // memory usage.
 func All(src []byte, dest *[][]byte, split bufio.SplitFunc) error {
 	for pos := 0; pos < len(src); {
