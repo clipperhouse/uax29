@@ -22,7 +22,7 @@ func FuzzValidShort(f *testing.F) {
 	}
 
 	// multi-lingual text, as small-ish lines
-	file, err := os.ReadFile("../testdata/sample.txt")
+	file, err := os.ReadFile("../internal/testdata/sample.txt")
 	if err != nil {
 		f.Error(err)
 	}
@@ -62,7 +62,7 @@ func FuzzValidShort(f *testing.F) {
 // FuzzValidLong fuzzes longer, valid UTF8 strings.
 func FuzzValidLong(f *testing.F) {
 	// add multi-lingual text, as decent (paragraph-sized) size chunks
-	file, err := os.ReadFile("../testdata/sample.txt")
+	file, err := os.ReadFile("../internal/testdata/sample.txt")
 	if err != nil {
 		f.Error(err)
 	}
@@ -120,7 +120,7 @@ func FuzzInvalid(f *testing.F) {
 	}
 
 	// known invalid utf-8
-	badUTF8, err := os.ReadFile("../testdata/UTF-8-test.txt")
+	badUTF8, err := os.ReadFile("../internal/testdata/UTF-8-test.txt")
 	if err != nil {
 		f.Error(err)
 	}

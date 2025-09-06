@@ -76,12 +76,12 @@ func TestScannerRoundtrip(t *testing.T) {
 func TestInvalidUTF8(t *testing.T) {
 	t.Parallel()
 
-	// For background, see testdata/UTF-8-test.txt, or:
+	// For background, see internal/testdata/UTF-8-test.txt, or:
 	// https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
 
 	// Btw, don't edit UTF-8-test.txt: your editor might turn it into valid UTF-8!
 
-	input, err := os.ReadFile("../testdata/UTF-8-test.txt")
+	input, err := os.ReadFile("../internal/testdata/UTF-8-test.txt")
 	inlen := len(input)
 
 	if err != nil {
@@ -166,7 +166,7 @@ func getRandomBytes() []byte {
 }
 
 func BenchmarkScanner(b *testing.B) {
-	file, err := os.ReadFile("../testdata/sample.txt")
+	file, err := os.ReadFile("../internal/testdata/sample.txt")
 
 	if err != nil {
 		b.Error(err)

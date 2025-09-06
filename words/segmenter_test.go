@@ -112,12 +112,12 @@ func TestSegmenterJoiners(t *testing.T) {
 func TestSegmenterInvalidUTF8(t *testing.T) {
 	t.Parallel()
 
-	// For background, see testdata/UTF-8-test.txt, or:
+	// For background, see internal/testdata/UTF-8-test.txt, or:
 	// https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
 
 	// Btw, don't edit UTF-8-test.txt: your editor might turn it into valid UTF-8!
 
-	input, err := os.ReadFile("../testdata/UTF-8-test.txt")
+	input, err := os.ReadFile("../internal/testdata/UTF-8-test.txt")
 
 	if err != nil {
 		t.Error(err)
@@ -189,7 +189,7 @@ func BenchmarkSegmenter(b *testing.B) {
 }
 
 func benchSeg(b *testing.B, seg *words.Segmenter) {
-	file, err := os.ReadFile("../testdata/sample.txt")
+	file, err := os.ReadFile("../internal/testdata/sample.txt")
 	if err != nil {
 		b.Error(err)
 	}
@@ -235,7 +235,7 @@ func BenchmarkSegmenterJoiners(b *testing.B) {
 }
 
 func BenchmarkSegmentAll(b *testing.B) {
-	file, err := os.ReadFile("../testdata/sample.txt")
+	file, err := os.ReadFile("../internal/testdata/sample.txt")
 
 	if err != nil {
 		b.Error(err)
