@@ -6,7 +6,6 @@ import (
 	"errors"
 
 	"github.com/clipperhouse/uax29/iterators/filter"
-	"golang.org/x/text/transform"
 )
 
 // Segmenter is an iterator for byte slices, which are segmented into tokens (segments).
@@ -18,14 +17,13 @@ import (
 // sub-packages, and relies on assumptions about their behavior. Caveat emptor when
 // bringing your own SplitFunc.
 type Segmenter struct {
-	split       bufio.SplitFunc
-	filter      filter.Func
-	transformer transform.Transformer
-	data        []byte
-	token       []byte
-	start       int
-	pos         int
-	err         error
+	split  bufio.SplitFunc
+	filter filter.Func
+	data   []byte
+	token  []byte
+	start  int
+	pos    int
+	err    error
 }
 
 // NewSegmenter creates a new segmenter given a SplitFunc. To use the new segmenter,
@@ -59,13 +57,6 @@ func (seg *Segmenter) Split(split bufio.SplitFunc) {
 // filter.
 func (seg *Segmenter) Filter(filter filter.Func) {
 	seg.filter = filter
-}
-
-// Transform applies one or more transforms to all tokens. Calling Transform
-// will overwrite previous transforms, so call it once
-// (it's variadic, you can add multiple, which will be applied in order).
-func (seg *Segmenter) Transform(transformers ...transform.Transformer) {
-	seg.transformer = transform.Chain(transformers...)
 }
 
 var ErrAdvanceNegative = errors.New("SplitFunc returned a negative advance, this is likely a bug in the SplitFunc")
@@ -104,15 +95,6 @@ func (seg *Segmenter) Next() bool {
 		// Interpret as EOF
 		if len(seg.token) == 0 {
 			return false
-		}
-
-		if seg.transformer != nil {
-			transformed, _, err := transform.Bytes(seg.transformer, seg.token)
-			if err != nil {
-				seg.err = err
-				return false
-			}
-			seg.token = transformed
 		}
 
 		if seg.filter != nil && !seg.filter(seg.token) {

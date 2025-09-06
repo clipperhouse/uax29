@@ -132,33 +132,6 @@ for seg.Next() {
 }
 ```
 
-### Transforms
-
-Tokens can be modified by adding a transformer to a `Scanner` or `Segmenter`.
-
-You might wish to lowercase all the words, for example:
-
-```go
-text := []byte("Hello, 世界. Nice dog! 👍🐶")
-
-segments := words.NewSegmenter(text)
-segments.Transform(transformer.Lower)
-
-for segments.Next() {
-	// Note that tokens come out lowercase
-	fmt.Printf("%q\n", segments.Bytes())
-}
-
-if segments.Err() != nil {
-	log.Fatal(segments.Err())
-}
-```
-Here are a [few more examples](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/transformer).
-
-We use the [`x/text/transform`](https://pkg.go.dev/golang.org/x/text/transform) package. We can accept anything that implements the `transform.Transformer` interface. Many things in `x/text` do that, such as [runes](https://pkg.go.dev/golang.org/x/text/runes), [normalization](https://pkg.go.dev/golang.org/x/text/unicode/norm), [casing](https://pkg.go.dev/golang.org/x/text/cases), and [encoding](https://pkg.go.dev/golang.org/x/text/encoding).
-
-See also [this stemming package](https://pkg.go.dev/github.com/clipperhouse/stemmer).
-
 ### Limitations
 
 This package follows the basic UAX #29 specification. For more idiomatic treatment of words across languages, there is more that can be done, scroll down to the [“Notes:” section of the standard](https://unicode.org/reports/tr29/#Word_Boundary_Rules):

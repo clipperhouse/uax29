@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"github.com/clipperhouse/uax29/iterators/filter"
-	"golang.org/x/text/transform"
 )
 
 type s = *bufio.Scanner
@@ -14,10 +13,9 @@ type Scanner struct {
 	// underlying bufio.Scanner; Bytes, Err and other methods are overridden
 	s
 	// token overrides (hides) the token of the underlying bufio.Scanner
-	token       []byte
-	filter      filter.Func
-	transformer transform.Transformer
-	err         error
+	token  []byte
+	filter filter.Func
+	err    error
 }
 
 // NewScanner creates a new Scanner given an io.Reader and bufio.SplitFunc. To use the new scanner,
@@ -51,16 +49,9 @@ func (sc *Scanner) Err() error {
 }
 
 // Filter applies one or more filters (predicates) to all tokens, only returning those
-// where all filters evaluate true. Filters are applied after Transformers.
+// where all filters evaluate true.
 func (sc *Scanner) Filter(filter filter.Func) {
 	sc.filter = filter
-}
-
-// Transform applies one or more transformers to all tokens, in order. Calling Transform overwrites
-// previous transformers, so call it once (it's variadic, you can add multiple). Transformers are
-// applied before Filters.
-func (sc *Scanner) Transform(transformers ...transform.Transformer) {
-	sc.transformer = transform.Chain(transformers...)
 }
 
 // Scan advances to the next token. It returns true until end of data, or
@@ -72,13 +63,6 @@ func (sc *Scanner) Scan() bool {
 
 	for sc.s.Scan() {
 		sc.token = sc.s.Bytes()
-
-		if sc.transformer != nil {
-			sc.token, _, sc.err = transform.Bytes(sc.transformer, sc.token)
-			if sc.err != nil {
-				return false
-			}
-		}
 
 		if sc.filter != nil && !sc.filter(sc.Bytes()) {
 			continue

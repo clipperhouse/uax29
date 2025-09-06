@@ -10,7 +10,6 @@ import (
 	"github.com/clipperhouse/uax29/graphemes"
 	"github.com/clipperhouse/uax29/iterators"
 	"github.com/clipperhouse/uax29/iterators/filter"
-	"github.com/clipperhouse/uax29/iterators/transformer"
 	"github.com/clipperhouse/uax29/phrases"
 	"github.com/clipperhouse/uax29/sentences"
 	"github.com/clipperhouse/uax29/words"
@@ -96,27 +95,6 @@ func TestStringSegmenterSameAsAll(t *testing.T) {
 				t.Fatal(seg.Err())
 			}
 		}
-	}
-}
-
-func TestStringSegmenterTransformIsApplied(t *testing.T) {
-	t.Parallel()
-
-	text := "Hello, 世界, I am enjoying cups of Açaí in Örebro."
-
-	seg := iterators.NewStringSegmenter(bufio.ScanWords)
-	seg.SetText(text)
-	seg.Transform(transformer.Lower, transformer.Diacritics)
-
-	var tokens []string
-	for seg.Next() {
-		tokens = append(tokens, seg.Text())
-	}
-
-	got := tokens[7]
-	expected := "acai"
-	if expected != got {
-		t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
 	}
 }
 

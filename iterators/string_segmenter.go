@@ -5,21 +5,19 @@ import (
 	"unsafe"
 
 	"github.com/clipperhouse/uax29/iterators/filter"
-	"golang.org/x/text/transform"
 )
 
 // StringSegmenter reuses the existing SplitFunc logic while achieving zero-copy behavior.
 // It works by converting only the portion of the string needed for boundary detection
 // to []byte, then extracting the result as a string slice.
 type StringSegmenter struct {
-	split       bufio.SplitFunc
-	filter      filter.Func
-	transformer transform.Transformer
-	data        string
-	pos         int
-	start       int
-	token       string
-	err         error
+	split  bufio.SplitFunc
+	filter filter.Func
+	data   string
+	pos    int
+	start  int
+	token  string
+	err    error
 }
 
 // NewStringSegmenter creates a new StringSegmenter for the given string and SplitFunc.
@@ -50,13 +48,6 @@ func (seg *StringSegmenter) Filter(filter filter.Func) {
 	seg.filter = filter
 }
 
-// Transform applies one or more transforms to all tokens. Calling Transform
-// will overwrite previous transforms, so call it once
-// (it's variadic, you can add multiple, which will be applied in order).
-func (seg *StringSegmenter) Transform(transformers ...transform.Transformer) {
-	seg.transformer = transform.Chain(transformers...)
-}
-
 // Next advances the segmenter to the next token. It returns false when there
 // are no remaining tokens or an error occurred.
 func (seg *StringSegmenter) Next() bool {
@@ -77,16 +68,6 @@ func (seg *StringSegmenter) Next() bool {
 
 		seg.pos += advance
 		seg.token = bytesToString(token)
-
-		// Apply transforms if any are set
-		if seg.transformer != nil {
-			transformed, _, err := transform.String(seg.transformer, seg.token)
-			if err != nil {
-				seg.err = err
-				return false
-			}
-			seg.token = transformed
-		}
 
 		// Apply filter if any is set
 		if seg.filter != nil && !seg.filter(token) {

@@ -135,33 +135,6 @@ if segments.Err() != nil {
 
 You can write your own filters (predicates), with arbitrary logic, by implementing a `func([]byte) bool`. You can also create a filter based on Unicode categories with the [`filter.Contains`](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/filter#Contains) and [`filter.Entirely`](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/filter#Entirely) methods.
 
-### Transforms
-
-Tokens can be modified by adding a transformer to a `Scanner` or `Segmenter`.
-
-You might wish to lowercase all the phrases, for example:
-
-```go
-text := []byte("Hello, 世界. Nice dog! 👍🐶")
-
-phrases := phrases.NewSegmenter(text)
-phrases.Transform(transformer.Lower)
-
-for phrases.Next() {
-	// Note that tokens come out lowercase
-	fmt.Printf("%q\n", phrases.Bytes())
-}
-
-if phrases.Err() != nil {
-	log.Fatal(phrases.Err())
-}
-```
-Here are a [few more examples](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/transformer).
-
-We use the [`x/text/transform`](https://pkg.go.dev/golang.org/x/text/transform) package. We can accept anything that implements the `transform.Transformer` interface. Many things in `x/text` do that, such as [runes](https://pkg.go.dev/golang.org/x/text/runes), [normalization](https://pkg.go.dev/golang.org/x/text/unicode/norm), [casing](https://pkg.go.dev/golang.org/x/text/cases), and [encoding](https://pkg.go.dev/golang.org/x/text/encoding).
-
-See also [this stemming package](https://pkg.go.dev/github.com/clipperhouse/stemmer).
-
 ### Limitations
 
 This package follows derives from the basic UAX #29 specification. For more idiomatic treatment of phrases across languages, there is more that can be done, scroll down to the [“Notes:” section of the standard](https://unicode.org/reports/tr29/#Word_Boundary_Rules):

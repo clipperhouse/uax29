@@ -11,7 +11,6 @@ import (
 
 	"github.com/clipperhouse/uax29/iterators"
 	"github.com/clipperhouse/uax29/iterators/filter"
-	"github.com/clipperhouse/uax29/iterators/transformer"
 	"github.com/clipperhouse/uax29/words"
 )
 
@@ -109,27 +108,6 @@ func TestSegmenterFilterIsApplied(t *testing.T) {
 
 	if count != 2 {
 		t.Fatalf("segmenter filter should have found 2 results, got %d", count)
-	}
-}
-
-func TestSegmenterTransformIsApplied(t *testing.T) {
-	t.Parallel()
-
-	text := "Hello, 世界, I am enjoying cups of Açaí in Örebro."
-
-	seg := iterators.NewSegmenter(bufio.ScanWords)
-	seg.SetText([]byte(text))
-	seg.Transform(transformer.Lower, transformer.Diacritics)
-
-	var tokens [][]byte
-	for seg.Next() {
-		tokens = append(tokens, seg.Bytes())
-	}
-
-	got := tokens[7]
-	expected := []byte("acai")
-	if !bytes.Equal(expected, got) {
-		t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
 	}
 }
 
