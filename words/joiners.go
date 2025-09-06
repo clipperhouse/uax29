@@ -8,7 +8,7 @@ func (seg *BytesIterator) Joiners(j *Joiners) {
 
 // Joiners sets runes that should be treated like word characters, where
 // otherwise words will be split. See the [Joiners] type.
-func (seg *StringSegmenter) Joiners(j *Joiners) {
+func (seg *StringIterator) Joiners(j *Joiners) {
 	seg.Split(j.splitFunc)
 }
 

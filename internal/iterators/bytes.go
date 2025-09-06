@@ -23,16 +23,16 @@ func NewBytesIterator(split bufio.SplitFunc) *BytesIterator {
 
 // SetText sets the text for the BytesIterator to operate on, and resets
 // all state.
-func (seg *BytesIterator) SetText(data []byte) {
-	seg.data = data
-	seg.token = nil
-	seg.pos = 0
-	seg.err = nil
+func (iter *BytesIterator) SetText(data []byte) {
+	iter.data = data
+	iter.token = nil
+	iter.pos = 0
+	iter.err = nil
 }
 
 // Split sets the SplitFunc for the BytesIterator
-func (seg *BytesIterator) Split(split bufio.SplitFunc) {
-	seg.split = split
+func (iter *BytesIterator) Split(split bufio.SplitFunc) {
+	iter.split = split
 }
 
 var ErrAdvanceNegative = errors.New("SplitFunc returned a negative advance, this is likely a bug in the SplitFunc")
@@ -42,29 +42,29 @@ var ErrAdvanceTooFar = errors.New("SplitFunc advanced beyond the end of the data
 // when there are no remaining segments, or an error occurred.
 //
 // Always check Err() after Next() returns false.
-func (seg *BytesIterator) Next() bool {
-	if seg.pos >= len(seg.data) {
+func (iter *BytesIterator) Next() bool {
+	if iter.pos >= len(iter.data) {
 		return false
 	}
 
-	seg.start = seg.pos
+	iter.start = iter.pos
 
-	advance, token, err := seg.split(seg.data[seg.pos:], true)
-	seg.pos += advance
-	seg.token = token
-	seg.err = err
+	advance, token, err := iter.split(iter.data[iter.pos:], true)
+	iter.pos += advance
+	iter.token = token
+	iter.err = err
 
-	if seg.err != nil {
+	if iter.err != nil {
 		return false
 	}
 
 	// Guardrails
 	if advance < 0 {
-		seg.err = ErrAdvanceNegative
+		iter.err = ErrAdvanceNegative
 		return false
 	}
-	if seg.pos > len(seg.data) {
-		seg.err = ErrAdvanceTooFar
+	if iter.pos > len(iter.data) {
+		iter.err = ErrAdvanceTooFar
 		return false
 	}
 
@@ -74,7 +74,7 @@ func (seg *BytesIterator) Next() bool {
 	}
 
 	// Interpret as EOF
-	if len(seg.token) == 0 {
+	if len(iter.token) == 0 {
 		return false
 	}
 
@@ -83,18 +83,18 @@ func (seg *BytesIterator) Next() bool {
 
 // Err indicates an error occured when calling Next; Next() will return false
 // when an error occurs.
-func (seg *BytesIterator) Err() error {
-	return seg.err
+func (iter *BytesIterator) Err() error {
+	return iter.err
 }
 
 // Bytes returns the current token.
-func (seg *BytesIterator) Bytes() []byte {
-	return seg.token
+func (iter *BytesIterator) Bytes() []byte {
+	return iter.token
 }
 
 // Text returns the current token as a newly-allocated string.
-func (seg *BytesIterator) Text() string {
-	return string(seg.token)
+func (iter *BytesIterator) Text() string {
+	return string(iter.token)
 }
 
 // These extensive comments are here because someone is gonna be surprised by
@@ -119,16 +119,16 @@ func (seg *BytesIterator) Text() string {
 // to make start and end explicit.
 
 // Start returns the position (byte index) of the current token in the original text.
-func (seg *BytesIterator) Start() int {
-	return seg.start
+func (iter *BytesIterator) Start() int {
+	return iter.start
 }
 
 // End returns the position (byte index) of the first byte after the current token,
 // in the original text.
 //
 // In other words, segmenter.Bytes() == original[segmenter.Start():segmenter.End()]
-func (seg *BytesIterator) End() int {
-	return seg.start + len(seg.token)
+func (iter *BytesIterator) End() int {
+	return iter.start + len(iter.token)
 }
 
 // All iterates through all tokens and collect them into a [][]byte. It is a

@@ -38,7 +38,7 @@ func TestStringSegmenterSameAsSegmenter(t *testing.T) {
 			seg.SetText(text)
 
 			// Test with string segmenter
-			stringSeg := iterators.NewStringSegmenter(split)
+			stringSeg := iterators.NewStringIterator(split)
 			stringSeg.SetText(string(text))
 
 			for seg.Next() && stringSeg.Next() {
@@ -80,7 +80,7 @@ func TestStringSegmenterSameAsAll(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			seg := iterators.NewStringSegmenter(split)
+			seg := iterators.NewStringIterator(split)
 			seg.SetText(string(text))
 
 			for i := 0; seg.Next(); i++ {
@@ -103,7 +103,7 @@ func TestStringSegmenterStart(t *testing.T) {
 	text := "Hello world"
 
 	{
-		seg := iterators.NewStringSegmenter(words.SplitFunc)
+		seg := iterators.NewStringIterator(words.SplitFunc)
 		seg.SetText(text)
 		expected := []int{0, 5, 6}
 		var got []int
@@ -116,7 +116,7 @@ func TestStringSegmenterStart(t *testing.T) {
 	}
 
 	{
-		seg := iterators.NewStringSegmenter(bufio.ScanWords)
+		seg := iterators.NewStringIterator(bufio.ScanWords)
 		seg.SetText(text)
 		expected := []int{0, 6}
 		var got []int
@@ -135,7 +135,7 @@ func TestStringSegmenterEnd(t *testing.T) {
 	text := "Hello world"
 
 	{
-		seg := iterators.NewStringSegmenter(words.SplitFunc)
+		seg := iterators.NewStringIterator(words.SplitFunc)
 		seg.SetText(text)
 
 		expected := []int{5, 6, len(text)}
@@ -149,7 +149,7 @@ func TestStringSegmenterEnd(t *testing.T) {
 	}
 
 	{
-		seg := iterators.NewStringSegmenter(bufio.ScanWords)
+		seg := iterators.NewStringIterator(bufio.ScanWords)
 		seg.SetText(text)
 		expected := []int{5, len(text)}
 		var got []int

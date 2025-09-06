@@ -8,7 +8,6 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/internal/iterators"
 	"github.com/clipperhouse/uax29/internal/testdata"
 	"github.com/clipperhouse/uax29/phrases"
 )
@@ -20,7 +19,7 @@ func TestStringSegmenterRoundtrip(t *testing.T) {
 
 	const runs = 2000
 
-	seg := phrases.NewStringSegmenter("")
+	seg := phrases.FromString("")
 
 	for i := 0; i < runs; i++ {
 		input := string(getRandomBytes())
@@ -74,7 +73,7 @@ func TestStringSegmenterInvalidUTF8(t *testing.T) {
 	}
 }
 
-func stringSegToSetTrimmed(seg *iterators.StringSegmenter) map[string]struct{} {
+func stringSegToSetTrimmed(seg *phrases.StringIterator) map[string]struct{} {
 	founds := make(map[string]struct{})
 	for seg.Next() {
 		key := strings.TrimSpace(seg.Text())
@@ -87,7 +86,7 @@ func TestStringPhraseBoundaries(t *testing.T) {
 	t.Parallel()
 
 	input := []byte("This should break here. And then here. 世界. I think, perhaps you can understand that — aside 🏆 🐶 here — “a quote”.")
-	seg := phrases.NewStringSegmenter(string(input))
+	seg := phrases.FromString(string(input))
 	got := stringSegToSetTrimmed(seg)
 	expecteds := map[string]struct{}{
 		"This should break here":          exists,
@@ -118,7 +117,7 @@ func BenchmarkStringSegmenter(b *testing.B) {
 
 	len := len(file)
 	b.SetBytes(int64(len))
-	seg := phrases.NewStringSegmenter(s)
+	seg := phrases.FromString(s)
 
 	b.ResetTimer()
 	c := 0

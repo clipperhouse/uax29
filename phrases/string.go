@@ -2,13 +2,20 @@ package phrases
 
 import "github.com/clipperhouse/uax29/internal/iterators"
 
-// NewStringSegmenter returns a StringSegmenter, which is an iterator over the
-// source text. Iterate while Next() is true, and access the phrase via
-// Text().
-func NewStringSegmenter(data string) *iterators.StringSegmenter {
-	seg := iterators.NewStringSegmenter(SplitFunc)
-	seg.SetText(data)
-	return seg
+// StringIterator is an iterator for phrases. Iterate while Next() is
+// true, and access the phrase via Text().
+type StringIterator struct {
+	*iterators.StringIterator
+}
+
+// FromString returns an iterator for the phrases in the input string.
+// Iterate while Next() is true, and access the phrase via Text().
+func FromString(s string) *StringIterator {
+	iter := &StringIterator{
+		iterators.NewStringIterator(SplitFunc),
+	}
+	iter.SetText(s)
+	return iter
 }
 
 // SegmentAllString will iterate through all phrases and collect them into a
@@ -21,7 +28,7 @@ func SegmentAllString(data string) []string {
 	// Optimization: guesstimate that the average phrase is 20 bytes,
 	// allocate a large enough array to avoid resizing
 	result := make([]string, 0, len(data)/20)
-	seg := NewStringSegmenter(data)
+	seg := FromString(data)
 	for seg.Next() {
 		result = append(result, seg.Text())
 	}

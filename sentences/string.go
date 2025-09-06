@@ -2,13 +2,21 @@ package sentences
 
 import "github.com/clipperhouse/uax29/internal/iterators"
 
-// NewStringSegmenter returns a StringSegmenter, which is an iterator over the
+// StringIterator is an iterator for sentences. Iterate while Next() is
+// true, and access the sentence via Text().
+type StringIterator struct {
+	*iterators.StringIterator
+}
+
+// FromString returns an iterator for the sentences in the input string.
 // source text. Iterate while Next() is true, and access the sentence via
 // Text().
-func NewStringSegmenter(data string) *iterators.StringSegmenter {
-	seg := iterators.NewStringSegmenter(SplitFunc)
-	seg.SetText(data)
-	return seg
+func FromString(s string) *StringIterator {
+	iter := &StringIterator{
+		iterators.NewStringIterator(SplitFunc),
+	}
+	iter.SetText(s)
+	return iter
 }
 
 // SegmentAllString will iterate through all sentences and collect them into a
@@ -21,7 +29,7 @@ func SegmentAllString(data string) []string {
 	// Optimization: guesstimate that the average sentence is 50 bytes,
 	// allocate a large enough array to avoid resizing
 	result := make([]string, 0, len(data)/50)
-	seg := NewStringSegmenter(data)
+	seg := FromString(data)
 	for seg.Next() {
 		result = append(result, seg.Text())
 	}

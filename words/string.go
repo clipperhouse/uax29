@@ -2,19 +2,20 @@ package words
 
 import "github.com/clipperhouse/uax29/internal/iterators"
 
-type StringSegmenter struct {
-	// made a words.Segmenter so we can attach the Joiners method just for words.
-	*iterators.StringSegmenter
+// StringIterator is an iterator for words. Iterate while Next() is
+// true, and access the word via Text().
+type StringIterator struct {
+	*iterators.StringIterator
 }
 
-// NewStringSegmenter returns a StringSegmenter, which is an iterator over the
-// source text. Iterate while Next() is true, and access the word via Text().
-func NewStringSegmenter(data string) *StringSegmenter {
-	seg := &StringSegmenter{
-		iterators.NewStringSegmenter(SplitFunc),
+// FromString returns an iterator for the words in the input string.
+// Iterate while Next() is true, and access the word via Text().
+func FromString(s string) *StringIterator {
+	iter := &StringIterator{
+		iterators.NewStringIterator(SplitFunc),
 	}
-	seg.SetText(data)
-	return seg
+	iter.SetText(s)
+	return iter
 }
 
 // SegmentAllString will iterate through all words and collect them into a
@@ -27,7 +28,7 @@ func SegmentAllString(data string) []string {
 	// Optimization: guesstimate that the average word is 3 bytes,
 	// allocate a large enough array to avoid resizing
 	result := make([]string, 0, len(data)/3)
-	seg := NewStringSegmenter(data)
+	seg := FromString(data)
 	for seg.Next() {
 		result = append(result, seg.Text())
 	}

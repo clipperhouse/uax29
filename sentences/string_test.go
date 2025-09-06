@@ -1,4 +1,4 @@
-package words_test
+package sentences_test
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/internal/testdata"
-	"github.com/clipperhouse/uax29/words"
+	"github.com/clipperhouse/uax29/sentences"
 )
 
 func TestStringSegmenterUnicode(t *testing.T) {
@@ -20,7 +20,7 @@ func TestStringSegmenterUnicode(t *testing.T) {
 		test := test
 
 		var segmented []string
-		segmenter := words.NewStringSegmenter(string(test.input))
+		segmenter := sentences.FromString(string(test.input))
 		for segmenter.Next() {
 			segmented = append(segmented, segmenter.Text())
 		}
@@ -46,7 +46,7 @@ func TestStringSegmenterUnicode(t *testing.T) {
 		}
 
 		// Test SegmentAll while we're here
-		all := words.SegmentAllString(string(test.input))
+		all := sentences.SegmentAllString(string(test.input))
 		if !reflect.DeepEqual(all, segmented) {
 			t.Error("calling SegmentAll should be identical to iterating Segmenter")
 		}
@@ -66,7 +66,7 @@ func TestStringSegmenterRoundtrip(t *testing.T) {
 
 	for i := 0; i < runs; i++ {
 		input := string(getRandomBytes())
-		seg := words.NewStringSegmenter(input)
+		seg := sentences.FromString(input)
 
 		var output string
 		for seg.Next() {
@@ -79,35 +79,6 @@ func TestStringSegmenterRoundtrip(t *testing.T) {
 
 		if output != input {
 			t.Fatal("input bytes are not the same as segmented bytes")
-		}
-	}
-}
-
-func stringSegToSet(seg *words.StringSegmenter) map[string]struct{} {
-	founds := make(map[string]struct{})
-	for seg.Next() {
-		founds[seg.Text()] = struct{}{}
-	}
-	return founds
-}
-
-func TestStringSegmenterJoiners(t *testing.T) {
-	s := string(joinersInput)
-	seg1 := words.NewStringSegmenter(s)
-	founds1 := stringSegToSet(seg1)
-
-	seg2 := words.NewStringSegmenter(s)
-	seg2.Joiners(joiners)
-	founds2 := stringSegToSet(seg2)
-
-	for _, test := range joinersTests {
-		_, found1 := founds1[test.input]
-		if found1 != test.found1 {
-			t.Fatalf("For %q, expected %t for found in non-config segmenter, but got %t", test.input, test.found1, found1)
-		}
-		_, found2 := founds2[test.input]
-		if found2 != test.found2 {
-			t.Fatalf("For %q, expected %t for found in segmenter with joiners, but got %t", test.input, test.found2, found2)
 		}
 	}
 }
@@ -130,7 +101,7 @@ func TestStringSegmenterInvalidUTF8(t *testing.T) {
 		t.Error("input file should not be valid utf8")
 	}
 
-	sc := words.NewStringSegmenter(string(input))
+	sc := sentences.FromString(string(input))
 
 	var output string
 	for sc.Next() {
@@ -155,7 +126,7 @@ func BenchmarkStringSegmenter(b *testing.B) {
 
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
-	seg := words.NewStringSegmenter(s)
+	seg := sentences.FromString(s)
 
 	for i := 0; i < b.N; i++ {
 		seg.SetText(s)
@@ -184,10 +155,10 @@ func BenchmarkStringSegmentAll(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = words.SegmentAllString(s)
+		_ = sentences.SegmentAllString(s)
 	}
 
-	c := len(words.SegmentAllString(s))
+	c := len(sentences.SegmentAllString(s))
 	b.ReportMetric(float64(c), "tokens")
 	b.Logf("tokens %d, len %d, avg %d", c, len(file), len(file)/c)
 }
@@ -203,7 +174,7 @@ func BenchmarkStringUnicodeTests(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 
-	seg := words.NewStringSegmenter(s)
+	seg := sentences.FromString(s)
 
 	for i := 0; i < b.N; i++ {
 		seg.SetText(s)

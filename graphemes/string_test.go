@@ -1,4 +1,4 @@
-package sentences_test
+package graphemes_test
 
 import (
 	"bytes"
@@ -7,8 +7,8 @@ import (
 	"testing"
 	"unicode/utf8"
 
+	"github.com/clipperhouse/uax29/graphemes"
 	"github.com/clipperhouse/uax29/internal/testdata"
-	"github.com/clipperhouse/uax29/sentences"
 )
 
 func TestStringSegmenterUnicode(t *testing.T) {
@@ -20,7 +20,7 @@ func TestStringSegmenterUnicode(t *testing.T) {
 		test := test
 
 		var segmented []string
-		segmenter := sentences.NewStringSegmenter(string(test.input))
+		segmenter := graphemes.FromString(string(test.input))
 		for segmenter.Next() {
 			segmented = append(segmented, segmenter.Text())
 		}
@@ -46,7 +46,7 @@ func TestStringSegmenterUnicode(t *testing.T) {
 		}
 
 		// Test SegmentAll while we're here
-		all := sentences.SegmentAllString(string(test.input))
+		all := graphemes.SegmentAllString(string(test.input))
 		if !reflect.DeepEqual(all, segmented) {
 			t.Error("calling SegmentAll should be identical to iterating Segmenter")
 		}
@@ -66,7 +66,7 @@ func TestStringSegmenterRoundtrip(t *testing.T) {
 
 	for i := 0; i < runs; i++ {
 		input := string(getRandomBytes())
-		seg := sentences.NewStringSegmenter(input)
+		seg := graphemes.FromString(input)
 
 		var output string
 		for seg.Next() {
@@ -101,7 +101,7 @@ func TestStringSegmenterInvalidUTF8(t *testing.T) {
 		t.Error("input file should not be valid utf8")
 	}
 
-	sc := sentences.NewStringSegmenter(string(input))
+	sc := graphemes.FromString(string(input))
 
 	var output string
 	for sc.Next() {
@@ -126,7 +126,7 @@ func BenchmarkStringSegmenter(b *testing.B) {
 
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
-	seg := sentences.NewStringSegmenter(s)
+	seg := graphemes.FromString(s)
 
 	for i := 0; i < b.N; i++ {
 		seg.SetText(s)
@@ -155,10 +155,10 @@ func BenchmarkStringSegmentAll(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = sentences.SegmentAllString(s)
+		_ = graphemes.SegmentAllString(s)
 	}
 
-	c := len(sentences.SegmentAllString(s))
+	c := len(graphemes.SegmentAllString(s))
 	b.ReportMetric(float64(c), "tokens")
 	b.Logf("tokens %d, len %d, avg %d", c, len(file), len(file)/c)
 }
@@ -174,7 +174,7 @@ func BenchmarkStringUnicodeTests(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 
-	seg := sentences.NewStringSegmenter(s)
+	seg := graphemes.FromString(s)
 
 	for i := 0; i < b.N; i++ {
 		seg.SetText(s)
