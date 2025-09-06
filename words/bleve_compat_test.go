@@ -199,7 +199,7 @@ func TestAdhocSegmentsWithType(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		scanner := words.NewScanner(bytes.NewReader(test.input))
+		scanner := words.FromReader(bytes.NewReader(test.input))
 
 		i := 0
 		for scanner.Scan() {

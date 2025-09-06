@@ -20,7 +20,7 @@ func TestScannerUnicode(t *testing.T) {
 	var passed, failed int
 	for _, test := range unicodeTests {
 		var scanned [][]byte
-		scanner := words.NewScanner(bytes.NewReader(test.input))
+		scanner := words.FromReader(bytes.NewReader(test.input))
 		for scanner.Scan() {
 			scanned = append(scanned, scanner.Bytes())
 		}
@@ -55,7 +55,7 @@ func TestScannerRoundtrip(t *testing.T) {
 		input := getRandomBytes()
 
 		r := bytes.NewReader(input)
-		sc := words.NewScanner(r)
+		sc := words.FromReader(r)
 
 		var output []byte
 		for sc.Scan() {
@@ -81,11 +81,11 @@ func scanToSet(seg *words.Scanner) map[string]struct{} {
 
 func TestScannerJoiners(t *testing.T) {
 	r1 := bytes.NewReader(joinersInput)
-	sc1 := words.NewScanner(r1)
+	sc1 := words.FromReader(r1)
 	founds1 := scanToSet(sc1)
 
 	r2 := bytes.NewReader(joinersInput)
-	seg2 := words.NewScanner(r2)
+	seg2 := words.FromReader(r2)
 	seg2.Joiners(joiners)
 	founds2 := scanToSet(seg2)
 
@@ -120,7 +120,7 @@ func TestInvalidUTF8(t *testing.T) {
 	}
 
 	r := bytes.NewReader(input)
-	sc := words.NewScanner(r)
+	sc := words.FromReader(r)
 
 	var output []byte
 	for sc.Scan() {
@@ -202,7 +202,7 @@ func BenchmarkScanner(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		r.Reset(file)
-		sc := words.NewScanner(r)
+		sc := words.FromReader(r)
 
 		c := 0
 		for sc.Scan() {
@@ -230,7 +230,7 @@ func BenchmarkUnicodeSegments(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		r.Reset(file)
-		sc := words.NewScanner(r)
+		sc := words.FromReader(r)
 
 		c := 0
 		for sc.Scan() {

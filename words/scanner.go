@@ -10,13 +10,13 @@ type Scanner struct {
 	*bufio.Scanner
 }
 
-// NewScanner returns a Scanner, to split words per
+// FromReader returns a Scanner, to split words per
 // https://unicode.org/reports/tr29/#Word_Boundaries.
 //
 // It embeds a [bufio.Scanner], so you can use its methods.
 //
 // Iterate through words by calling Scan() until false, then check Err().
-func NewScanner(r io.Reader) *Scanner {
+func FromReader(r io.Reader) *Scanner {
 	s := bufio.NewScanner(r)
 	s.Split(SplitFunc)
 	sc := &Scanner{
