@@ -9,6 +9,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/clipperhouse/uax29/internal/testdata"
 	"github.com/clipperhouse/uax29/words"
 )
 
@@ -189,7 +190,7 @@ func BenchmarkSegmenter(b *testing.B) {
 }
 
 func benchSeg(b *testing.B, seg *words.Segmenter) {
-	file, err := os.ReadFile("../internal/testdata/sample.txt")
+	file, err := testdata.Sample()
 	if err != nil {
 		b.Error(err)
 	}
@@ -235,8 +236,7 @@ func BenchmarkSegmenterJoiners(b *testing.B) {
 }
 
 func BenchmarkSegmentAll(b *testing.B) {
-	file, err := os.ReadFile("../internal/testdata/sample.txt")
-
+	file, err := testdata.Sample()
 	if err != nil {
 		b.Error(err)
 	}

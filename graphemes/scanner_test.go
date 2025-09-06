@@ -10,6 +10,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/graphemes"
+	"github.com/clipperhouse/uax29/internal/testdata"
 )
 
 func TestScannerUnicode(t *testing.T) {
@@ -165,7 +166,7 @@ func getRandomBytes() []byte {
 }
 
 func BenchmarkScanner(b *testing.B) {
-	file, err := os.ReadFile("../internal/testdata/sample.txt")
+	file, err := testdata.Sample()
 
 	if err != nil {
 		b.Error(err)

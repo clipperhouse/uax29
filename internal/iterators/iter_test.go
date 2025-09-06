@@ -10,12 +10,13 @@ import (
 	"testing"
 
 	"github.com/clipperhouse/uax29/internal/iterators"
+	"github.com/clipperhouse/uax29/internal/testdata"
 )
 
 func TestIterMatchesSegmenter(t *testing.T) {
 	t.Parallel()
 
-	file, err := os.ReadFile("../internal/testdata/sample.txt")
+	file, err := testdata.Sample()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -48,7 +49,7 @@ func TestIterMatchesSegmenter(t *testing.T) {
 func TestIterMatchesStringSegmenter(t *testing.T) {
 	t.Parallel()
 
-	file, err := os.ReadFile("../internal/testdata/sample.txt")
+	file, err := testdata.Sample()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,7 +85,7 @@ func TestIterMatchesScanner(t *testing.T) {
 	t.Parallel()
 
 	for pkg, splitFunc := range splitFuncs {
-		file1, err := os.Open("../internal/testdata/sample.txt")
+		file1, err := os.Open("../testdata/sample.txt")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -100,7 +101,7 @@ func TestIterMatchesScanner(t *testing.T) {
 		}
 		file1.Close()
 
-		file2, err := os.Open("../internal/testdata/sample.txt")
+		file2, err := os.Open("../testdata/sample.txt")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -126,7 +127,7 @@ func TestIterMatchesScanner(t *testing.T) {
 }
 
 func TestScannerIterErr(t *testing.T) {
-	file1, err := os.Open("../internal/testdata/sample.txt")
+	file1, err := os.Open("../testdata/sample.txt")
 	if err != nil {
 		t.Fatal(err)
 	}

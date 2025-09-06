@@ -1,6 +1,3 @@
-//go:build go1.18
-// +build go1.18
-
 package graphemes_test
 
 import (
@@ -11,6 +8,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/graphemes"
+	"github.com/clipperhouse/uax29/internal/testdata"
 )
 
 // FuzzValidShort fuzzes small, valid UTF8 strings. I suspect more, shorter
@@ -22,7 +20,7 @@ func FuzzValidShort(f *testing.F) {
 	}
 
 	// multi-lingual text, as small-ish lines
-	file, err := os.ReadFile("../internal/testdata/sample.txt")
+	file, err := testdata.Sample()
 	if err != nil {
 		f.Error(err)
 	}
@@ -62,7 +60,7 @@ func FuzzValidShort(f *testing.F) {
 // FuzzValidLong fuzzes longer, valid UTF8 strings.
 func FuzzValidLong(f *testing.F) {
 	// add multi-lingual text, as decent (paragraph-sized) size chunks
-	file, err := os.ReadFile("../internal/testdata/sample.txt")
+	file, err := testdata.Sample()
 	if err != nil {
 		f.Error(err)
 	}

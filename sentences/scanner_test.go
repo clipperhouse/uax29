@@ -10,6 +10,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
+	"github.com/clipperhouse/uax29/internal/testdata"
 	"github.com/clipperhouse/uax29/sentences"
 )
 
@@ -166,7 +167,7 @@ func getRandomBytes() []byte {
 }
 
 func BenchmarkScanner(b *testing.B) {
-	file, err := os.ReadFile("../internal/testdata/sample.txt")
+	file, err := testdata.Sample()
 
 	if err != nil {
 		b.Error(err)

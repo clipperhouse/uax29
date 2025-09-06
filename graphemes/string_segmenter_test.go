@@ -8,6 +8,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/graphemes"
+	"github.com/clipperhouse/uax29/internal/testdata"
 )
 
 func TestStringSegmenterUnicode(t *testing.T) {
@@ -116,7 +117,7 @@ func TestStringSegmenterInvalidUTF8(t *testing.T) {
 }
 
 func BenchmarkStringSegmenter(b *testing.B) {
-	file, err := os.ReadFile("../internal/testdata/sample.txt")
+	file, err := testdata.Sample()
 	if err != nil {
 		b.Error(err)
 	}
@@ -144,7 +145,7 @@ func BenchmarkStringSegmenter(b *testing.B) {
 }
 
 func BenchmarkStringSegmentAll(b *testing.B) {
-	file, err := os.ReadFile("../internal/testdata/sample.txt")
+	file, err := testdata.Sample()
 	if err != nil {
 		b.Error(err)
 	}

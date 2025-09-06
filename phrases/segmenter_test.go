@@ -8,6 +8,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/internal/iterators"
+	"github.com/clipperhouse/uax29/internal/testdata"
 	"github.com/clipperhouse/uax29/phrases"
 )
 
@@ -108,7 +109,7 @@ func TestPhraseBoundaries(t *testing.T) {
 }
 
 func BenchmarkSegmenter(b *testing.B) {
-	file, err := os.ReadFile("../internal/testdata/sample.txt")
+	file, err := testdata.Sample()
 
 	if err != nil {
 		b.Error(err)
@@ -146,7 +147,7 @@ func BenchmarkSegmenter(b *testing.B) {
 }
 
 func BenchmarkSegmentAll(b *testing.B) {
-	file, err := os.ReadFile("../internal/testdata/sample.txt")
+	file, err := testdata.Sample()
 
 	if err != nil {
 		b.Error(err)
