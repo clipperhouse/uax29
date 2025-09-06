@@ -2,10 +2,17 @@ package words
 
 import "github.com/clipperhouse/uax29/iterators"
 
+type StringSegmenter struct {
+	// made a words.Segmenter so we can attach the Joiners method just for words.
+	*iterators.StringSegmenter
+}
+
 // NewSegmenter retuns a Segmenter, which is an iterator over the source text.
 // Iterate while Next() is true, and access the segmented graphemes via Bytes().
-func NewStringSegmenter(data string) *iterators.StringSegmenter {
-	seg := iterators.NewStringSegmenter(SplitFunc)
+func NewStringSegmenter(data string) *StringSegmenter {
+	seg := &StringSegmenter{
+		iterators.NewStringSegmenter(SplitFunc),
+	}
 	seg.SetText(data)
 	return seg
 }

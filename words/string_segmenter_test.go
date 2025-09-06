@@ -82,6 +82,35 @@ func TestStringSegmenterRoundtrip(t *testing.T) {
 	}
 }
 
+func stringSegToSet(seg *words.StringSegmenter) map[string]struct{} {
+	founds := make(map[string]struct{})
+	for seg.Next() {
+		founds[seg.Text()] = struct{}{}
+	}
+	return founds
+}
+
+func TestStringSegmenterJoiners(t *testing.T) {
+	s := string(joinersInput)
+	seg1 := words.NewStringSegmenter(s)
+	founds1 := stringSegToSet(seg1)
+
+	seg2 := words.NewStringSegmenter(s)
+	seg2.Joiners(joiners)
+	founds2 := stringSegToSet(seg2)
+
+	for _, test := range joinersTests {
+		_, found1 := founds1[test.input]
+		if found1 != test.found1 {
+			t.Fatalf("For %q, expected %t for found in non-config segmenter, but got %t", test.input, test.found1, found1)
+		}
+		_, found2 := founds2[test.input]
+		if found2 != test.found2 {
+			t.Fatalf("For %q, expected %t for found in segmenter with joiners, but got %t", test.input, test.found2, found2)
+		}
+	}
+}
+
 func TestStringSegmenterInvalidUTF8(t *testing.T) {
 	t.Parallel()
 
