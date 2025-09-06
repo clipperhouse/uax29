@@ -126,12 +126,10 @@ func TestSegmenterTransformIsApplied(t *testing.T) {
 		tokens = append(tokens, seg.Bytes())
 	}
 
-	{
-		got := tokens[7]
-		expected := []byte("acai")
-		if !bytes.Equal(expected, got) {
-			t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
-		}
+	got := tokens[7]
+	expected := []byte("acai")
+	if !bytes.Equal(expected, got) {
+		t.Fatalf("transforms of lower case or diacritics were not applied, expected %q, got %q", expected, got)
 	}
 }
 
