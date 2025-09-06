@@ -22,7 +22,7 @@ func NewStringSegmenter(data string) *StringSegmenter {
 // this will save you some code. The downside is that this allocation is
 // unbounded -- O(n) on the number of tokens. Use Segmenter for more bounded
 // memory usage.
-func StringSegmentAll(data string) []string {
+func SegmentAllString(data string) []string {
 	// Optimization: guesstimate that the average grapheme is 1 bytes,
 	// allocate a large enough array to avoid resizing
 	result := make([]string, 0, len(data))

@@ -172,7 +172,7 @@ func BenchmarkStringSegmentAll(b *testing.B) {
 	b.SetBytes(int64(len(file)))
 
 	for i := 0; i < b.N; i++ {
-		phrases := phrases.StringSegmentAll(s)
+		phrases := phrases.SegmentAllString(s)
 
 		c := 0
 		for range phrases {

@@ -45,7 +45,7 @@ func TestStringSegmenterUnicode(t *testing.T) {
 		}
 
 		// Test SegmentAll while we're here
-		all := graphemes.StringSegmentAll(string(test.input))
+		all := graphemes.SegmentAllString(string(test.input))
 		if !reflect.DeepEqual(all, segmented) {
 			t.Error("calling SegmentAll should be identical to iterating Segmenter")
 		}
@@ -154,10 +154,10 @@ func BenchmarkStringSegmentAll(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = graphemes.StringSegmentAll(s)
+		_ = graphemes.SegmentAllString(s)
 	}
 
-	c := len(graphemes.StringSegmentAll(s))
+	c := len(graphemes.SegmentAllString(s))
 	b.ReportMetric(float64(c), "tokens")
 	b.Logf("tokens %d, len %d, avg %d", c, len(file), len(file)/c)
 }
