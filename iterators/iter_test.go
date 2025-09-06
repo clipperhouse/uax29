@@ -45,6 +45,41 @@ func TestIterMatchesSegmenter(t *testing.T) {
 	}
 }
 
+func TestIterMatchesStringSegmenter(t *testing.T) {
+	t.Parallel()
+
+	file, err := os.ReadFile("../testdata/sample.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s := string(file)
+
+	for _, splitFunc := range splitFuncs {
+		seg1 := iterators.NewStringSegmenter(splitFunc)
+		seg1.SetText(s)
+		var expected []string
+		for seg1.Next() {
+			expected = append(expected, seg1.Text())
+		}
+
+		seg2 := iterators.NewStringSegmenter(splitFunc)
+		seg2.SetText(s)
+		var got []string
+		for token := range seg2.Iter() {
+			got = append(got, token.Value())
+		}
+
+		if len(got) == 0 || len(expected) != len(got) {
+			t.Fatal("iter and segmenter returned different lengths")
+		}
+
+		if !reflect.DeepEqual(expected, got) {
+			t.Fatal("iter and segmenter returned different results")
+		}
+	}
+}
+
 func TestIterMatchesScanner(t *testing.T) {
 	t.Parallel()
 

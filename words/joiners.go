@@ -6,6 +6,12 @@ func (seg *Segmenter) Joiners(j *Joiners) {
 	seg.Split(j.splitFunc)
 }
 
+// Joiners sets runes that should be treated like word characters, where
+// otherwise words will be split. See the [Joiners] type.
+func (seg *StringSegmenter) Joiners(j *Joiners) {
+	seg.Split(j.splitFunc)
+}
+
 // Joiners allows specification of characters (runes) which will join words (tokens)
 // rather than breaking them. For example, "@" breaks words by default,
 // but you might wish to join words into email addresses.
