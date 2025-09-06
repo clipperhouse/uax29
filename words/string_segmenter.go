@@ -1,6 +1,6 @@
 package words
 
-import "github.com/clipperhouse/uax29/iterators"
+import "github.com/clipperhouse/uax29/internal/iterators"
 
 type StringSegmenter struct {
 	// made a words.Segmenter so we can attach the Joiners method just for words.

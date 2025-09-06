@@ -111,7 +111,7 @@ if segments.Err() != nil {
 }
 ```
 
-You can write your own filters (predicates), with arbitrary logic, by implementing a `func([]byte) bool`. You can also create a filter based on Unicode categories with the [`filter.Contains`](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/filter#Contains) and [`filter.Entirely`](https://pkg.go.dev/github.com/clipperhouse/uax29/iterators/filter#Entirely) methods.
+You can write your own filters (predicates), with arbitrary logic, by implementing a `func([]byte) bool`. You can also create a filter based on Unicode categories with the [`filter.Contains`](https://pkg.go.dev/github.com/clipperhouse/uax29/internal/iterators/filter#Contains) and [`filter.Entirely`](https://pkg.go.dev/github.com/clipperhouse/uax29/internal/iterators/filter#Entirely) methods.
 
 ### Joiners
 

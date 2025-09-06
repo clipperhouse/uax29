@@ -4,7 +4,7 @@ import (
 	"testing"
 	"unicode"
 
-	"github.com/clipperhouse/uax29/iterators/util"
+	"github.com/clipperhouse/uax29/internal/iterators/util"
 	"golang.org/x/text/unicode/rangetable"
 )
 

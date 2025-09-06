@@ -4,7 +4,7 @@ package words
 import (
 	"io"
 
-	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/internal/iterators"
 )
 
 type Scanner struct {

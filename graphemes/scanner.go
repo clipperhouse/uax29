@@ -4,7 +4,7 @@ package graphemes
 import (
 	"io"
 
-	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/internal/iterators"
 )
 
 // NewScanner returns a Scanner, to tokenize graphemes per https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries.

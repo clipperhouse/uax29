@@ -4,7 +4,7 @@ package phrases
 import (
 	"io"
 
-	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/internal/iterators"
 )
 
 // NewScanner returns a Scanner, to tokenize phrases per https://unicode.org/reports/tr29/#phrase_Boundaries.

@@ -15,7 +15,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/clipperhouse/uax29/iterators/filter"
+	"github.com/clipperhouse/uax29/internal/iterators/filter"
 	"github.com/clipperhouse/uax29/words"
 )
 

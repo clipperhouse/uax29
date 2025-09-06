@@ -1,7 +1,7 @@
 package words
 
 import (
-	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/internal/iterators"
 )
 
 // Segmenter is an iterator for byte slices, which are segmented into tokens (segments).

@@ -1,7 +1,7 @@
 package graphemes
 
 import (
-	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/internal/iterators"
 )
 
 // NewSegmenter returns a Segmenter, which is an iterator over the source text.

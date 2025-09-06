@@ -1,6 +1,6 @@
 package sentences
 
-import "github.com/clipperhouse/uax29/iterators"
+import "github.com/clipperhouse/uax29/internal/iterators"
 
 // NewStringSegmenter returns a StringSegmenter, which is an iterator over the
 // source text. Iterate while Next() is true, and access the sentence via

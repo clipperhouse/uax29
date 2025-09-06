@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/internal/iterators"
 	"github.com/clipperhouse/uax29/words"
 )
 

@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/clipperhouse/uax29/graphemes"
-	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/internal/iterators"
 	"github.com/clipperhouse/uax29/phrases"
 	"github.com/clipperhouse/uax29/sentences"
 	"github.com/clipperhouse/uax29/words"

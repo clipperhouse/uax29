@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/clipperhouse/uax29/iterators"
+	"github.com/clipperhouse/uax29/internal/iterators"
 )
 
 func TestIterMatchesSegmenter(t *testing.T) {

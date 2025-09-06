@@ -4,7 +4,7 @@ import (
 	"testing"
 	"unicode"
 
-	"github.com/clipperhouse/uax29/iterators/filter"
+	"github.com/clipperhouse/uax29/internal/iterators/filter"
 )
 
 func TestContains(t *testing.T) {
