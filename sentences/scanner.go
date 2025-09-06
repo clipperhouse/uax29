@@ -2,14 +2,24 @@
 package sentences
 
 import (
+	"bufio"
 	"io"
-
-	"github.com/clipperhouse/uax29/internal/iterators"
 )
 
-// NewScanner returns a Scanner, to tokenize sentences per https://unicode.org/reports/tr29/#Sentence_Boundaries.
-// Iterate through sentences by calling Scan() until false, then check Err(). See also the bufio.Scanner docs.
-func NewScanner(r io.Reader) *iterators.Scanner {
-	sc := iterators.NewScanner(r, SplitFunc)
-	return sc
+type Scanner struct {
+	*bufio.Scanner
+}
+
+// NewScanner returns a Scanner, to split sentences per
+// https://unicode.org/reports/tr29/#Sentence_Boundaries.
+//
+// It embeds a [bufio.Scanner], so you can use its methods.
+//
+// Iterate through sentences by calling Scan() until false, then check Err().
+func NewScanner(r io.Reader) *Scanner {
+	sc := bufio.NewScanner(r)
+	sc.Split(SplitFunc)
+	return &Scanner{
+		Scanner: sc,
+	}
 }

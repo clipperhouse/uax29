@@ -2,14 +2,24 @@
 package graphemes
 
 import (
+	"bufio"
 	"io"
-
-	"github.com/clipperhouse/uax29/internal/iterators"
 )
 
-// NewScanner returns a Scanner, to tokenize graphemes per https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries.
-// Iterate through graphemes by calling Scan() until false, then check Err(). See also the bufio.Scanner docs.
-func NewScanner(r io.Reader) *iterators.Scanner {
-	scanner := iterators.NewScanner(r, SplitFunc)
-	return scanner
+type Scanner struct {
+	*bufio.Scanner
+}
+
+// NewScanner returns a Scanner, to split graphemes per
+// https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries.
+//
+// It embeds a [bufio.Scanner], so you can use its methods.
+//
+// Iterate through graphemes by calling Scan() until false, then check Err().
+func NewScanner(r io.Reader) *Scanner {
+	sc := bufio.NewScanner(r)
+	sc.Split(SplitFunc)
+	return &Scanner{
+		Scanner: sc,
+	}
 }

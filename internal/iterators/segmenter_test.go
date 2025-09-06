@@ -7,45 +7,18 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/clipperhouse/uax29/graphemes"
 	"github.com/clipperhouse/uax29/internal/iterators"
+	"github.com/clipperhouse/uax29/phrases"
+	"github.com/clipperhouse/uax29/sentences"
 	"github.com/clipperhouse/uax29/words"
 )
 
-func TestSegmenterSameAsScanner(t *testing.T) {
-	t.Parallel()
-
-	text := make([]byte, 50000)
-
-	for _, split := range splitFuncs {
-		for i := 0; i < 100; i++ {
-			_, err := rand.Read(text)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			seg := iterators.NewSegmenter(split)
-			seg.SetText(text)
-
-			r := bytes.NewReader(text)
-			sc := iterators.NewScanner(r, split)
-
-			for seg.Next() && sc.Scan() {
-				if !bytes.Equal(seg.Bytes(), sc.Bytes()) {
-					t.Fatalf(`
-					Scanner and Segmenter should give identical results
-					Scanner:   %q
-					Segmenter: %q
-					`, sc.Bytes(), seg.Bytes())
-				}
-			}
-			if seg.Err() != nil {
-				t.Fatal(seg.Err())
-			}
-			if sc.Err() != nil {
-				t.Fatal(sc.Err())
-			}
-		}
-	}
+var splitFuncs = map[string]bufio.SplitFunc{
+	"words":     words.SplitFunc,
+	"sentences": sentences.SplitFunc,
+	"graphemes": graphemes.SplitFunc,
+	"phrases":   phrases.SplitFunc,
 }
 
 func TestSegmenterSameAsAll(t *testing.T) {
