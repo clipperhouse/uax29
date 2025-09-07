@@ -23,7 +23,7 @@ func TestScannerUnicode(t *testing.T) {
 		test := test
 
 		var got [][]byte
-		sc := sentences.NewScanner(bytes.NewReader(test.input))
+		sc := sentences.FromReader(bytes.NewReader(test.input))
 
 		for sc.Scan() {
 			got = append(got, sc.Bytes())
@@ -58,7 +58,7 @@ func TestScannerRoundtrip(t *testing.T) {
 		input := getRandomBytes()
 
 		r := bytes.NewReader(input)
-		sc := sentences.NewScanner(r)
+		sc := sentences.FromReader(r)
 
 		var output []byte
 		for sc.Scan() {
@@ -94,7 +94,7 @@ func TestInvalidUTF8(t *testing.T) {
 	}
 
 	r := bytes.NewReader(input)
-	sc := sentences.NewScanner(r)
+	sc := sentences.FromReader(r)
 
 	var output []byte
 	for sc.Scan() {
@@ -178,7 +178,7 @@ func BenchmarkScanner(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		r.Reset(file)
-		sc := sentences.NewScanner(r)
+		sc := sentences.FromReader(r)
 
 		c := 0
 		for sc.Scan() {
@@ -206,7 +206,7 @@ func BenchmarkUnicodeSegments(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		r.Reset(file)
-		sc := sentences.NewScanner(r)
+		sc := sentences.FromReader(r)
 
 		c := 0
 		for sc.Scan() {

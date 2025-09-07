@@ -9,22 +9,18 @@ go get "github.com/clipperhouse/uax29/words"
 ```go
 import "github.com/clipperhouse/uax29/words"
 
-text := []byte("Hello, 世界. Nice dog! 👍🐶")
+text := "Hello, 世界. Nice dog! 👍🐶"
 
-segments := words.NewSegmenter(text)            // A segmenter is an iterator over the words
+tokens := words.FromString(text)            // A segmenter is an iterator over the words
 
-for segments.Next() {                           // Next() returns true until end of data or error
-	fmt.Printf("%q\n", segments.Bytes())        // Do something with the current token
-}
-
-if segments.Err() != nil {                      // Check the error
-	log.Fatal(segments.Err())
+for tokens.Next() {                           // Next() returns true until end of data or error
+	fmt.Printf("%q\n", tokens.Text())        // Do something with the current token
 }
 ```
 
 [![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/words.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/words)
 
-_Note: this package will return all tokens, including whitespace and punctuation — it's not strictly “words” in the common sense. If you wish to omit things like whitespace and punctuation, you can use a filter (see below). For our purposes, “segment”, “word”, and “token” are used synonymously._
+_Note: this package returns all tokens, including whitespace and punctuation — it's not strictly “words” in the common sense._
 
 ## Conformance
 
@@ -34,46 +30,48 @@ We use the Unicode [test suite](https://unicode.org/reports/tr41/tr41-26.html#Te
 
 ## APIs
 
-#### If you have a `[]byte`
+#### If you have a `string`
 
-Use `Segmenter` for bounded memory and best performance:
-
-```go
-text := []byte("Hello, 世界. Nice dog! 👍🐶")
-
-segments := words.NewSegmenter(text)            // A segmenter is an iterator over the words
-
-for segments.Next() {                           // Next() returns true until end of data or error
-	fmt.Printf("%q\n", segments.Bytes())        // Do something with the current word
-}
-
-if segments.Err() != nil {                      // Check the error
-	log.Fatal(segments.Err())
-}
-```
-
-Use `SegmentAll()` if you prefer brevity, and are not too concerned about allocations.
+Use `FromString` for bounded memory and best performance:
 
 ```go
-segments := words.SegmentAll(text)             // Returns a slice of byte slices; each slice is a word
+text := "Hello, 世界. Nice dog! 👍🐶"
 
-fmt.Println("Words: %q", segments)
+tokens := words.FromString(text)
+
+for tokens.Next() {                          // Next() returns true until end of data
+	fmt.Printf("%q\n", tokens.Text())        // Do something with the current word
+}
 ```
 
 #### If you have an `io.Reader`
 
-Use `Scanner`
+Use `FromReader`. It embeds a [`bufio.Scanner`](https://pkg.go.dev/bufio#Scanner), so you can use those methods.
 
 ```go
-r := getYourReader()                            // from a file or network maybe
-scanner := words.NewScanner(r)
+r := getYourReader()                           // from a file or network maybe
+tokens := words.FromReader(r)
 
-for scanner.Scan() {                            // Scan() returns true until error or EOF
-	fmt.Println(scanner.Text())                 // Do something with the current word
+for tokens.Scan() {                            // Scan() returns true until end of data or error
+	fmt.Printf("%q\n", tokens.Text())          // Do something with the current word
 }
 
-if scanner.Err() != nil {                       // Check the error
-	log.Fatal(scanner.Err())
+if tokens.Err() != nil {                       // Check the error
+	log.Fatal(tokens.Err())
+}
+```
+
+#### If you have a `[]byte`
+
+Use `FromBytes`.
+
+```go
+b := []byte("Hello, 世界. Nice dog! 👍🐶")
+
+tokens := words.FromBytes(b)
+
+for tokens.Next() {                            // Next() returns true until end of data
+	fmt.Printf("%q\n", tokens.Bytes())         // Do something with the current word
 }
 ```
 
@@ -81,37 +79,13 @@ if scanner.Err() != nil {                       // Check the error
 
 On a Mac M2 laptop, we see around 150MB/s, which works out to around 40 million words (tokens, really) per second.
 
-You should see approximately constant memory when using `Segmenter` or `Scanner`, independent of data size. When using `SegmentAll()`, expect memory to be `O(n)` on the number of words.
+You should see approximately constant memory, independent of data size. We iterate tokens instead of collecting them into a slice.
 
 ### Invalid inputs
 
 Invalid UTF-8 input is considered undefined behavior. We test to ensure that bad inputs will not cause pathological outcomes, such as a panic or infinite loop. Callers should expect “garbage-in, garbage-out”.
 
 Your pipeline should probably include a call to [`utf8.Valid()`](https://pkg.go.dev/unicode/utf8#Valid).
-
-### Filters
-
-You can add a filter to a `Scanner` or `Segmenter`.
-
-For example, the Segmenter / Scanner returns _all_ tokens, split by word boundaries. This includes things like whitespace and punctuation, which may not be what one means by “words”. By using a filter, you can omit them.
-
-```go
-text := []byte("Hello, 世界. Nice dog! 👍🐶")
-
-segments := words.NewSegmenter(text)
-segments.Filter(filter.Wordlike)
-
-for segments.Next() {
-	// Note that whitespace and punctuation are omitted.
-	fmt.Printf("%q\n", segments.Bytes())
-}
-
-if segments.Err() != nil {
-	log.Fatal(segments.Err())
-}
-```
-
-You can write your own filters (predicates), with arbitrary logic, by implementing a `func([]byte) bool`. You can also create a filter based on Unicode categories with the [`filter.Contains`](https://pkg.go.dev/github.com/clipperhouse/uax29/internal/iterators/filter#Contains) and [`filter.Entirely`](https://pkg.go.dev/github.com/clipperhouse/uax29/internal/iterators/filter#Entirely) methods.
 
 ### Joiners
 
@@ -124,11 +98,11 @@ joiners := &words.Joiners{
 	Leading: []rune("#."),  // appearing at the front of a word
 }
 
-seg := words.NewSegmenter([]byte(text))
-seg.Joiners(joiners)
+tokens := words.FromString(text)
+tokens.Joiners(joiners)
 
-for seg.Next() {
-	fmt.Println(seg.Text())
+for tokens.Next() {
+	fmt.Println(tokens.Text())
 }
 ```
 
@@ -137,5 +111,3 @@ for seg.Next() {
 This package follows the basic UAX #29 specification. For more idiomatic treatment of words across languages, there is more that can be done, scroll down to the [“Notes:” section of the standard](https://unicode.org/reports/tr29/#Word_Boundary_Rules):
 
 > It is not possible to provide a uniform set of rules that resolves all issues across languages or that handles all ambiguous situations within a given language. The goal for the specification presented in this annex is to provide a workable default; tailored implementations can be more sophisticated.
-
-I also found [this article](https://www.hathitrust.org/blogs/large-scale-search/multilingual-issues-part-1-word-segmentation) helpful.

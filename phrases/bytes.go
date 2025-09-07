@@ -12,10 +12,10 @@ type BytesIterator struct {
 
 // FromBytes returns an iterator for the phrases in the input bytes.
 // Iterate while Next() is true, and access the phrase via Bytes().
-func FromBytes(data []byte) *BytesIterator {
+func FromBytes(b []byte) *BytesIterator {
 	iter := &BytesIterator{
 		iterators.NewBytesIterator(SplitFunc),
 	}
-	iter.SetText(data)
+	iter.SetText(b)
 	return iter
 }

@@ -9,22 +9,16 @@ go get "github.com/clipperhouse/uax29/sentences"
 ```go
 import "github.com/clipperhouse/uax29/sentences"
 
-text := []byte("Hello, 世界. Nice dog! 👍🐶")
+text := "Hello, 世界. Nice dog! 👍🐶"
 
-segments := sentences.NewSegmenter(text)        // A segmenter is an iterator over the sentences
+tokens := sentences.FromString(text)
 
-for segments.Next() {                           // Next() returns true until end of data or error
-	fmt.Printf("%q\n", segments.Bytes())        // Do something with the current sentence
-}
-
-if err := segments.Err(); err != nil {          // Check the error
-	log.Fatal(err)
+for tokens.Next() {                         // Next() returns true until end of data
+	fmt.Printf("%q\n", tokens.Text())       // Do something with the current sentence
 }
 ```
 
 [![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/sentences.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/sentences)
-
-_For our purposes, “segment”, “sentence”, and “token” are used synonymously._
 
 ## Conformance
 
@@ -34,47 +28,48 @@ We use the Unicode [test suite](https://unicode.org/reports/tr41/tr41-26.html#Te
 
 ## APIs
 
-### If you have a `[]byte`
+### If you have a `string`
 
-Use `Segmenter` for bounded memory and best performance:
-
-```go
-text := []byte("Hello, 世界. Nice dog! 👍🐶")
-
-segments := sentences.NewSegmenter(text)        // A segmenter is an iterator over the sentences
-
-for segments.Next() {                           // Next() returns true until end of data or error
-	fmt.Printf("%q\n", segments.Bytes())        // Do something with the current sentence
-}
-
-if err := segments.Err(); err != nil {          // Check the error
-	log.Fatal(err)
-}
-```
-
-Use `SegmentAll()` if you prefer brevity, are not too concerned about allocations, or would be populating a `[][]byte` anyway.
+Use `FromString`:
 
 ```go
-text := []byte("Hello, 世界. Nice dog! 👍🐶")
-segments := sentences.SegmentAll(text)          // Returns a slice of byte slices; each slice is a sentence
+text := "Hello, 世界. Nice dog! 👍🐶"
 
-fmt.Println("Graphemes: %q", segments)
+segments := sentences.FromString(text)
+
+for segments.Next() {                         // Next() returns true until end of data
+	fmt.Printf("%q\n", segments.Text())       // Do something with the current sentence
+}
 ```
 
 ### If you have an `io.Reader`
 
-Use `Scanner` (which is a [`bufio.Scanner`](https://pkg.go.dev/bufio#Scanner), those docs will tell you what to do).
+Use `FromReader`. It embeds a [`bufio.Scanner`](https://pkg.go.dev/bufio#Scanner), so you can use those methods.
 
 ```go
 r := getYourReader()                            // from a file or network maybe
-scanner := sentences.NewScanner(r)
+tokens := sentences.FromReader(r)
 
-for scanner.Scan() {                            // Scan() returns true until error or EOF
-	fmt.Println(scanner.Text())                 // Do something with the current sentence
+for tokens.Scan() {                             // Scan() returns true until error or EOF
+	fmt.Println(tokens.Bytes())                 // Do something with the current sentence
 }
 
-if err := scanner.Err(); err != nil {           // Check the error
-	log.Fatal(err)
+if tokens.Err() != nil {                       // Check the error
+	log.Fatal(tokens.Err())
+}
+```
+
+### If you have a `[]byte`
+
+Use `FromBytes`.
+
+```go
+b := []byte("Hello, 世界. Nice dog! 👍🐶")
+
+tokens := sentences.FromBytes(b)
+
+for tokens.Next() {                            // Next() returns true until end of data
+	fmt.Printf("%q\n", tokens.Bytes())         // Do something with the current sentence
 }
 ```
 
@@ -82,7 +77,7 @@ if err := scanner.Err(); err != nil {           // Check the error
 
 On a Mac laptop, we see around 35MB/s, which works out to around 180 thousand sentences per second.
 
-You should see approximately constant memory when using `Segmenter` or `Scanner`, independent of data size. When using `SegmentAll()`, expect memory to be `O(n)` on the number of sentences.
+You should see approximately constant memory, independent of data size.
 
 ### Invalid inputs
 

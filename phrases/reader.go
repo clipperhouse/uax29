@@ -10,13 +10,13 @@ type Scanner struct {
 	*bufio.Scanner
 }
 
-// NewScanner returns a Scanner, to split phrases. "Phrase" is defined as
+// FromReader returns a Scanner, to split phrases. "Phrase" is defined as
 // a series of words separated only by spaces.
 //
 // It embeds a [bufio.Scanner], so you can use its methods.
 //
 // Iterate through phrases by calling Scan() until false, then check Err().
-func NewScanner(r io.Reader) *Scanner {
+func FromReader(r io.Reader) *Scanner {
 	sc := bufio.NewScanner(r)
 	sc.Split(SplitFunc)
 	return &Scanner{

@@ -24,7 +24,7 @@ func TestScannerRoundtrip(t *testing.T) {
 		input := getRandomBytes()
 
 		r := bytes.NewReader(input)
-		sc := phrases.NewScanner(r)
+		sc := phrases.FromReader(r)
 
 		var output []byte
 		for sc.Scan() {
@@ -59,7 +59,7 @@ func TestInvalidUTF8(t *testing.T) {
 	}
 
 	r := bytes.NewReader(input)
-	sc := phrases.NewScanner(r)
+	sc := phrases.FromReader(r)
 
 	var output []byte
 	for sc.Scan() {
@@ -141,7 +141,7 @@ func BenchmarkScanner(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		r.Reset(file)
-		sc := phrases.NewScanner(r)
+		sc := phrases.FromReader(r)
 
 		c := 0
 		for sc.Scan() {

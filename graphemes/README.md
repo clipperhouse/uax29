@@ -9,22 +9,18 @@ go get "github.com/clipperhouse/uax29/graphemes"
 ```go
 import "github.com/clipperhouse/uax29/graphemes"
 
-text := []byte("Hello, 世界. Nice dog! 👍🐶")
+text := "Hello, 世界. Nice dog! 👍🐶"
 
-segments := graphemes.NewSegmenter(text)        // A segmenter is an iterator over the graphemes
+tokens := graphemes.FromString(text)        // A segmenter is an iterator over the graphemes
 
-for segments.Next() {                           // Next() returns true until end of data or error
-	fmt.Printf("%q\n", segments.Bytes())        // Do something with the current grapheme
-}
-
-if err := segments.Err(); err != nil {          // Check the error
-	log.Fatal(err)
+for tokens.Next() {                         // Next() returns true until end of data
+	fmt.Printf("%q\n", tokens.Text())       // Do something with the current grapheme
 }
 ```
 
 [![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/graphemes.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/graphemes)
 
-_A grapheme is a “single visible character”, which might be a simple as a single letter, or a complex emoji that consists of several Unicode code points. For our purposes, “segment”, “grapheme”, and “token” are used synonymously._
+_A grapheme is a “single visible character”, which might be a simple as a single letter, or a complex emoji that consists of several Unicode code points._
 
 ## Conformance
 
@@ -34,47 +30,48 @@ We use the Unicode [test suite](https://unicode.org/reports/tr41/tr41-26.html#Te
 
 ## APIs
 
-### If you have a `[]byte`
+### If you have a `string`
 
 Use `Segmenter` for bounded memory and best performance:
 
 ```go
-text := []byte("Hello, 世界. Nice dog! 👍🐶")
+text := "Hello, 世界. Nice dog! 👍🐶"
 
-segments := graphemes.NewSegmenter(text)        // A segmenter is an iterator over the graphemes
+segments := graphemes.FromString(text)
 
-for segments.Next() {                           // Next() returns true until end of data or error
-	fmt.Printf("%q\n", segments.Bytes())        // Do something with the current grapheme
+for segments.Next() {                         // Next() returns true until end of data
+	fmt.Printf("%q\n", segments.Text())       // Do something with the current grapheme
 }
-
-if err := segments.Err(); err != nil {          // Check the error
-	log.Fatal(err)
-}
-```
-
-Use `SegmentAll()` if you prefer brevity, are not too concerned about allocations, or would be populating a `[][]byte` anyway.
-
-```go
-text := []byte("Hello, 世界. Nice dog! 👍🐶")
-segments := graphemes.SegmentAll(text)          // Returns a slice of byte slices; each slice is a grapheme
-
-fmt.Println("Graphemes: %q", segments)
 ```
 
 ### If you have an `io.Reader`
 
-Use `Scanner` (which is a [`bufio.Scanner`](https://pkg.go.dev/bufio#Scanner), those docs will tell you what to do).
+Use `FromReader`. It embeds a [`bufio.Scanner`](https://pkg.go.dev/bufio#Scanner), so you can use those methods.
 
 ```go
 r := getYourReader()                            // from a file or network maybe
-scanner := graphemes.NewScanner(r)
+tokens := graphemes.FromReader(r)
 
-for scanner.Scan() {                            // Scan() returns true until error or EOF
-	fmt.Println(scanner.Text())                 // Do something with the current grapheme
+for tokens.Scan() {                             // Scan() returns true until error or EOF
+	fmt.Println(tokens.Bytes())                 // Do something with the current grapheme
 }
 
-if err := scanner.Err(); err != nil {           // Check the error
-	log.Fatal(err)
+if tokens.Err() != nil {                        // Check the error
+	log.Fatal(tokens.Err())
+}
+```
+
+### If you have a `[]byte`
+
+Use `FromBytes`.
+
+```go
+b := []byte("Hello, 世界. Nice dog! 👍🐶")
+
+tokens := graphemes.FromBytes(b)
+
+for tokens.Next() {                            // Next() returns true until end of data
+	fmt.Printf("%q\n", tokens.Bytes())         // Do something with the current grapheme
 }
 ```
 
@@ -82,7 +79,7 @@ if err := scanner.Err(); err != nil {           // Check the error
 
 On a Mac laptop, we see around 70MB/s, which works out to around 70 million graphemes per second.
 
-You should see approximately constant memory when using `Segmenter` or `Scanner`, independent of data size. When using `SegmentAll()`, expect memory to be `O(n)` on the number of graphemes.
+You should see approximately constant memory, independent of data size.
 
 ### Invalid inputs
 
