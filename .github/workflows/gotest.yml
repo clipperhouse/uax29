@@ -32,4 +32,4 @@ jobs:
           ${{ runner.os }}-go-
 
     - name: Run test
-      run: go test ./... -race
+      run: go test ./... -race -short

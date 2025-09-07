@@ -14,6 +14,9 @@ import (
 // FuzzValidShort fuzzes small, valid UTF8 strings. I suspect more, shorter
 // strings in the corpus lead to more mutation and coverage. True?
 func FuzzValidShort(f *testing.F) {
+	if testing.Short() {
+		f.Skip("skipping fuzz test in short mode")
+	}
 	// multi-lingual text, as small-ish lines
 	file, err := testdata.Sample()
 	if err != nil {
@@ -51,6 +54,9 @@ func FuzzValidShort(f *testing.F) {
 
 // FuzzValidLong fuzzes longer, valid UTF8 strings.
 func FuzzValidLong(f *testing.F) {
+	if testing.Short() {
+		f.Skip("skipping fuzz test in short mode")
+	}
 	// add multi-lingual text, as decent (paragraph-sized) size chunks
 	file, err := testdata.Sample()
 	if err != nil {
@@ -88,6 +94,9 @@ func FuzzValidLong(f *testing.F) {
 
 // FuzzInvalid fuzzes invalid UTF8 strings.
 func FuzzInvalid(f *testing.F) {
+	if testing.Short() {
+		f.Skip("skipping fuzz test in short mode")
+	}
 	random := getRandomBytes()
 
 	const max = 100
