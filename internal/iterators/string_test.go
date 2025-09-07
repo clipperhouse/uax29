@@ -42,9 +42,6 @@ func TestStringSegmenterSameAsSegmenter(t *testing.T) {
 					`, segBytes, stringBytes)
 				}
 			}
-			if seg.Err() != nil {
-				t.Fatal(seg.Err())
-			}
 		}
 	}
 }

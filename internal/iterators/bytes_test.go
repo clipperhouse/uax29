@@ -47,9 +47,6 @@ func TestSegmenterSameAsAll(t *testing.T) {
 					t.Fatal("All and Segmenter should give identical results")
 				}
 			}
-			if seg.Err() != nil {
-				t.Fatal(seg.Err())
-			}
 		}
 	}
 }

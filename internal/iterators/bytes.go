@@ -15,7 +15,6 @@ type BytesIterator struct {
 	token []byte
 	start int
 	pos   int
-	err   error
 }
 
 func NewBytesIterator(split bufio.SplitFunc) *BytesIterator {
@@ -30,7 +29,6 @@ func (iter *BytesIterator) SetText(data []byte) {
 	iter.data = data
 	iter.token = nil
 	iter.pos = 0
-	iter.err = nil
 }
 
 // Split sets the SplitFunc for the BytesIterator
@@ -71,12 +69,6 @@ func (iter *BytesIterator) Next() bool {
 	iter.token = token
 
 	return true
-}
-
-// Err indicates an error occured when calling Next; Next() will return false
-// when an error occurs.
-func (iter *BytesIterator) Err() error {
-	return iter.err
 }
 
 // Bytes returns the current token.

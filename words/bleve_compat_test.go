@@ -181,9 +181,6 @@ func TestAdhocSegmentsWithType(t *testing.T) {
 		if i != len(test.output) {
 			t.Fatalf("missed a token in %q", test.input)
 		}
-		if err := segmenter.Err(); err != nil {
-			t.Fatal(err)
-		}
 
 		for i, f := range test.outputTypes {
 			expected := test.output[i]

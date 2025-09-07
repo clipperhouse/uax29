@@ -25,10 +25,6 @@ func TestSegmenterUnicode(t *testing.T) {
 			segmented = append(segmented, segmenter.Bytes())
 		}
 
-		if err := segmenter.Err(); err != nil {
-			t.Fatal(err)
-		}
-
 		if !reflect.DeepEqual(segmented, test.expected) {
 			failed++
 			t.Errorf(`
@@ -70,10 +66,6 @@ func TestSegmenterRoundtrip(t *testing.T) {
 			output = append(output, seg.Bytes()...)
 		}
 
-		if err := seg.Err(); err != nil {
-			t.Fatal(err)
-		}
-
 		if !bytes.Equal(output, input) {
 			t.Fatal("input bytes are not the same as segmented bytes")
 		}
@@ -104,9 +96,6 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 	for sc.Next() {
 		output = append(output, sc.Bytes()...)
 	}
-	if err := sc.Err(); err != nil {
-		t.Error(err)
-	}
 
 	if !bytes.Equal(output, input) {
 		t.Fatalf("input bytes are not the same as segmented bytes")
@@ -129,10 +118,6 @@ func BenchmarkSegmenter(b *testing.B) {
 		c := 0
 		for seg.Next() {
 			c++
-		}
-
-		if err := seg.Err(); err != nil {
-			b.Error(err)
 		}
 
 		b.ReportMetric(float64(c), "tokens")
@@ -178,9 +163,6 @@ func BenchmarkUnicodeTests(b *testing.B) {
 		c := 0
 		for seg.Next() {
 			c++
-		}
-		if err := seg.Err(); err != nil {
-			b.Error(err)
 		}
 
 		b.ReportMetric(float64(c), "tokens")

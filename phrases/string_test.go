@@ -60,9 +60,6 @@ func TestStringSegmenterInvalidUTF8(t *testing.T) {
 	for sc.Next() {
 		output = append(output, sc.Bytes()...)
 	}
-	if err := sc.Err(); err != nil {
-		t.Error(err)
-	}
 
 	if !bytes.Equal(output, input) {
 		t.Fatalf("input bytes are not the same as segmented bytes")

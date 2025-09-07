@@ -27,10 +27,6 @@ func TestSegmenterUnicode(t *testing.T) {
 			segmented = append(segmented, segmenter.Bytes())
 		}
 
-		if err := segmenter.Err(); err != nil {
-			t.Fatal(err)
-		}
-
 		if !reflect.DeepEqual(segmented, test.expected) {
 			failed++
 			t.Errorf(`
@@ -70,10 +66,6 @@ func TestSegmenterRoundtrip(t *testing.T) {
 		var output []byte
 		for seg.Next() {
 			output = append(output, seg.Bytes()...)
-		}
-
-		if err := seg.Err(); err != nil {
-			t.Fatal(err)
 		}
 
 		if !bytes.Equal(output, input) {
@@ -128,14 +120,11 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 		t.Error("input file should not be valid utf8")
 	}
 
-	sc := words.FromBytes(input)
+	seg := words.FromBytes(input)
 
 	var output []byte
-	for sc.Next() {
-		output = append(output, sc.Bytes()...)
-	}
-	if err := sc.Err(); err != nil {
-		t.Error(err)
+	for seg.Next() {
+		output = append(output, seg.Bytes()...)
 	}
 
 	if !bytes.Equal(output, input) {
@@ -209,9 +198,6 @@ func benchSeg(b *testing.B, seg *words.BytesIterator) {
 			c++
 		}
 
-		if err := seg.Err(); err != nil {
-			b.Error(err)
-		}
 	}
 
 	elapsed := time.Since(start)
@@ -274,9 +260,6 @@ func BenchmarkUnicodeTests(b *testing.B) {
 		c := 0
 		for seg.Next() {
 			c++
-		}
-		if err := seg.Err(); err != nil {
-			b.Error(err)
 		}
 
 		b.ReportMetric(float64(c), "tokens")

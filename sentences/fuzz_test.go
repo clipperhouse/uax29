@@ -36,9 +36,6 @@ func FuzzValidShort(f *testing.F) {
 		for seg.Next() {
 			segs = append(segs, seg.Bytes())
 		}
-		if seg.Err() != nil {
-			t.Error(seg.Err())
-		}
 
 		roundtrip := make([]byte, 0, len(original))
 		for _, s := range segs {
@@ -75,9 +72,6 @@ func FuzzValidLong(f *testing.F) {
 		seg := sentences.FromBytes(original)
 		for seg.Next() {
 			segs = append(segs, seg.Bytes())
-		}
-		if seg.Err() != nil {
-			t.Error(seg.Err())
 		}
 
 		roundtrip := make([]byte, 0, len(original))
@@ -133,9 +127,6 @@ func FuzzInvalid(f *testing.F) {
 		seg := sentences.FromBytes(original)
 		for seg.Next() {
 			segs = append(segs, seg.Bytes())
-		}
-		if seg.Err() != nil {
-			t.Error(seg.Err())
 		}
 
 		roundtrip := make([]byte, 0, len(original))

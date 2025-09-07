@@ -29,10 +29,6 @@ func TestSegmenterRoundtrip(t *testing.T) {
 			output = append(output, seg.Bytes()...)
 		}
 
-		if err := seg.Err(); err != nil {
-			t.Fatal(err)
-		}
-
 		if !bytes.Equal(output, input) {
 			t.Fatal("input bytes are not the same as segmented bytes")
 		}
@@ -57,14 +53,11 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 		t.Error("input file should not be valid utf8")
 	}
 
-	sc := phrases.FromBytes(input)
+	seg := phrases.FromBytes(input)
 
 	var output []byte
-	for sc.Next() {
-		output = append(output, sc.Bytes()...)
-	}
-	if err := sc.Err(); err != nil {
-		t.Error(err)
+	for seg.Next() {
+		output = append(output, seg.Bytes()...)
 	}
 
 	if !bytes.Equal(output, input) {
@@ -127,10 +120,6 @@ func BenchmarkSegmenter(b *testing.B) {
 
 		for seg.Next() {
 			c++
-		}
-
-		if err := seg.Err(); err != nil {
-			b.Error(err)
 		}
 	}
 
