@@ -88,9 +88,9 @@ func (t *graphemesTrie) lookup(s []byte) (v property, sz int) {
 // graphemesTrie. Total size: 29120 bytes (28.44 KiB). Checksum: 80ad0c5ab9375f7.
 type graphemesTrie struct{}
 
-func newGraphemesTrie(i int) *graphemesTrie {
-	return &graphemesTrie{}
-}
+// func newGraphemesTrie(i int) *graphemesTrie {
+// 	return &graphemesTrie{}
+// }
 
 // lookupValue determines the type of block n and looks up the value for b.
 func (t *graphemesTrie) lookupValue(n uint32, b byte) property {

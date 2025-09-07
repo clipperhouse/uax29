@@ -1,6 +1,6 @@
 package sentences
 
-var trie = newSentencesTrie(0)
+var trie = &sentencesTrie{}
 
 // is determines if lookup intersects propert(ies)
 func (lookup property) is(properties property) bool {

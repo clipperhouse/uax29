@@ -94,9 +94,9 @@ func (t *wordsTrie) lookup(s []byte) (v property, sz int) {
 // wordsTrie. Total size: 94464 bytes (92.25 KiB). Checksum: ef6ff72028f76377.
 type wordsTrie struct{}
 
-func newWordsTrie(i int) *wordsTrie {
-	return &wordsTrie{}
-}
+// func newWordsTrie(i int) *wordsTrie {
+// 	return &wordsTrie{}
+// }
 
 // lookupValue determines the type of block n and looks up the value for b.
 func (t *wordsTrie) lookupValue(n uint32, b byte) property {

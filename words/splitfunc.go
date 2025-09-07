@@ -5,7 +5,7 @@ import (
 	"unicode/utf8"
 )
 
-var trie = newWordsTrie(0)
+var trie = &wordsTrie{}
 
 // is determines if lookup intersects propert(ies)
 func (lookup property) is(properties property) bool {

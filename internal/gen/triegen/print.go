@@ -118,21 +118,21 @@ type {{.Name}}Trie struct { {{if $multi}}
 	utf8Start  []{{.IndexType}} // index for UTF-8 bytes >= 0xC0
 {{end}}}
 
-func new{{title .Name}}Trie(i int) *{{.Name}}Trie { {{if $multi}}
-	h := {{.Name}}TrieHandles[i]
-	return &{{.Name}}Trie{ {{.Name}}Values[uint32(h.ascii)<<6:], {{.Name}}Index[uint32(h.multi)<<6:] }
-}
-
-type {{.Name}}TrieHandle struct {
-	ascii, multi {{.IndexType}}
-}
-
-// {{.Name}}TrieHandles: {{len .Trie}} handles, {{.Stats.NHandleBytes}} bytes
-var {{.Name}}TrieHandles = [{{len .Trie}}]{{.Name}}TrieHandle{
-{{range .Trie}}	{ {{.ASCIIIndex}}, {{.StarterIndex}} }, // {{printf "%08x" .Checksum}}: {{.Name}}
-{{end}}}{{else}}
-	return &{{.Name}}Trie{}
-}
+// func new{{title .Name}}Trie(i int) *{{.Name}}Trie { {{if $multi}}
+// 	h := {{.Name}}TrieHandles[i]
+// 	return &{{.Name}}Trie{ {{.Name}}Values[uint32(h.ascii)<<6:], {{.Name}}Index[uint32(h.multi)<<6:] }
+// }
+//
+// type {{.Name}}TrieHandle struct {
+// 	ascii, multi {{.IndexType}}
+// }
+//
+// // {{.Name}}TrieHandles: {{len .Trie}} handles, {{.Stats.NHandleBytes}} bytes
+// var {{.Name}}TrieHandles = [{{len .Trie}}]{{.Name}}TrieHandle{
+// {{range .Trie}}	{ {{.ASCIIIndex}}, {{.StarterIndex}} }, // {{printf "%08x" .Checksum}}: {{.Name}}
+// {{end}}}{{else}}
+// 	return &{{.Name}}Trie{}
+// }
 {{end}}
 // lookupValue determines the type of block n and looks up the value for b.
 func (t *{{.Name}}Trie) lookupValue(n uint32, b byte) {{.ValueType}}{{$last := dec (len .Compactions)}} {

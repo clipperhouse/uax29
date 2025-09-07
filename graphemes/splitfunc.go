@@ -1,6 +1,6 @@
 package graphemes
 
-var trie = newGraphemesTrie(0)
+var trie = &graphemesTrie{}
 
 // is determines if lookup intersects propert(ies)
 func (lookup property) is(properties property) bool {
