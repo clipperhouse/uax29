@@ -6,6 +6,9 @@ import (
 	"errors"
 )
 
+// BytesIterator is an iterator for bytes. Iterate while Next() is true,
+// It is only intended for use within this package. It will do the
+// wrong thing with a SplitFunc that does not return all bytes.
 type BytesIterator struct {
 	split bufio.SplitFunc
 	data  []byte
@@ -35,46 +38,37 @@ func (iter *BytesIterator) Split(split bufio.SplitFunc) {
 	iter.split = split
 }
 
-var ErrAdvanceNegative = errors.New("SplitFunc returned a negative advance, this is likely a bug in the SplitFunc")
-var ErrAdvanceTooFar = errors.New("SplitFunc advanced beyond the end of the data, this is likely a bug in the SplitFunc")
+var errAdvanceIllegal = errors.New("SplitFunc returned a negative advance, this is likely a bug in the SplitFunc")
+var errAdvanceTooFar = errors.New("SplitFunc advanced beyond the end of the data, this is likely a bug in the SplitFunc")
 
 // Next advances BytesIterator to the next token (segment). It returns false
 // when there are no remaining segments, or an error occurred.
 //
 // Always check Err() after Next() returns false.
 func (iter *BytesIterator) Next() bool {
-	if iter.pos >= len(iter.data) {
+	if iter.pos == len(iter.data) {
 		return false
+	}
+	if iter.pos > len(iter.data) {
+		panic(errAdvanceTooFar)
 	}
 
 	iter.start = iter.pos
 
 	advance, token, err := iter.split(iter.data[iter.pos:], true)
+	if err != nil {
+		panic(err)
+	}
+	if advance <= 0 {
+		panic(errAdvanceIllegal)
+	}
+
 	iter.pos += advance
-	iter.token = token
-	iter.err = err
-
-	if iter.err != nil {
-		return false
-	}
-
-	// Guardrails
-	if advance < 0 {
-		panic(ErrAdvanceNegative)
-	}
 	if iter.pos > len(iter.data) {
-		panic(ErrAdvanceTooFar)
+		panic(errAdvanceTooFar)
 	}
 
-	// Interpret as EOF
-	if advance == 0 {
-		return false
-	}
-
-	// Interpret as EOF
-	if len(iter.token) == 0 {
-		return false
-	}
+	iter.token = token
 
 	return true
 }
@@ -112,9 +106,6 @@ func (iter *BytesIterator) Text() string {
 
 // If a SplitFunc skips bytes before *and* after a token, then there is unlikely to
 // be a knowable right answer. Maybe the imprecision is OK for a given application.
-
-// For future work, we might consider implementing a SegmentFunc interface,
-// to make start and end explicit.
 
 // Start returns the position (byte index) of the current token in the original text.
 func (iter *BytesIterator) Start() int {

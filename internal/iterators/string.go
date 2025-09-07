@@ -5,9 +5,9 @@ import (
 	"unsafe"
 )
 
-// StringIterator reuses the existing SplitFunc logic while achieving zero-copy behavior.
-// It works by converting only the portion of the string needed for boundary detection
-// to []byte, then extracting the result as a string slice.
+// BytesIterator is an iterator for bytes. Iterate while Next() is true,
+// It is only intended for use within this package. It will do the
+// wrong thing with a SplitFunc that does not return all bytes.
 type StringIterator struct {
 	split bufio.SplitFunc
 	data  string
@@ -41,25 +41,29 @@ func (iter *StringIterator) Split(split bufio.SplitFunc) {
 // Next advances the iterator to the next token. It returns false when there
 // are no remaining tokens or an error occurred.
 func (iter *StringIterator) Next() bool {
-	if iter.pos >= len(iter.data) {
+	if iter.pos == len(iter.data) {
 		return false
+	}
+	if iter.pos > len(iter.data) {
+		panic(errAdvanceTooFar)
 	}
 
 	iter.start = iter.pos
 
 	b := stringToBytes(iter.data[iter.pos:])
-
 	advance, token, err := iter.split(b, true)
 	if err != nil {
-		iter.err = err
-		return false
+		panic(err)
 	}
-
 	if advance <= 0 {
-		return false
+		panic(errAdvanceIllegal)
 	}
 
 	iter.pos += advance
+	if iter.pos > len(iter.data) {
+		panic(errAdvanceTooFar)
+	}
+
 	iter.token = bytesToString(token)
 
 	return true
