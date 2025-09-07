@@ -2,7 +2,6 @@ package words_test
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	"reflect"
 	"testing"
@@ -122,47 +121,6 @@ func TestBytesInvalidUTF8(t *testing.T) {
 	if !bytes.Equal(output, input) {
 		t.Fatalf("input bytes are not the same as output bytes")
 	}
-}
-
-var example = ", ;👍-@/.#"
-var searches = []rune{' ', 'x', '@', '👍'}
-
-func BenchmarkArray(b *testing.B) {
-	var array []rune
-	for _, r := range example {
-		array = append(array, r)
-	}
-
-	var found rune
-	for i := 0; i < b.N; i++ {
-		for _, s := range searches {
-			for j := range array {
-				if array[j] == s {
-					found = s
-				}
-			}
-		}
-	}
-
-	fmt.Println(found)
-}
-
-func BenchmarkMap(b *testing.B) {
-	m := make(map[rune]struct{})
-	for _, r := range example {
-		m[r] = struct{}{}
-	}
-
-	var found rune
-	for i := 0; i < b.N; i++ {
-		for _, s := range searches {
-			if _, ok := m[s]; ok {
-				found = s
-			}
-		}
-	}
-
-	fmt.Println(found)
 }
 
 func BenchmarkBytes(b *testing.B) {
