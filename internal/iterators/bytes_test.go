@@ -19,18 +19,18 @@ var splitFuncs = map[string]bufio.SplitFunc{
 	"phrases":   phrases.SplitFunc,
 }
 
-func TestSegmenterStart(t *testing.T) {
+func TestBytesStart(t *testing.T) {
 	t.Parallel()
 
 	text := []byte("Hello world")
 
 	{
-		seg := words.FromBytes(text)
-		seg.SetText(text)
+		tokens := words.FromBytes(text)
+		tokens.SetText(text)
 		expected := []int{0, 5, 6}
 		var got []int
-		for seg.Next() {
-			got = append(got, seg.Start())
+		for tokens.Next() {
+			got = append(got, tokens.Start())
 		}
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("start failed for words.SplitFunc, expected %v, got %v", expected, got)
@@ -38,12 +38,12 @@ func TestSegmenterStart(t *testing.T) {
 	}
 
 	{
-		seg := iterators.NewBytesIterator(bufio.ScanWords)
-		seg.SetText(text)
+		tokens := iterators.NewBytesIterator(bufio.ScanWords)
+		tokens.SetText(text)
 		expected := []int{0, 6}
 		var got []int
-		for seg.Next() {
-			got = append(got, seg.Start())
+		for tokens.Next() {
+			got = append(got, tokens.Start())
 		}
 		if !reflect.DeepEqual(got, expected) {
 			t.Fatalf("start failed for bufio.ScanWords, expected %v, got %v", expected, got)
@@ -51,21 +51,18 @@ func TestSegmenterStart(t *testing.T) {
 	}
 }
 
-func TestSegmenterEnd(t *testing.T) {
+func TestBytesEnd(t *testing.T) {
 	t.Parallel()
 
 	text := []byte("Hello world")
+	tokens := words.FromBytes(text)
 
-	{
-		seg := words.FromBytes(text)
-
-		expected := []int{5, 6, len(text)}
-		var got []int
-		for seg.Next() {
-			got = append(got, seg.End())
-		}
-		if !reflect.DeepEqual(got, expected) {
-			t.Fatalf("end failed for words.SplitFunc, expected %v, got %v", expected, got)
-		}
+	expected := []int{5, 6, len(text)}
+	var got []int
+	for tokens.Next() {
+		got = append(got, tokens.End())
+	}
+	if !reflect.DeepEqual(got, expected) {
+		t.Fatalf("end failed for words.SplitFunc, expected %v, got %v", expected, got)
 	}
 }

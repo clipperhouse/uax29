@@ -11,7 +11,7 @@ import (
 	"github.com/clipperhouse/uax29/words"
 )
 
-func TestStringSegmenterUnicode(t *testing.T) {
+func TestStringUnicode(t *testing.T) {
 	t.Parallel()
 
 	// From the Unicode test suite; see the gen/ folder.
@@ -19,10 +19,10 @@ func TestStringSegmenterUnicode(t *testing.T) {
 	for _, test := range unicodeTests {
 		test := test
 
-		var segmented []string
-		segmenter := words.FromString(string(test.input))
-		for segmenter.Next() {
-			segmented = append(segmented, segmenter.Text())
+		var all []string
+		tokens := words.FromString(string(test.input))
+		for tokens.Next() {
+			all = append(all, tokens.Text())
 		}
 
 		expected := make([]string, len(test.expected))
@@ -30,13 +30,13 @@ func TestStringSegmenterUnicode(t *testing.T) {
 			expected[i] = string(v)
 		}
 
-		if !reflect.DeepEqual(segmented, expected) {
+		if !reflect.DeepEqual(all, expected) {
 			failed++
 			t.Errorf(`
 	for input %v
 	expected  %v
 	got       %v
-	spec      %s`, test.input, test.expected, segmented, test.comment)
+	spec      %s`, test.input, test.expected, all, test.comment)
 		} else {
 			passed++
 		}
@@ -47,58 +47,56 @@ func TestStringSegmenterUnicode(t *testing.T) {
 	}
 }
 
-// TestSegmenterRoundtrip tests that all input bytes are output after segmentation.
-// De facto, it also tests that we don't get infinite loops, or ever return an error.
-func TestStringSegmenterRoundtrip(t *testing.T) {
+func TestStringRoundtrip(t *testing.T) {
 	t.Parallel()
 
 	const runs = 2000
 
 	for i := 0; i < runs; i++ {
 		input := string(getRandomBytes())
-		seg := words.FromString(input)
+		tokens := words.FromString(input)
 
 		var output string
-		for seg.Next() {
-			output += seg.Text()
+		for tokens.Next() {
+			output += tokens.Text()
 		}
 
 		if output != input {
-			t.Fatal("input bytes are not the same as segmented bytes")
+			t.Fatal("input bytes are not the same as output bytes")
 		}
 	}
 }
 
-func stringSegToSet(seg *words.StringIterator) map[string]struct{} {
+func stringIterToSet(tokens *words.StringIterator) map[string]struct{} {
 	founds := make(map[string]struct{})
-	for seg.Next() {
-		founds[seg.Text()] = struct{}{}
+	for tokens.Next() {
+		founds[tokens.Text()] = struct{}{}
 	}
 	return founds
 }
 
-func TestStringSegmenterJoiners(t *testing.T) {
+func TestStringJoiners(t *testing.T) {
 	s := string(joinersInput)
-	seg1 := words.FromString(s)
-	founds1 := stringSegToSet(seg1)
+	tokens1 := words.FromString(s)
+	founds1 := stringIterToSet(tokens1)
 
-	seg2 := words.FromString(s)
-	seg2.Joiners(joiners)
-	founds2 := stringSegToSet(seg2)
+	tokens2 := words.FromString(s)
+	tokens2.Joiners(joiners)
+	founds2 := stringIterToSet(tokens2)
 
 	for _, test := range joinersTests {
 		_, found1 := founds1[test.input]
 		if found1 != test.found1 {
-			t.Fatalf("For %q, expected %t for found in non-config segmenter, but got %t", test.input, test.found1, found1)
+			t.Fatalf("For %q, expected %t for found in non-config iterator, but got %t", test.input, test.found1, found1)
 		}
 		_, found2 := founds2[test.input]
 		if found2 != test.found2 {
-			t.Fatalf("For %q, expected %t for found in segmenter with joiners, but got %t", test.input, test.found2, found2)
+			t.Fatalf("For %q, expected %t for found in iterator with joiners, but got %t", test.input, test.found2, found2)
 		}
 	}
 }
 
-func TestStringSegmenterInvalidUTF8(t *testing.T) {
+func TestStringInvalidUTF8(t *testing.T) {
 	t.Parallel()
 
 	// For background, see internal/testdata/UTF-8-test.txt, or:
@@ -124,11 +122,11 @@ func TestStringSegmenterInvalidUTF8(t *testing.T) {
 	}
 
 	if output != string(input) {
-		t.Fatalf("input bytes are not the same as segmented bytes")
+		t.Fatalf("input bytes are not the same as output bytes")
 	}
 }
 
-func BenchmarkStringSegmenter(b *testing.B) {
+func BenchmarkString(b *testing.B) {
 	file, err := testdata.Sample()
 	if err != nil {
 		b.Error(err)
@@ -138,13 +136,13 @@ func BenchmarkStringSegmenter(b *testing.B) {
 
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
-	seg := words.FromString(s)
+	tokens := words.FromString(s)
 
 	for i := 0; i < b.N; i++ {
-		seg.SetText(s)
+		tokens.SetText(s)
 
 		c := 0
-		for seg.Next() {
+		for tokens.Next() {
 			c++
 		}
 
@@ -163,13 +161,13 @@ func BenchmarkStringUnicodeTests(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 
-	seg := words.FromString(s)
+	tokens := words.FromString(s)
 
 	for i := 0; i < b.N; i++ {
-		seg.SetText(s)
+		tokens.SetText(s)
 
 		c := 0
-		for seg.Next() {
+		for tokens.Next() {
 			c++
 		}
 

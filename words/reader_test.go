@@ -43,8 +43,6 @@ func TestScannerUnicode(t *testing.T) {
 	t.Logf("%d tests: passed %d, failed %d", len(unicodeTests), passed, failed)
 }
 
-// TestScannerRoundtrip tests that all input bytes are output after segmentation.
-// De facto, it also tests that we don't get infinite loops, or ever return an error.
 func TestScannerRoundtrip(t *testing.T) {
 	t.Parallel()
 
@@ -71,23 +69,23 @@ func TestScannerRoundtrip(t *testing.T) {
 	}
 }
 
-func scanToSet(seg *words.Scanner) map[string]struct{} {
+func scanToSet(tokens *words.Scanner) map[string]struct{} {
 	founds := make(map[string]struct{})
-	for seg.Scan() {
-		founds[string(seg.Bytes())] = struct{}{}
+	for tokens.Scan() {
+		founds[string(tokens.Bytes())] = struct{}{}
 	}
 	return founds
 }
 
 func TestScannerJoiners(t *testing.T) {
 	r1 := bytes.NewReader(joinersInput)
-	sc1 := words.FromReader(r1)
-	founds1 := scanToSet(sc1)
+	tokens1 := words.FromReader(r1)
+	founds1 := scanToSet(tokens1)
 
 	r2 := bytes.NewReader(joinersInput)
-	seg2 := words.FromReader(r2)
-	seg2.Joiners(joiners)
-	founds2 := scanToSet(seg2)
+	tokens2 := words.FromReader(r2)
+	tokens2.Joiners(joiners)
+	founds2 := scanToSet(tokens2)
 
 	for _, test := range joinersTests {
 		_, found1 := founds1[test.input]
@@ -120,14 +118,14 @@ func TestInvalidUTF8(t *testing.T) {
 	}
 
 	r := bytes.NewReader(input)
-	sc := words.FromReader(r)
+	tokens := words.FromReader(r)
 
 	var output []byte
-	for sc.Scan() {
-		output = append(output, sc.Bytes()...)
+	for tokens.Scan() {
+		output = append(output, tokens.Bytes()...)
 	}
 
-	if err := sc.Err(); err != nil {
+	if err := tokens.Err(); err != nil {
 		t.Error(err)
 	}
 
@@ -215,7 +213,7 @@ func BenchmarkScanner(b *testing.B) {
 	}
 }
 
-func BenchmarkUnicodeSegments(b *testing.B) {
+func BenchmarkUnicodeScanner(b *testing.B) {
 	var buf bytes.Buffer
 	for _, test := range unicodeTests {
 		buf.Write(test.input)

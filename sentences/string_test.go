@@ -11,7 +11,7 @@ import (
 	"github.com/clipperhouse/uax29/sentences"
 )
 
-func TestStringSegmenterUnicode(t *testing.T) {
+func TestStringUnicode(t *testing.T) {
 	t.Parallel()
 
 	// From the Unicode test suite; see the gen/ folder.
@@ -19,10 +19,10 @@ func TestStringSegmenterUnicode(t *testing.T) {
 	for _, test := range unicodeTests {
 		test := test
 
-		var segmented []string
-		segmenter := sentences.FromString(string(test.input))
-		for segmenter.Next() {
-			segmented = append(segmented, segmenter.Text())
+		var all []string
+		tokens := sentences.FromString(string(test.input))
+		for tokens.Next() {
+			all = append(all, tokens.Text())
 		}
 
 		expected := make([]string, len(test.expected))
@@ -30,13 +30,13 @@ func TestStringSegmenterUnicode(t *testing.T) {
 			expected[i] = string(v)
 		}
 
-		if !reflect.DeepEqual(segmented, expected) {
+		if !reflect.DeepEqual(all, expected) {
 			failed++
 			t.Errorf(`
 	for input %v
 	expected  %v
 	got       %v
-	spec      %s`, test.input, test.expected, segmented, test.comment)
+	spec      %s`, test.input, test.expected, all, test.comment)
 		} else {
 			passed++
 		}
@@ -47,29 +47,27 @@ func TestStringSegmenterUnicode(t *testing.T) {
 	}
 }
 
-// TestSegmenterRoundtrip tests that all input bytes are output after segmentation.
-// De facto, it also tests that we don't get infinite loops, or ever return an error.
-func TestStringSegmenterRoundtrip(t *testing.T) {
+func TestStringRoundtrip(t *testing.T) {
 	t.Parallel()
 
 	const runs = 2000
 
 	for i := 0; i < runs; i++ {
 		input := string(getRandomBytes())
-		seg := sentences.FromString(input)
+		tokens := sentences.FromString(input)
 
 		var output string
-		for seg.Next() {
-			output += seg.Text()
+		for tokens.Next() {
+			output += tokens.Text()
 		}
 
 		if output != input {
-			t.Fatal("input bytes are not the same as segmented bytes")
+			t.Fatal("input bytes are not the same as output bytes")
 		}
 	}
 }
 
-func TestStringSegmenterInvalidUTF8(t *testing.T) {
+func TestStringInvalidUTF8(t *testing.T) {
 	t.Parallel()
 
 	// For background, see internal/testdata/UTF-8-test.txt, or:
@@ -87,19 +85,19 @@ func TestStringSegmenterInvalidUTF8(t *testing.T) {
 		t.Error("input file should not be valid utf8")
 	}
 
-	sc := sentences.FromString(string(input))
+	tokens := sentences.FromString(string(input))
 
 	var output string
-	for sc.Next() {
-		output += sc.Text()
+	for tokens.Next() {
+		output += tokens.Text()
 	}
 
 	if output != string(input) {
-		t.Fatalf("input bytes are not the same as segmented bytes")
+		t.Fatalf("input bytes are not the same as output bytes")
 	}
 }
 
-func BenchmarkStringSegmenter(b *testing.B) {
+func BenchmarkString(b *testing.B) {
 	file, err := testdata.Sample()
 	if err != nil {
 		b.Error(err)
@@ -109,13 +107,13 @@ func BenchmarkStringSegmenter(b *testing.B) {
 
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
-	seg := sentences.FromString(s)
+	tokens := sentences.FromString(s)
 
 	for i := 0; i < b.N; i++ {
-		seg.SetText(s)
+		tokens.SetText(s)
 
 		c := 0
-		for seg.Next() {
+		for tokens.Next() {
 			c++
 		}
 
@@ -134,13 +132,13 @@ func BenchmarkStringUnicodeTests(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 
-	seg := sentences.FromString(s)
+	tokens := sentences.FromString(s)
 
 	for i := 0; i < b.N; i++ {
-		seg.SetText(s)
+		tokens.SetText(s)
 
 		c := 0
-		for seg.Next() {
+		for tokens.Next() {
 			c++
 		}
 

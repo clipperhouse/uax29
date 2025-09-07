@@ -10,9 +10,9 @@ var joiners = &words.Joiners{
 
 type joinersTest struct {
 	input string
-	// word should be found in standard segmenter
+	// word should be found in standard iterator
 	found1 bool
-	// word should be found in segmenter with joiners
+	// word should be found in iterator with joiners
 	found2 bool
 }
 

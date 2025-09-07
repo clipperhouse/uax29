@@ -11,7 +11,7 @@ import (
 	"github.com/clipperhouse/uax29/internal/testdata"
 )
 
-func TestSegmenterUnicode(t *testing.T) {
+func TestBytesUnicode(t *testing.T) {
 	t.Parallel()
 
 	// From the Unicode test suite; see the gen/ folder.
@@ -19,19 +19,19 @@ func TestSegmenterUnicode(t *testing.T) {
 	for _, test := range unicodeTests {
 		test := test
 
-		var segmented [][]byte
-		segmenter := graphemes.FromBytes(test.input)
-		for segmenter.Next() {
-			segmented = append(segmented, segmenter.Bytes())
+		var all [][]byte
+		tokens := graphemes.FromBytes(test.input)
+		for tokens.Next() {
+			all = append(all, tokens.Bytes())
 		}
 
-		if !reflect.DeepEqual(segmented, test.expected) {
+		if !reflect.DeepEqual(all, test.expected) {
 			failed++
 			t.Errorf(`
 	for input %v
 	expected  %v
 	got       %v
-	spec      %s`, test.input, test.expected, segmented, test.comment)
+	spec      %s`, test.input, test.expected, all, test.comment)
 		} else {
 			passed++
 		}
@@ -42,31 +42,30 @@ func TestSegmenterUnicode(t *testing.T) {
 	}
 }
 
-// TestSegmenterRoundtrip tests that all input bytes are output after segmentation.
-// De facto, it also tests that we don't get infinite loops, or ever return an error.
-func TestSegmenterRoundtrip(t *testing.T) {
+// TestBytesRoundtrip tests that all input bytes are output by the iterator.
+func TestBytesRoundtrip(t *testing.T) {
 	t.Parallel()
 
 	const runs = 2000
 
-	seg := graphemes.FromBytes(nil)
+	tokens := graphemes.FromBytes(nil)
 
 	for i := 0; i < runs; i++ {
 		input := getRandomBytes()
-		seg.SetText(input)
+		tokens.SetText(input)
 
 		var output []byte
-		for seg.Next() {
-			output = append(output, seg.Bytes()...)
+		for tokens.Next() {
+			output = append(output, tokens.Bytes()...)
 		}
 
 		if !bytes.Equal(output, input) {
-			t.Fatal("input bytes are not the same as segmented bytes")
+			t.Fatal("input bytes are not the same as output bytes")
 		}
 	}
 }
 
-func TestSegmenterInvalidUTF8(t *testing.T) {
+func TestBytesInvalidUTF8(t *testing.T) {
 	t.Parallel()
 
 	// For background, see internal/testdata/UTF-8-test.txt, or:
@@ -84,19 +83,19 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 		t.Error("input file should not be valid utf8")
 	}
 
-	seg := graphemes.FromBytes(input)
+	tokens := graphemes.FromBytes(input)
 
 	var output []byte
-	for seg.Next() {
-		output = append(output, seg.Bytes()...)
+	for tokens.Next() {
+		output = append(output, tokens.Bytes()...)
 	}
 
 	if !bytes.Equal(output, input) {
-		t.Fatalf("input bytes are not the same as segmented bytes")
+		t.Fatalf("input bytes are not the same as output bytes")
 	}
 }
 
-func BenchmarkSegmenter(b *testing.B) {
+func BenchmarkBytes(b *testing.B) {
 	file, err := testdata.Sample()
 	if err != nil {
 		b.Error(err)
@@ -104,13 +103,13 @@ func BenchmarkSegmenter(b *testing.B) {
 
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
-	seg := graphemes.FromBytes(file)
+	tokens := graphemes.FromBytes(file)
 
 	for i := 0; i < b.N; i++ {
-		seg.SetText(file)
+		tokens.SetText(file)
 
 		c := 0
-		for seg.Next() {
+		for tokens.Next() {
 			c++
 		}
 
@@ -118,7 +117,7 @@ func BenchmarkSegmenter(b *testing.B) {
 	}
 }
 
-func BenchmarkUnicodeTests(b *testing.B) {
+func BenchmarkBytesUnicodeTests(b *testing.B) {
 	var buf bytes.Buffer
 	for _, test := range unicodeTests {
 		buf.Write(test.input)
@@ -128,13 +127,13 @@ func BenchmarkUnicodeTests(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 
-	seg := graphemes.FromBytes(file)
+	tokens := graphemes.FromBytes(file)
 
 	for i := 0; i < b.N; i++ {
-		seg.SetText(file)
+		tokens.SetText(file)
 
 		c := 0
-		for seg.Next() {
+		for tokens.Next() {
 			c++
 		}
 

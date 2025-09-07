@@ -46,8 +46,7 @@ func TestScannerUnicode(t *testing.T) {
 	t.Logf("passed %d, failed %d", passed, failed)
 }
 
-// TestScannerRoundtrip tests that all input bytes are output after segmentation.
-// De facto, it also tests that we don't get infinite loops, or ever return an error.
+// TestScannerRoundtrip tests that all input bytes are output after iteration.
 func TestScannerRoundtrip(t *testing.T) {
 	t.Parallel()
 
@@ -179,13 +178,13 @@ func BenchmarkScanner(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		r.Reset(file)
-		sc := graphemes.FromReader(r)
+		tokens := graphemes.FromReader(r)
 
 		c := 0
-		for sc.Scan() {
+		for tokens.Scan() {
 			c++
 		}
-		if err := sc.Err(); err != nil {
+		if err := tokens.Err(); err != nil {
 			b.Error(err)
 		}
 
@@ -193,7 +192,7 @@ func BenchmarkScanner(b *testing.B) {
 	}
 }
 
-func BenchmarkUnicodeSegments(b *testing.B) {
+func BenchmarkUnicodeScanner(b *testing.B) {
 	var buf bytes.Buffer
 	for _, test := range unicodeTests {
 		buf.Write(test.input)
@@ -207,13 +206,13 @@ func BenchmarkUnicodeSegments(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		r.Reset(file)
-		sc := graphemes.FromReader(r)
+		tokens := graphemes.FromReader(r)
 
 		c := 0
-		for sc.Scan() {
+		for tokens.Scan() {
 			c++
 		}
-		if err := sc.Err(); err != nil {
+		if err := tokens.Err(); err != nil {
 			b.Error(err)
 		}
 

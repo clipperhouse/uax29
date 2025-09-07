@@ -2,14 +2,14 @@ package words
 
 // Joiners sets runes that should be treated like word characters, where
 // otherwise words will be split. See the [Joiners] type.
-func (seg *BytesIterator) Joiners(j *Joiners) {
-	seg.Split(j.splitFunc)
+func (iter *BytesIterator) Joiners(j *Joiners) {
+	iter.Split(j.splitFunc)
 }
 
 // Joiners sets runes that should be treated like word characters, where
 // otherwise words will be split. See the [Joiners] type.
-func (seg *StringIterator) Joiners(j *Joiners) {
-	seg.Split(j.splitFunc)
+func (iter *StringIterator) Joiners(j *Joiners) {
+	iter.Split(j.splitFunc)
 }
 
 // Joiners allows specification of characters (runes) which will join words (tokens)

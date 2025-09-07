@@ -94,7 +94,7 @@ func (iter *StringIterator) End() int {
 	return iter.pos
 }
 
-// Reset resets the segmenter to the beginning of the string.
+// Reset resets the iterator to the beginning of the string.
 func (iter *StringIterator) Reset() {
 	iter.pos = 0
 	iter.start = 0

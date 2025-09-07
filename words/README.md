@@ -11,9 +11,9 @@ import "github.com/clipperhouse/uax29/words"
 
 text := "Hello, 世界. Nice dog! 👍🐶"
 
-tokens := words.FromString(text)            // A segmenter is an iterator over the words
+tokens := words.FromString(text)
 
-for tokens.Next() {                           // Next() returns true until end of data or error
+for tokens.Next() {                          // Next() returns true until end of data or error
 	fmt.Printf("%q\n", tokens.Text())        // Do something with the current token
 }
 ```

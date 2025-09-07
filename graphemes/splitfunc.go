@@ -9,7 +9,10 @@ func (lookup property) is(properties property) bool {
 
 const _Ignore = _Extend
 
-// SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner.
+// SplitFunc is a bufio.SplitFunc implementation of Unicode grapheme cluster
+// segmentation, for use with bufio.Scanner.
+//
+// See https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries.
 func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if len(data) == 0 {
 		return 0, nil, nil

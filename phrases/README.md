@@ -22,8 +22,6 @@ for tokens.Next() {                         // Next() returns true until end of 
 
 [![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/phrases.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/phrases)
 
-_Note: this package will return all tokens, including punctuation — it's not strictly "phrases" in the common sense. For our purposes, "segment", "phrase", and "token" are used synonymously._
-
 ## APIs
 
 ### If you have a `string`

@@ -47,8 +47,6 @@ func TestScannerUnicode(t *testing.T) {
 	t.Logf("passed %d, failed %d", passed, failed)
 }
 
-// TestScannerRoundtrip tests that all input bytes are output after segmentation.
-// De facto, it also tests that we don't get infinite loops, or ever return an error.
 func TestScannerRoundtrip(t *testing.T) {
 	t.Parallel()
 
@@ -192,7 +190,7 @@ func BenchmarkScanner(b *testing.B) {
 	}
 }
 
-func BenchmarkUnicodeSegments(b *testing.B) {
+func BenchmarkUnicodeScanner(b *testing.B) {
 	var buf bytes.Buffer
 	for _, test := range unicodeTests {
 		buf.Write(test.input)

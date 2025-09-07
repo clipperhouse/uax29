@@ -35,10 +35,10 @@ Use `FromString`:
 ```go
 text := "Hello, 世界. Nice dog! 👍🐶"
 
-segments := sentences.FromString(text)
+tokens := sentences.FromString(text)
 
-for segments.Next() {                         // Next() returns true until end of data
-	fmt.Printf("%q\n", segments.Text())       // Do something with the current sentence
+for tokens.Next() {                         // Next() returns true until end of data
+	fmt.Printf("%q\n", tokens.Text())       // Do something with the current sentence
 }
 ```
 
@@ -54,7 +54,7 @@ for tokens.Scan() {                             // Scan() returns true until err
 	fmt.Println(tokens.Bytes())                 // Do something with the current sentence
 }
 
-if tokens.Err() != nil {                       // Check the error
+if tokens.Err() != nil {                        // Check the error
 	log.Fatal(tokens.Err())
 }
 ```

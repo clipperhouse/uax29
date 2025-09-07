@@ -11,7 +11,7 @@ import "github.com/clipperhouse/uax29/graphemes"
 
 text := "Hello, 世界. Nice dog! 👍🐶"
 
-tokens := graphemes.FromString(text)        // A segmenter is an iterator over the graphemes
+tokens := graphemes.FromString(text)
 
 for tokens.Next() {                         // Next() returns true until end of data
 	fmt.Printf("%q\n", tokens.Text())       // Do something with the current grapheme
@@ -32,15 +32,15 @@ We use the Unicode [test suite](https://unicode.org/reports/tr41/tr41-26.html#Te
 
 ### If you have a `string`
 
-Use `Segmenter` for bounded memory and best performance:
+Use `FromString`:
 
 ```go
 text := "Hello, 世界. Nice dog! 👍🐶"
 
-segments := graphemes.FromString(text)
+tokens := graphemes.FromString(text)
 
-for segments.Next() {                         // Next() returns true until end of data
-	fmt.Printf("%q\n", segments.Text())       // Do something with the current grapheme
+for tokens.Next() {                         // Next() returns true until end of data
+	fmt.Printf("%q\n", tokens.Text())       // Do something with the current grapheme
 }
 ```
 

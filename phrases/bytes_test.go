@@ -11,31 +11,29 @@ import (
 	"github.com/clipperhouse/uax29/phrases"
 )
 
-// TestSegmenterRoundtrip tests that all input bytes are output after segmentation.
-// De facto, it also tests that we don't get infinite loops, or ever return an error.
-func TestSegmenterRoundtrip(t *testing.T) {
+func TestBytesRoundtrip(t *testing.T) {
 	t.Parallel()
 
 	const runs = 2000
 
-	seg := phrases.FromBytes(nil)
+	tokens := phrases.FromBytes(nil)
 
 	for i := 0; i < runs; i++ {
 		input := getRandomBytes()
-		seg.SetText(input)
+		tokens.SetText(input)
 
 		var output []byte
-		for seg.Next() {
-			output = append(output, seg.Bytes()...)
+		for tokens.Next() {
+			output = append(output, tokens.Bytes()...)
 		}
 
 		if !bytes.Equal(output, input) {
-			t.Fatal("input bytes are not the same as segmented bytes")
+			t.Fatal("input bytes are not the same as output bytes")
 		}
 	}
 }
 
-func TestSegmenterInvalidUTF8(t *testing.T) {
+func TestBytesInvalidUTF8(t *testing.T) {
 	t.Parallel()
 
 	// For background, see internal/testdata/UTF-8-test.txt, or:
@@ -53,24 +51,24 @@ func TestSegmenterInvalidUTF8(t *testing.T) {
 		t.Error("input file should not be valid utf8")
 	}
 
-	seg := phrases.FromBytes(input)
+	tokens := phrases.FromBytes(input)
 
 	var output []byte
-	for seg.Next() {
-		output = append(output, seg.Bytes()...)
+	for tokens.Next() {
+		output = append(output, tokens.Bytes()...)
 	}
 
 	if !bytes.Equal(output, input) {
-		t.Fatalf("input bytes are not the same as segmented bytes")
+		t.Fatalf("input bytes are not the same as output bytes")
 	}
 }
 
 var exists = struct{}{}
 
-func segToSetTrimmed(seg *phrases.BytesIterator) map[string]struct{} {
+func bytesToSetTrimmed(tokens *phrases.BytesIterator) map[string]struct{} {
 	founds := make(map[string]struct{})
-	for seg.Next() {
-		key := bytes.TrimSpace(seg.Bytes())
+	for tokens.Next() {
+		key := bytes.TrimSpace(tokens.Bytes())
 		founds[string(key)] = exists
 	}
 	return founds
@@ -80,8 +78,8 @@ func TestPhraseBoundaries(t *testing.T) {
 	t.Parallel()
 
 	input := []byte("This should break here. And then here. 世界. I think, perhaps you can understand that — aside 🏆 🐶 here — “a quote”.")
-	seg := phrases.FromBytes(input)
-	got := segToSetTrimmed(seg)
+	tokens := phrases.FromBytes(input)
+	got := bytesToSetTrimmed(tokens)
 	expecteds := map[string]struct{}{
 		"This should break here":          exists,
 		"And then here":                   exists,
@@ -100,7 +98,7 @@ func TestPhraseBoundaries(t *testing.T) {
 	}
 }
 
-func BenchmarkSegmenter(b *testing.B) {
+func BenchmarkBytes(b *testing.B) {
 	file, err := testdata.Sample()
 
 	if err != nil {
@@ -110,15 +108,14 @@ func BenchmarkSegmenter(b *testing.B) {
 	b.ResetTimer()
 	bytes := len(file)
 	b.SetBytes(int64(bytes))
-	seg := phrases.FromBytes(file)
+	tokens := phrases.FromBytes(file)
 
 	c := 0
 	start := time.Now()
 
 	for i := 0; i < b.N; i++ {
-		seg.SetText(file)
-
-		for seg.Next() {
+		tokens.SetText(file)
+		for tokens.Next() {
 			c++
 		}
 	}

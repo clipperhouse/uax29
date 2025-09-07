@@ -12,8 +12,6 @@ import (
 	"github.com/clipperhouse/uax29/phrases"
 )
 
-// TestScannerRoundtrip tests that all input bytes are output after segmentation.
-// De facto, it also tests that we don't get infinite loops, or ever return an error.
 func TestScannerRoundtrip(t *testing.T) {
 	t.Parallel()
 

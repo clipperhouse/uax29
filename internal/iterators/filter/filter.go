@@ -1,8 +1,3 @@
-// Package filter provides methods for filtering via Scanners and Segmenters. A filter is
-// defined as a func(text []byte) bool -- given a string, what is true about it?
-//
-// A filter can contain arbitrary logic. A common use of a filter is to determine
-// what Unicode categories a string belongs to.
 package filter
 
 import (

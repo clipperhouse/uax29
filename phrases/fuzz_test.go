@@ -25,15 +25,15 @@ func FuzzValidShort(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, original []byte) {
-		var segs [][]byte
+		var all [][]byte
 		valid1 := utf8.Valid(original)
-		seg := phrases.FromBytes(original)
-		for seg.Next() {
-			segs = append(segs, seg.Bytes())
+		tokens := phrases.FromBytes(original)
+		for tokens.Next() {
+			all = append(all, tokens.Bytes())
 		}
 
 		roundtrip := make([]byte, 0, len(original))
-		for _, s := range segs {
+		for _, s := range all {
 			roundtrip = append(roundtrip, s...)
 		}
 
@@ -62,15 +62,15 @@ func FuzzValidLong(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, original []byte) {
-		var segs [][]byte
+		var all [][]byte
 		valid1 := utf8.Valid(original)
-		seg := phrases.FromBytes(original)
-		for seg.Next() {
-			segs = append(segs, seg.Bytes())
+		tokens := phrases.FromBytes(original)
+		for tokens.Next() {
+			all = append(all, tokens.Bytes())
 		}
 
 		roundtrip := make([]byte, 0, len(original))
-		for _, s := range segs {
+		for _, s := range all {
 			roundtrip = append(roundtrip, s...)
 		}
 
@@ -117,15 +117,15 @@ func FuzzInvalid(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, original []byte) {
-		var segs [][]byte
+		var all [][]byte
 		valid1 := utf8.Valid(original)
-		seg := phrases.FromBytes(original)
-		for seg.Next() {
-			segs = append(segs, seg.Bytes())
+		tokens := phrases.FromBytes(original)
+		for tokens.Next() {
+			all = append(all, tokens.Bytes())
 		}
 
 		roundtrip := make([]byte, 0, len(original))
-		for _, s := range segs {
+		for _, s := range all {
 			roundtrip = append(roundtrip, s...)
 		}
 
