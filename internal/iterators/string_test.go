@@ -7,26 +7,16 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/clipperhouse/uax29/graphemes"
 	"github.com/clipperhouse/uax29/internal/iterators"
-	"github.com/clipperhouse/uax29/phrases"
-	"github.com/clipperhouse/uax29/sentences"
 	"github.com/clipperhouse/uax29/words"
 )
-
-var stringSplitFuncs = map[string]bufio.SplitFunc{
-	"words":     words.SplitFunc,
-	"sentences": sentences.SplitFunc,
-	"graphemes": graphemes.SplitFunc,
-	"phrases":   phrases.SplitFunc,
-}
 
 func TestStringSegmenterSameAsSegmenter(t *testing.T) {
 	t.Parallel()
 
 	text := make([]byte, 50000)
 
-	for _, split := range stringSplitFuncs {
+	for _, split := range splitFuncs {
 		for i := 0; i < 100; i++ {
 			_, err := rand.Read(text)
 			if err != nil {
@@ -67,7 +57,7 @@ func TestStringSegmenterSameAsAll(t *testing.T) {
 
 	text := make([]byte, 50000)
 
-	for _, split := range stringSplitFuncs {
+	for _, split := range splitFuncs {
 		for i := 0; i < 100; i++ {
 			_, err := rand.Read(text)
 			if err != nil {
