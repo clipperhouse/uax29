@@ -25,10 +25,6 @@ func TestStringSegmenterUnicode(t *testing.T) {
 			segmented = append(segmented, segmenter.Text())
 		}
 
-		if err := segmenter.Err(); err != nil {
-			t.Fatal(err)
-		}
-
 		expected := make([]string, len(test.expected))
 		for i, v := range test.expected {
 			expected[i] = string(v)
@@ -71,10 +67,6 @@ func TestStringSegmenterRoundtrip(t *testing.T) {
 		var output string
 		for seg.Next() {
 			output += seg.Text()
-		}
-
-		if err := seg.Err(); err != nil {
-			t.Fatal(err)
 		}
 
 		if output != input {
@@ -136,9 +128,6 @@ func TestStringSegmenterInvalidUTF8(t *testing.T) {
 	for sc.Next() {
 		output += sc.Text()
 	}
-	if err := sc.Err(); err != nil {
-		t.Error(err)
-	}
 
 	if output != string(input) {
 		t.Fatalf("input bytes are not the same as segmented bytes")
@@ -163,10 +152,6 @@ func BenchmarkStringSegmenter(b *testing.B) {
 		c := 0
 		for seg.Next() {
 			c++
-		}
-
-		if err := seg.Err(); err != nil {
-			b.Error(err)
 		}
 
 		b.ReportMetric(float64(c), "tokens")
@@ -211,9 +196,6 @@ func BenchmarkStringUnicodeTests(b *testing.B) {
 		c := 0
 		for seg.Next() {
 			c++
-		}
-		if err := seg.Err(); err != nil {
-			b.Error(err)
 		}
 
 		b.ReportMetric(float64(c), "tokens")

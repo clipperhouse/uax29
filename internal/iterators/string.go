@@ -14,7 +14,6 @@ type StringIterator struct {
 	pos   int
 	start int
 	token string
-	err   error
 }
 
 // NewStringIterator creates a new StringIterator for the given string and SplitFunc.
@@ -30,7 +29,6 @@ func (iter *StringIterator) SetText(s string) {
 	iter.pos = 0
 	iter.start = 0
 	iter.token = ""
-	iter.err = nil
 }
 
 // Split sets the SplitFunc for the StringIterator.
@@ -96,15 +94,9 @@ func (iter *StringIterator) End() int {
 	return iter.pos
 }
 
-// Err returns any error that occurred during iteration.
-func (iter *StringIterator) Err() error {
-	return iter.err
-}
-
 // Reset resets the segmenter to the beginning of the string.
 func (iter *StringIterator) Reset() {
 	iter.pos = 0
 	iter.start = 0
 	iter.token = ""
-	iter.err = nil
 }

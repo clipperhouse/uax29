@@ -45,9 +45,6 @@ func TestStringSegmenterSameAsSegmenter(t *testing.T) {
 			if seg.Err() != nil {
 				t.Fatal(seg.Err())
 			}
-			if stringSeg.Err() != nil {
-				t.Fatal(stringSeg.Err())
-			}
 		}
 	}
 }
@@ -79,9 +76,6 @@ func TestStringSegmenterSameAsAll(t *testing.T) {
 				if !bytes.Equal(expected, got) {
 					t.Fatal("All and StringSegmenter should give identical results")
 				}
-			}
-			if seg.Err() != nil {
-				t.Fatal(seg.Err())
 			}
 		}
 	}

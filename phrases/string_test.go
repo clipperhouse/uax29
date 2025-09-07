@@ -30,10 +30,6 @@ func TestStringSegmenterRoundtrip(t *testing.T) {
 			output += seg.Text()
 		}
 
-		if err := seg.Err(); err != nil {
-			t.Fatal(err)
-		}
-
 		if output != input {
 			t.Fatal("input bytes are not the same as segmented bytes")
 		}
@@ -128,10 +124,6 @@ func BenchmarkStringSegmenter(b *testing.B) {
 
 		for seg.Next() {
 			c++
-		}
-
-		if err := seg.Err(); err != nil {
-			b.Error(err)
 		}
 	}
 
