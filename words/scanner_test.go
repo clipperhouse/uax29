@@ -136,21 +136,24 @@ func TestInvalidUTF8(t *testing.T) {
 	}
 }
 
-func TestNeverZeroAtEOF(t *testing.T) {
+func TestNeverZero(t *testing.T) {
 	t.Parallel()
 
 	// SplitFunc should never return advance = 0 when atEOF. This test is redundant
 	// with the roundtrip test above, but nice to call out this invariant.
 
 	const runs = 100
+	atEOFs := []bool{true, false}
 
 	for i := 0; i < runs; i++ {
-		input := getRandomBytes()
+		for _, atEOF := range atEOFs {
+			input := getRandomBytes()
 
-		advance, _, _ := words.SplitFunc(input, true)
+			advance, _, _ := words.SplitFunc(input, atEOF)
 
-		if advance == 0 {
-			t.Error("advance should never be zero when atEOF is true")
+			if advance == 0 {
+				t.Errorf("advance should never be zero (atEOF %t)", atEOF)
+			}
 		}
 	}
 }
