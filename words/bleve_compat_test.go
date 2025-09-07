@@ -15,8 +15,8 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/clipperhouse/uax29/iterators/filter"
-	"github.com/clipperhouse/uax29/words"
+	"github.com/clipperhouse/uax29/v2/internal/iterators/filter"
+	"github.com/clipperhouse/uax29/v2/words"
 )
 
 var letter filter.Func = func(token []byte) bool {
@@ -167,11 +167,11 @@ func TestAdhocSegmentsWithType(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		segmenter := words.NewSegmenter(test.input)
+		tokens := words.FromBytes(test.input)
 
 		i := 0
-		for segmenter.Next() {
-			got := segmenter.Bytes()
+		for tokens.Next() {
+			got := tokens.Bytes()
 			expected := test.output[i]
 			if !bytes.Equal(expected, got) {
 				t.Fatalf("expected %q, got %q", expected, got)
@@ -180,9 +180,6 @@ func TestAdhocSegmentsWithType(t *testing.T) {
 		}
 		if i != len(test.output) {
 			t.Fatalf("missed a token in %q", test.input)
-		}
-		if err := segmenter.Err(); err != nil {
-			t.Fatal(err)
 		}
 
 		for i, f := range test.outputTypes {
@@ -199,11 +196,11 @@ func TestAdhocSegmentsWithType(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		scanner := words.NewScanner(bytes.NewReader(test.input))
+		tokens := words.FromReader(bytes.NewReader(test.input))
 
 		i := 0
-		for scanner.Scan() {
-			got := scanner.Bytes()
+		for tokens.Scan() {
+			got := tokens.Bytes()
 			expected := test.output[i]
 			if !bytes.Equal(expected, got) {
 				t.Fatalf("expected %q, got %q", expected, got)
@@ -213,7 +210,7 @@ func TestAdhocSegmentsWithType(t *testing.T) {
 		if i != len(test.output) {
 			t.Fatalf("missed a token in %q", test.input)
 		}
-		if err := scanner.Err(); err != nil {
+		if err := tokens.Err(); err != nil {
 			t.Fatal(err)
 		}
 

@@ -29,22 +29,18 @@ We use the official [Unicode test suites](https://unicode.org/reports/tr41/tr41-
 ## Quick start
 
 ```
-go get "github.com/clipperhouse/uax29/words"
+go get "github.com/clipperhouse/uax29/v2/words"
 ```
 
 ```go
-import "github.com/clipperhouse/uax29/words"
+import "github.com/clipperhouse/uax29/v2/words"
 
-text := []byte("Hello, 世界. Nice dog! 👍🐶")
+text := "Hello, 世界. Nice dog! 👍🐶"
 
-segments := words.NewSegmenter(text)            // A segmenter is an iterator over the words
+tokens := words.FromString(text)
 
-for segments.Next() {                           // Next() returns true until end of data or error
-	fmt.Printf("%q\n", segments.Bytes())        // Do something with the current token
-}
-
-if segments.Err() != nil {                      // Check the error
-	log.Fatal(segments.Err())
+for tokens.Next() {                          // Next() returns true until end of data
+	fmt.Printf("%q\n", tokens.Text())        // Do something with the current token
 }
 ```
 

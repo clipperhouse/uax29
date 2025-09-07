@@ -19,4 +19,4 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v4
     - name: ${{ matrix.package }}.${{ matrix.fuzzer }}
-      run: go test -fuzz=${{ matrix.fuzzer }} -fuzztime=60s github.com/clipperhouse/uax29/${{ matrix.package }}
+      run: go test -fuzz=${{ matrix.fuzzer }} -fuzztime=60s github.com/clipperhouse/uax29/v2/${{ matrix.package }}

@@ -5,7 +5,7 @@ import (
 	"unicode/utf8"
 )
 
-var trie = newWordsTrie(0)
+var trie = &wordsTrie{}
 
 // is determines if lookup intersects propert(ies)
 func (lookup property) is(properties property) bool {
@@ -19,9 +19,10 @@ const (
 )
 
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner.
+//
+// See https://unicode.org/reports/tr29/#Word_Boundaries.
 var SplitFunc bufio.SplitFunc = none.splitFunc
 
-// splitFunc is a bufio.splitFunc implementation of word segmentation, for use with bufio.Scanner.
 func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if len(data) == 0 {
 		return 0, nil, nil

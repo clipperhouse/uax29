@@ -1,6 +1,3 @@
-//go:build go1.18
-// +build go1.18
-
 package graphemes_test
 
 import (
@@ -10,19 +7,23 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/graphemes"
+	"github.com/clipperhouse/uax29/v2/graphemes"
+	"github.com/clipperhouse/uax29/v2/internal/testdata"
 )
 
 // FuzzValidShort fuzzes small, valid UTF8 strings. I suspect more, shorter
 // strings in the corpus lead to more mutation and coverage. True?
 func FuzzValidShort(f *testing.F) {
+	if testing.Short() {
+		f.Skip("skipping fuzz test in short mode")
+	}
 	// unicode test suite
 	for _, test := range unicodeTests {
 		f.Add(test.input)
 	}
 
 	// multi-lingual text, as small-ish lines
-	file, err := os.ReadFile("../testdata/sample.txt")
+	file, err := testdata.Sample()
 	if err != nil {
 		f.Error(err)
 	}
@@ -32,18 +33,15 @@ func FuzzValidShort(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, original []byte) {
-		var segs [][]byte
+		var all [][]byte
 		valid1 := utf8.Valid(original)
-		seg := graphemes.NewSegmenter(original)
-		for seg.Next() {
-			segs = append(segs, seg.Bytes())
-		}
-		if seg.Err() != nil {
-			t.Error(seg.Err())
+		tokens := graphemes.FromBytes(original)
+		for tokens.Next() {
+			all = append(all, tokens.Bytes())
 		}
 
 		roundtrip := make([]byte, 0, len(original))
-		for _, s := range segs {
+		for _, s := range all {
 			roundtrip = append(roundtrip, s...)
 		}
 
@@ -61,8 +59,11 @@ func FuzzValidShort(f *testing.F) {
 
 // FuzzValidLong fuzzes longer, valid UTF8 strings.
 func FuzzValidLong(f *testing.F) {
+	if testing.Short() {
+		f.Skip("skipping fuzz test in short mode")
+	}
 	// add multi-lingual text, as decent (paragraph-sized) size chunks
-	file, err := os.ReadFile("../testdata/sample.txt")
+	file, err := testdata.Sample()
 	if err != nil {
 		f.Error(err)
 	}
@@ -72,18 +73,15 @@ func FuzzValidLong(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, original []byte) {
-		var segs [][]byte
+		var all [][]byte
 		valid1 := utf8.Valid(original)
-		seg := graphemes.NewSegmenter(original)
-		for seg.Next() {
-			segs = append(segs, seg.Bytes())
-		}
-		if seg.Err() != nil {
-			t.Error(seg.Err())
+		tokens := graphemes.FromBytes(original)
+		for tokens.Next() {
+			all = append(all, tokens.Bytes())
 		}
 
 		roundtrip := make([]byte, 0, len(original))
-		for _, s := range segs {
+		for _, s := range all {
 			roundtrip = append(roundtrip, s...)
 		}
 
@@ -101,6 +99,9 @@ func FuzzValidLong(f *testing.F) {
 
 // FuzzInvalid fuzzes invalid UTF8 strings.
 func FuzzInvalid(f *testing.F) {
+	if testing.Short() {
+		f.Skip("skipping fuzz test in short mode")
+	}
 	random := getRandomBytes()
 
 	const max = 100
@@ -120,7 +121,7 @@ func FuzzInvalid(f *testing.F) {
 	}
 
 	// known invalid utf-8
-	badUTF8, err := os.ReadFile("../testdata/UTF-8-test.txt")
+	badUTF8, err := os.ReadFile("../internal/testdata/UTF-8-test.txt")
 	if err != nil {
 		f.Error(err)
 	}
@@ -130,18 +131,15 @@ func FuzzInvalid(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, original []byte) {
-		var segs [][]byte
+		var all [][]byte
 		valid1 := utf8.Valid(original)
-		seg := graphemes.NewSegmenter(original)
-		for seg.Next() {
-			segs = append(segs, seg.Bytes())
-		}
-		if seg.Err() != nil {
-			t.Error(seg.Err())
+		tokens := graphemes.FromBytes(original)
+		for tokens.Next() {
+			all = append(all, tokens.Bytes())
 		}
 
 		roundtrip := make([]byte, 0, len(original))
-		for _, s := range segs {
+		for _, s := range all {
 			roundtrip = append(roundtrip, s...)
 		}
 
