@@ -1,6 +1,6 @@
 package graphemes
 
-import "github.com/clipperhouse/uax29/internal/iterators"
+import "github.com/clipperhouse/uax29/v2/internal/iterators"
 
 // StringIterator is an iterator for grapheme clusters. Iterate while Next() is
 // true, and access the grapheme via Text().

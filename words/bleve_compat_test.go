@@ -15,8 +15,8 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/clipperhouse/uax29/internal/iterators/filter"
-	"github.com/clipperhouse/uax29/words"
+	"github.com/clipperhouse/uax29/v2/internal/iterators/filter"
+	"github.com/clipperhouse/uax29/v2/words"
 )
 
 var letter filter.Func = func(token []byte) bool {

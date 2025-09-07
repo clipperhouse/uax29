@@ -1,7 +1,7 @@
 package words
 
 import (
-	"github.com/clipperhouse/uax29/internal/iterators"
+	"github.com/clipperhouse/uax29/v2/internal/iterators"
 )
 
 // BytesIterator is an iterator for words. Iterate while Next() is true,

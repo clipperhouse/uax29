@@ -1,6 +1,6 @@
 package words
 
-import "github.com/clipperhouse/uax29/internal/iterators"
+import "github.com/clipperhouse/uax29/v2/internal/iterators"
 
 // StringIterator is an iterator for words. Iterate while Next() is
 // true, and access the word via Text().

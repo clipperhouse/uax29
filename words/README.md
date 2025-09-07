@@ -3,11 +3,11 @@ An implementation of word boundaries from [Unicode text segmentation](https://un
 ## Quick start
 
 ```
-go get "github.com/clipperhouse/uax29/words"
+go get "github.com/clipperhouse/uax29/v2/words"
 ```
 
 ```go
-import "github.com/clipperhouse/uax29/words"
+import "github.com/clipperhouse/uax29/v2/words"
 
 text := "Hello, 世界. Nice dog! 👍🐶"
 
@@ -18,7 +18,7 @@ for tokens.Next() {                          // Next() returns true until end of
 }
 ```
 
-[![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/words.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/words)
+[![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/v2/words.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/v2/words)
 
 _Note: this package returns all tokens, including whitespace and punctuation — it's not strictly “words” in the common sense._
 

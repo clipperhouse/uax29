@@ -5,11 +5,11 @@ An implementation of "phrase boundaries", a variation on words boundaries from [
 ## Quick start
 
 ```
-go get "github.com/clipperhouse/uax29/phrases"
+go get "github.com/clipperhouse/uax29/v2/phrases"
 ```
 
 ```go
-import "github.com/clipperhouse/uax29/phrases"
+import "github.com/clipperhouse/uax29/v2/phrases"
 
 text := "Hello, 世界. Nice — and totally adorable — dog; perhaps the "best one"! 🏆 🐶"
 
@@ -20,7 +20,7 @@ for tokens.Next() {                         // Next() returns true until end of 
 }
 ```
 
-[![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/phrases.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/phrases)
+[![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/v2/phrases.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/v2/phrases)
 
 ## APIs
 

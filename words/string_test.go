@@ -7,8 +7,8 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/internal/testdata"
-	"github.com/clipperhouse/uax29/words"
+	"github.com/clipperhouse/uax29/v2/internal/testdata"
+	"github.com/clipperhouse/uax29/v2/words"
 )
 
 func TestStringUnicode(t *testing.T) {

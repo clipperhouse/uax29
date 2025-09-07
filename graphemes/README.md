@@ -3,11 +3,11 @@ An implementation of grapheme cluster boundaries from [Unicode text segmentation
 ## Quick start
 
 ```
-go get "github.com/clipperhouse/uax29/graphemes"
+go get "github.com/clipperhouse/uax29/v2/graphemes"
 ```
 
 ```go
-import "github.com/clipperhouse/uax29/graphemes"
+import "github.com/clipperhouse/uax29/v2/graphemes"
 
 text := "Hello, 世界. Nice dog! 👍🐶"
 
@@ -18,7 +18,7 @@ for tokens.Next() {                         // Next() returns true until end of 
 }
 ```
 
-[![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/graphemes.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/graphemes)
+[![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/v2/graphemes.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/v2/graphemes)
 
 _A grapheme is a “single visible character”, which might be a simple as a single letter, or a complex emoji that consists of several Unicode code points._
 

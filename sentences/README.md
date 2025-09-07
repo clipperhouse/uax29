@@ -3,11 +3,11 @@ An implementation of sentence boundaries from [Unicode text segmentation](https:
 ## Quick start
 
 ```
-go get "github.com/clipperhouse/uax29/sentences"
+go get "github.com/clipperhouse/uax29/v2/sentences"
 ```
 
 ```go
-import "github.com/clipperhouse/uax29/sentences"
+import "github.com/clipperhouse/uax29/v2/sentences"
 
 text := "Hello, 世界. Nice dog! 👍🐶"
 
@@ -18,7 +18,7 @@ for tokens.Next() {                         // Next() returns true until end of 
 }
 ```
 
-[![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/sentences.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/sentences)
+[![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/v2/sentences.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/v2/sentences)
 
 ## Conformance
 

@@ -1,6 +1,6 @@
 package words_test
 
-import "github.com/clipperhouse/uax29/words"
+import "github.com/clipperhouse/uax29/v2/words"
 
 var joinersInput = []byte("Hello, 世界. Tell me about your super-cool .com. I'm .01% interested and 3/4 of a mile away. Email me at foo@example.biz. #winning")
 var joiners = &words.Joiners{

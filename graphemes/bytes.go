@@ -1,7 +1,7 @@
 package graphemes
 
 import (
-	"github.com/clipperhouse/uax29/internal/iterators"
+	"github.com/clipperhouse/uax29/v2/internal/iterators"
 )
 
 // BytesIterator is an iterator for grapheme clusters. Iterate while Next() is

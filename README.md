@@ -1,12 +1,12 @@
 This package tokenizes (splits) words, sentences and graphemes, based on [Unicode text segmentation](https://unicode.org/reports/tr29/) (UAX #29), for Unicode version 15.0.0. Details and usage are in the respective packages:
 
-[uax29/words](https://github.com/clipperhouse/uax29/tree/master/words)
+[uax29/words](https://github.com/clipperhouse/uax29/tree/v2/words)
 
-[uax29/sentences](https://github.com/clipperhouse/uax29/tree/master/sentences)
+[uax29/sentences](https://github.com/clipperhouse/uax29/tree/v2/sentences)
 
-[uax29/graphemes](https://github.com/clipperhouse/uax29/tree/master/graphemes)
+[uax29/graphemes](https://github.com/clipperhouse/uax29/tree/v2/graphemes)
 
-[uax29/phrases](https://github.com/clipperhouse/uax29/tree/master/phrases)
+[uax29/phrases](https://github.com/clipperhouse/uax29/tree/v2/phrases)
 
 ### Why tokenize?
 
@@ -29,11 +29,11 @@ We use the official [Unicode test suites](https://unicode.org/reports/tr41/tr41-
 ## Quick start
 
 ```
-go get "github.com/clipperhouse/uax29/words"
+go get "github.com/clipperhouse/uax29/v2/words"
 ```
 
 ```go
-import "github.com/clipperhouse/uax29/words"
+import "github.com/clipperhouse/uax29/v2/words"
 
 text := "Hello, 世界. Nice dog! 👍🐶"
 

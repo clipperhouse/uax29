@@ -7,8 +7,8 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/internal/testdata"
-	"github.com/clipperhouse/uax29/phrases"
+	"github.com/clipperhouse/uax29/v2/internal/testdata"
+	"github.com/clipperhouse/uax29/v2/phrases"
 )
 
 // FuzzValidShort fuzzes small, valid UTF8 strings. I suspect more, shorter

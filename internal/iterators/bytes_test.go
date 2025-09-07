@@ -5,11 +5,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/clipperhouse/uax29/graphemes"
-	"github.com/clipperhouse/uax29/internal/iterators"
-	"github.com/clipperhouse/uax29/phrases"
-	"github.com/clipperhouse/uax29/sentences"
-	"github.com/clipperhouse/uax29/words"
+	"github.com/clipperhouse/uax29/v2/graphemes"
+	"github.com/clipperhouse/uax29/v2/internal/iterators"
+	"github.com/clipperhouse/uax29/v2/phrases"
+	"github.com/clipperhouse/uax29/v2/sentences"
+	"github.com/clipperhouse/uax29/v2/words"
 )
 
 var splitFuncs = map[string]bufio.SplitFunc{

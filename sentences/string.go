@@ -1,6 +1,6 @@
 package sentences
 
-import "github.com/clipperhouse/uax29/internal/iterators"
+import "github.com/clipperhouse/uax29/v2/internal/iterators"
 
 // StringIterator is an iterator for sentences. Iterate while Next() is
 // true, and access the sentence via Text().

@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/clipperhouse/uax29/internal/iterators"
-	"github.com/clipperhouse/uax29/words"
+	"github.com/clipperhouse/uax29/v2/internal/iterators"
+	"github.com/clipperhouse/uax29/v2/words"
 )
 
 func TestStringSameAsBytes(t *testing.T) {
