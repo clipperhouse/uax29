@@ -133,25 +133,3 @@ func BenchmarkSegmenter(b *testing.B) {
 	b.ReportMetric(tokensPerOp, "tokens/op")
 	b.ReportMetric(float64(bytes)/tokensPerOp, "B/token")
 }
-
-func BenchmarkSegmentAll(b *testing.B) {
-	file, err := testdata.Sample()
-
-	if err != nil {
-		b.Error(err)
-	}
-
-	b.ResetTimer()
-	b.SetBytes(int64(len(file)))
-
-	for i := 0; i < b.N; i++ {
-		segs := phrases.SegmentAll(file)
-
-		c := 0
-		for range segs {
-			c++
-		}
-
-		b.ReportMetric(float64(c), "tokens")
-	}
-}

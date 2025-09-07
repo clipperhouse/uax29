@@ -37,12 +37,6 @@ func TestSegmenterUnicode(t *testing.T) {
 		} else {
 			passed++
 		}
-
-		// Test SegmentAll while we're here
-		all := words.SegmentAll(test.input)
-		if !reflect.DeepEqual(all, segmented) {
-			t.Error("calling SegmentAll should be identical to iterating Segmenter")
-		}
 	}
 
 	if len(unicodeTests) != passed+failed {
@@ -219,27 +213,6 @@ func BenchmarkSegmenterJoiners(b *testing.B) {
 	seg := words.FromBytes(nil)
 	seg.Joiners(joiners)
 	benchSeg(b, seg)
-}
-
-func BenchmarkSegmentAll(b *testing.B) {
-	file, err := testdata.Sample()
-	if err != nil {
-		b.Error(err)
-	}
-
-	b.ResetTimer()
-	b.SetBytes(int64(len(file)))
-
-	for i := 0; i < b.N; i++ {
-		segs := words.SegmentAll(file)
-
-		c := 0
-		for range segs {
-			c++
-		}
-
-		b.ReportMetric(float64(c), "tokens")
-	}
 }
 
 func BenchmarkUnicodeTests(b *testing.B) {

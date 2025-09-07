@@ -17,21 +17,3 @@ func FromString(s string) *StringIterator {
 	iter.SetText(s)
 	return iter
 }
-
-// SegmentAllString will iterate through all phrases and collect them into a
-// []string. This is a convenience method -- if you will be allocating such a
-// slice anyway, this will save you some code.
-//
-// The downside is that this allocation is unbounded -- O(n) on the number of
-// phrases. Use StringSegmenter for more bounded memory usage.
-func SegmentAllString(data string) []string {
-	// Optimization: guesstimate that the average phrase is 20 bytes,
-	// allocate a large enough array to avoid resizing
-	result := make([]string, 0, len(data)/20)
-	seg := FromString(data)
-	for seg.Next() {
-		result = append(result, seg.Text())
-	}
-
-	return result
-}

@@ -2,8 +2,6 @@ package iterators_test
 
 import (
 	"bufio"
-	"bytes"
-	"crypto/rand"
 	"reflect"
 	"testing"
 
@@ -19,36 +17,6 @@ var splitFuncs = map[string]bufio.SplitFunc{
 	"sentences": sentences.SplitFunc,
 	"graphemes": graphemes.SplitFunc,
 	"phrases":   phrases.SplitFunc,
-}
-
-func TestSegmenterSameAsAll(t *testing.T) {
-	t.Parallel()
-
-	text := make([]byte, 50000)
-
-	for _, split := range splitFuncs {
-		for i := 0; i < 100; i++ {
-			_, err := rand.Read(text)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			var all [][]byte
-			err = iterators.All(text, &all, split)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			seg := iterators.NewBytesIterator(split)
-			seg.SetText(text)
-
-			for i := 0; seg.Next(); i++ {
-				if !bytes.Equal(seg.Bytes(), all[i]) {
-					t.Fatal("All and Segmenter should give identical results")
-				}
-			}
-		}
-	}
 }
 
 func TestSegmenterStart(t *testing.T) {

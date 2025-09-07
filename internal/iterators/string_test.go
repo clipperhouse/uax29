@@ -46,38 +46,6 @@ func TestStringSegmenterSameAsSegmenter(t *testing.T) {
 	}
 }
 
-func TestStringSegmenterSameAsAll(t *testing.T) {
-	t.Parallel()
-
-	text := make([]byte, 50000)
-
-	for _, split := range splitFuncs {
-		for i := 0; i < 100; i++ {
-			_, err := rand.Read(text)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			var all [][]byte
-			err = iterators.All(text, &all, split)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			seg := iterators.NewStringIterator(split)
-			seg.SetText(string(text))
-
-			for i := 0; seg.Next(); i++ {
-				expected := all[i]
-				got := []byte(seg.Text())
-				if !bytes.Equal(expected, got) {
-					t.Fatal("All and StringSegmenter should give identical results")
-				}
-			}
-		}
-	}
-}
-
 func TestStringSegmenterStart(t *testing.T) {
 	t.Parallel()
 

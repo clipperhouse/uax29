@@ -111,29 +111,3 @@ func (iter *BytesIterator) Start() int {
 func (iter *BytesIterator) End() int {
 	return iter.pos
 }
-
-// All iterates through all tokens and collect them into a [][]byte. It is a
-// convenience method. The downside is that it allocates, and can do so unbounded:
-// O(n) on the number of tokens (24 bytes per token). Prefer BytesIterator for constant
-// memory usage.
-func All(src []byte, dest *[][]byte, split bufio.SplitFunc) error {
-	for pos := 0; pos < len(src); {
-		advance, token, err := split(src[pos:], true)
-		if err != nil {
-			return err
-		}
-
-		if advance == 0 {
-			break
-		}
-		pos += advance
-
-		if len(token) == 0 {
-			break
-		}
-
-		*dest = append(*dest, token)
-	}
-
-	return nil
-}
