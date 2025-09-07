@@ -89,7 +89,7 @@ func (iter *StringIterator) Start() int {
 
 // End returns the byte position after the current token in the original string.
 func (iter *StringIterator) End() int {
-	return iter.start + len(iter.token)
+	return iter.pos
 }
 
 // Err returns any error that occurred during iteration.

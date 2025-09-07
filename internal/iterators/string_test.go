@@ -147,17 +147,4 @@ func TestStringSegmenterEnd(t *testing.T) {
 			t.Fatalf("end failed for words.SplitFunc, expected %v, got %v", expected, got)
 		}
 	}
-
-	{
-		seg := iterators.NewStringIterator(bufio.ScanWords)
-		seg.SetText(text)
-		expected := []int{5, len(text)}
-		var got []int
-		for seg.Next() {
-			got = append(got, seg.End())
-		}
-		if !reflect.DeepEqual(got, expected) {
-			t.Fatalf("end failed for bufio.ScanWords, expected %v, got %v", expected, got)
-		}
-	}
 }

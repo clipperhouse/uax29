@@ -60,12 +60,10 @@ func (iter *BytesIterator) Next() bool {
 
 	// Guardrails
 	if advance < 0 {
-		iter.err = ErrAdvanceNegative
-		return false
+		panic(ErrAdvanceNegative)
 	}
 	if iter.pos > len(iter.data) {
-		iter.err = ErrAdvanceTooFar
-		return false
+		panic(ErrAdvanceTooFar)
 	}
 
 	// Interpret as EOF
@@ -128,7 +126,7 @@ func (iter *BytesIterator) Start() int {
 //
 // In other words, segmenter.Bytes() == original[segmenter.Start():segmenter.End()]
 func (iter *BytesIterator) End() int {
-	return iter.start + len(iter.token)
+	return iter.pos
 }
 
 // All iterates through all tokens and collect them into a [][]byte. It is a
