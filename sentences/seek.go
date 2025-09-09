@@ -6,6 +6,21 @@ import (
 	"github.com/clipperhouse/uax29/v2/internal/iterators"
 )
 
+func decodeLastRune[T iterators.Stringish](data T) (rune, int) {
+	// This casting is a bit gross but it works
+	// and is surprisingly fast
+	switch any(data).(type) {
+	case []byte:
+		b := any(data).([]byte)
+		return utf8.DecodeLastRune(b)
+	case string:
+		s := any(data).(string)
+		return utf8.DecodeLastRuneInString(s)
+	default:
+		panic("unsupported type")
+	}
+}
+
 // previousIndex works backward until it hits a rune in properties,
 // ignoring runes in the _Ignore property (per SB5), and returns
 // the index of the rune in data. It returns -1 if such a rune is not found.
@@ -15,17 +30,7 @@ func previousIndex[T iterators.Stringish](properties property, data T) int {
 
 	i := len(data)
 	for i > 0 {
-		var w int
-		// TODO: make this less gross
-		switch any(data).(type) {
-		case []byte:
-			bytes := any(data).([]byte)
-			_, w = utf8.DecodeLastRune(bytes[:i])
-		case string:
-			str := any(data).(string)
-			_, w = utf8.DecodeLastRuneInString(str[:i])
-		}
-
+		_, w := decodeLastRune(data[:i])
 		i -= w
 
 		lookup, _ := trie.lookup(data[i:])

@@ -59,15 +59,7 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 	}
 
 	if j != nil && j.Leading != nil {
-		var r rune
-		switch any(data).(type) {
-		case []byte:
-			bytes := any(data).([]byte)
-			r, _ = utf8.DecodeRune(bytes[pos:])
-		case string:
-			str := any(data).(string)
-			r, _ = utf8.DecodeRuneInString(str[pos:])
-		}
+		r, _ := decodeRune(data[pos:])
 		if runesContain(j.Leading, r) {
 			// treat leading joiners as if they are letter,
 			// then depend on the existing logic below
@@ -111,15 +103,7 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 		}
 
 		if j != nil && j.Middle != nil {
-			var r rune
-			switch any(data).(type) {
-			case []byte:
-				bytes := any(data).([]byte)
-				r, _ = utf8.DecodeRune(bytes[pos:])
-			case string:
-				str := any(data).(string)
-				r, _ = utf8.DecodeRuneInString(str[pos:])
-			}
+			r, _ := decodeRune(data[pos:])
 			if runesContain(j.Middle, r) {
 				// treat middle joiners as if they are middle letters/numbers,
 				// then depend on the existing logic below
@@ -277,4 +261,19 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 	}
 
 	return pos, data[:pos], nil
+}
+
+func decodeRune[T iterators.Stringish](data T) (rune, int) {
+	// This casting is a bit gross but it works
+	// and is surprisingly fast
+	switch any(data).(type) {
+	case []byte:
+		b := any(data).([]byte)
+		return utf8.DecodeRune(b)
+	case string:
+		s := any(data).(string)
+		return utf8.DecodeRuneInString(s)
+	default:
+		panic("unsupported type")
+	}
 }
