@@ -1,6 +1,10 @@
 package phrases
 
-var trie = &phrasesTrie{}
+import (
+	"bufio"
+
+	"github.com/clipperhouse/uax29/v2/internal/iterators"
+)
 
 // is determines if lookup intersects propert(ies)
 func (lookup property) is(properties property) bool {
@@ -14,10 +18,18 @@ const (
 )
 
 // SplitFunc is a bufio.SplitFunc implementation of phrase segmentation, for use with bufio.Scanner.
-func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
+var SplitFunc bufio.SplitFunc = func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	return splitFunc(data, atEOF)
+}
+
+// splitFunc is a bufio.SplitFunc implementation of phrase segmentation, for use with bufio.Scanner.
+func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T, err error) {
+	var empty T
 	if len(data) == 0 {
-		return 0, nil, nil
+		return 0, empty, nil
 	}
+
+	trie := &phrasesTrie[T]{}
 
 	// These vars are stateful across loop iterations
 	var pos int
@@ -32,7 +44,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if w == 0 {
 		if !atEOF {
 			// Rune extends past current data, request more
-			return 0, nil, nil
+			return 0, empty, nil
 		}
 		pos = len(data)
 		return pos, data[:pos], nil
@@ -48,7 +60,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		if eot {
 			if !atEOF {
 				// Token extends past current data, request more
-				return 0, nil, nil
+				return 0, empty, nil
 			}
 
 			// https://unicode.org/reports/tr29/#WB2
@@ -70,7 +82,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 				break
 			}
 			// Rune extends past current data, request more
-			return 0, nil, nil
+			return 0, empty, nil
 		}
 
 		// Optimization: no rule can possibly apply
@@ -124,7 +136,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 			if more {
 				// Token extends past current data, request more
-				return 0, nil, nil
+				return 0, empty, nil
 			}
 
 			if found {
@@ -151,7 +163,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 			if more {
 				// Token extends past current data, request more
-				return 0, nil, nil
+				return 0, empty, nil
 			}
 
 			if found {
@@ -187,7 +199,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 			if more {
 				// Token extends past current data, request more
-				return 0, nil, nil
+				return 0, empty, nil
 			}
 
 			if found {
