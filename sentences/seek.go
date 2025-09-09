@@ -1,15 +1,30 @@
 package sentences
 
-import "unicode/utf8"
+import (
+	"unicode/utf8"
+
+	"github.com/clipperhouse/uax29/v2/internal/iterators"
+)
 
 // previousIndex works backward until it hits a rune in properties,
 // ignoring runes in the _Ignore property (per SB5), and returns
 // the index of the rune in data. It returns -1 if such a rune is not found.
-func previousIndex(properties property, data []byte) int {
+func previousIndex[T iterators.Stringish](properties property, data T) int {
 	// Start at the end of the buffer and move backwards
+	trie := &sentencesTrie[T]{}
+
 	i := len(data)
 	for i > 0 {
-		_, w := utf8.DecodeLastRune(data[:i])
+		var w int
+		// TODO: make this less gross
+		switch any(data).(type) {
+		case []byte:
+			bytes := any(data).([]byte)
+			_, w = utf8.DecodeLastRune(bytes[:i])
+		case string:
+			str := any(data).(string)
+			_, w = utf8.DecodeLastRuneInString(str[:i])
+		}
 
 		i -= w
 
@@ -32,13 +47,15 @@ func previousIndex(properties property, data []byte) int {
 
 // previous works backward in the buffer until it hits a rune in properties,
 // ignoring runes with the _Ignore property per SB5
-func previous(properties property, data []byte) bool {
+func previous[T iterators.Stringish](properties property, data T) bool {
 	return previousIndex(properties, data) != -1
 }
 
 // subsequent looks ahead in the buffer until it hits a rune in properties,
 // ignoring runes in the _Ignore property per SB5
-func subsequent(properties property, data []byte, atEOF bool) (found bool, pos int, requestMore bool) {
+func subsequent[T iterators.Stringish](properties property, data T, atEOF bool) (found bool, pos int, requestMore bool) {
+	trie := &sentencesTrie[T]{}
+
 	i := 0
 	for i < len(data) {
 		lookup, w := trie.lookup(data[i:])
