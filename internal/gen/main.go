@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -330,7 +331,8 @@ var unicodeTests = [%d]unicodeTest {
 		return err
 	}
 
-	dst, err := os.Create(p.PackageName() + "/unicode_test.go")
+	f := filepath.Join("../../", p.PackageName(), "unicode_test.go")
+	dst, err := os.Create(f)
 	if err != nil {
 		return err
 	}
@@ -394,7 +396,9 @@ func writeTrie(prop prop, trie *triegen.Trie, iotasByProperty map[string]uint64)
 		return err
 	}
 
-	dst, err := os.Create(prop.PackageName() + "/trie.go")
+	f := filepath.Join("../../", prop.PackageName(), "trie.go")
+
+	dst, err := os.Create(f)
 	if err != nil {
 		return err
 	}
