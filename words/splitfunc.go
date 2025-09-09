@@ -3,6 +3,8 @@ package words
 import (
 	"bufio"
 	"unicode/utf8"
+
+	"github.com/clipperhouse/uax29/v2/internal/iterators"
 )
 
 // is determines if lookup intersects propert(ies)
@@ -20,11 +22,12 @@ const (
 //
 // See https://unicode.org/reports/tr29/#Word_Boundaries.
 var SplitFunc bufio.SplitFunc = func(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	return none.splitFunc(data, atEOF)
+	return splitFunc(data, atEOF)
 }
 
-type stringish interface {
-	~[]byte | ~string
+func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T, err error) {
+	var none Joiners[T]
+	return none.splitFunc(data, atEOF)
 }
 
 func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err error) {

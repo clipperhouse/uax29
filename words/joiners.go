@@ -1,5 +1,7 @@
 package words
 
+import "github.com/clipperhouse/uax29/v2/internal/iterators"
+
 // Joiners sets runes that should be treated like word characters, where
 // otherwise words will be split. See the [Joiners] type.
 func (iter *Iterator[T]) Joiners(j *Joiners[T]) {
@@ -9,7 +11,7 @@ func (iter *Iterator[T]) Joiners(j *Joiners[T]) {
 // Joiners allows specification of characters (runes) which will join words (tokens)
 // rather than breaking them. For example, "@" breaks words by default,
 // but you might wish to join words into email addresses.
-type Joiners[T stringish] struct {
+type Joiners[T iterators.Stringish] struct {
 	// Middle specifies which characters (runes) should
 	// join words (tokens) where they would otherwise be split,
 	// in the middle of a word.
@@ -29,8 +31,6 @@ type Joiners[T stringish] struct {
 	// Specifying "." will preserve leading decimals like .01.
 	Leading []rune
 }
-
-var none *Joiners[[]byte] = nil
 
 func runesContain(runes []rune, rune rune) bool {
 	// Did some bechmarking, a map isn't faster for small numbers

@@ -1,24 +1,25 @@
-package words
+package iterators
 
-// Generic iterator implementation
+type Stringish interface {
+	~[]byte | ~string
+}
+
+type SplitFunc[T Stringish] func(T, bool) (int, T, error)
 
 // Iterator is a generic iterator for words that are either []byte or string.
 // Iterate while Next() is true, and access the word via Value().
-type Iterator[T stringish] struct {
-	split func(T, bool) (int, T, error)
+type Iterator[T Stringish] struct {
+	split SplitFunc[T]
 	data  T
-	pos   int
 	start int
+	pos   int
 	token T
 }
 
-// NewIterator creates a new Iterator for the given data and SplitFunc.
-func NewIterator[T stringish](data T) *Iterator[T] {
-	// Create a joiners instance for this type
-	joiners := &Joiners[T]{}
-
+// New creates a new Iterator for the given data and SplitFunc.
+func New[T Stringish](split SplitFunc[T], data T) *Iterator[T] {
 	iter := &Iterator[T]{
-		split: joiners.splitFunc,
+		split: split,
 		data:  data,
 	}
 	return iter
@@ -27,14 +28,14 @@ func NewIterator[T stringish](data T) *Iterator[T] {
 // SetText sets the text for the iterator to operate on, and resets all state.
 func (iter *Iterator[T]) SetText(data T) {
 	iter.data = data
-	iter.pos = 0
 	iter.start = 0
-	var empty T
-	iter.token = empty
+	iter.pos = 0
+	var none T
+	iter.token = none
 }
 
 // Split sets the SplitFunc for the Iterator.
-func (iter *Iterator[T]) Split(split func(T, bool) (int, T, error)) {
+func (iter *Iterator[T]) Split(split SplitFunc[T]) {
 	iter.split = split
 }
 

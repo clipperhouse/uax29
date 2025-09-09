@@ -1,4 +1,4 @@
-package words_test
+package iterators_test
 
 import (
 	"testing"
