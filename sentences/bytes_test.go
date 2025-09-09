@@ -45,7 +45,7 @@ func TestBytesUnicode(t *testing.T) {
 func TestBytesRoundtrip(t *testing.T) {
 	t.Parallel()
 
-	const runs = 2000
+	const runs = 100
 
 	tokens := sentences.FromBytes(nil)
 

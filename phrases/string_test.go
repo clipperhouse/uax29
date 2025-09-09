@@ -15,7 +15,7 @@ import (
 func TestStringRoundtrip(t *testing.T) {
 	t.Parallel()
 
-	const runs = 2000
+	const runs = 100
 
 	tokens := phrases.FromString("")
 

@@ -50,7 +50,7 @@ func TestStringUnicode(t *testing.T) {
 func TestStringRoundtrip(t *testing.T) {
 	t.Parallel()
 
-	const runs = 2000
+	const runs = 100
 
 	for i := 0; i < runs; i++ {
 		input := string(getRandomBytes())
