@@ -22,7 +22,7 @@ func TestStringUnicode(t *testing.T) {
 		var all []string
 		tokens := graphemes.FromString(string(test.input))
 		for tokens.Next() {
-			all = append(all, tokens.Text())
+			all = append(all, tokens.Value())
 		}
 
 		expected := make([]string, len(test.expected))
@@ -58,7 +58,7 @@ func TestStringRoundtrip(t *testing.T) {
 
 		var output string
 		for tokens.Next() {
-			output += tokens.Text()
+			output += tokens.Value()
 		}
 
 		if output != input {
@@ -89,7 +89,7 @@ func TestStringInvalidUTF8(t *testing.T) {
 
 	var output string
 	for tokens.Next() {
-		output += tokens.Text()
+		output += tokens.Value()
 	}
 
 	if output != string(input) {
