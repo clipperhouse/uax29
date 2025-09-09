@@ -22,7 +22,7 @@ func TestStringUnicode(t *testing.T) {
 		var all []string
 		tokens := words.FromString(string(test.input))
 		for tokens.Next() {
-			all = append(all, tokens.Text())
+			all = append(all, tokens.Value())
 		}
 
 		expected := make([]string, len(test.expected))
@@ -58,7 +58,7 @@ func TestStringRoundtrip(t *testing.T) {
 
 		var output string
 		for tokens.Next() {
-			output += tokens.Text()
+			output += tokens.Value()
 		}
 
 		if output != input {
@@ -67,10 +67,10 @@ func TestStringRoundtrip(t *testing.T) {
 	}
 }
 
-func stringIterToSet(tokens *words.StringIterator) map[string]struct{} {
+func stringIterToSet(tokens *words.Iterator[string]) map[string]struct{} {
 	founds := make(map[string]struct{})
 	for tokens.Next() {
-		founds[tokens.Text()] = struct{}{}
+		founds[tokens.Value()] = struct{}{}
 	}
 	return founds
 }
@@ -81,7 +81,11 @@ func TestStringJoiners(t *testing.T) {
 	founds1 := stringIterToSet(tokens1)
 
 	tokens2 := words.FromString(s)
-	tokens2.Joiners(joiners)
+	stringJoiners := &words.Joiners[string]{
+		Middle:  []rune("@-/"),
+		Leading: []rune("#."),
+	}
+	tokens2.Joiners(stringJoiners)
 	founds2 := stringIterToSet(tokens2)
 
 	for _, test := range joinersTests {
@@ -118,7 +122,7 @@ func TestStringInvalidUTF8(t *testing.T) {
 
 	var output string
 	for sc.Next() {
-		output += sc.Text()
+		output += sc.Value()
 	}
 
 	if output != string(input) {

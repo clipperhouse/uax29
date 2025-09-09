@@ -2,20 +2,14 @@ package words
 
 // Joiners sets runes that should be treated like word characters, where
 // otherwise words will be split. See the [Joiners] type.
-func (iter *BytesIterator) Joiners(j *Joiners) {
-	iter.Split(j.splitFunc)
-}
-
-// Joiners sets runes that should be treated like word characters, where
-// otherwise words will be split. See the [Joiners] type.
-func (iter *StringIterator) Joiners(j *Joiners) {
+func (iter *Iterator[T]) Joiners(j *Joiners[T]) {
 	iter.Split(j.splitFunc)
 }
 
 // Joiners allows specification of characters (runes) which will join words (tokens)
 // rather than breaking them. For example, "@" breaks words by default,
 // but you might wish to join words into email addresses.
-type Joiners struct {
+type Joiners[T stringish] struct {
 	// Middle specifies which characters (runes) should
 	// join words (tokens) where they would otherwise be split,
 	// in the middle of a word.
@@ -36,7 +30,7 @@ type Joiners struct {
 	Leading []rune
 }
 
-var none *Joiners = nil
+var none *Joiners[[]byte] = nil
 
 func runesContain(runes []rune, rune rune) bool {
 	// Did some bechmarking, a map isn't faster for small numbers

@@ -5,11 +5,22 @@ import "unicode/utf8"
 // previousIndex works backward until it hits a rune in properties,
 // ignoring runes with the _Ignore property (per WB4), and returns
 // the index in data. It returns -1 if such a rune is not found.
-func previousIndex(properties property, data []byte) int {
+func previousIndex[T stringish](properties property, data T) int {
+	// Create a trie instance for this type
+	trie := &wordsTrie[T]{}
+
 	// Start at the end of the buffer and move backwards
 	i := len(data)
 	for i > 0 {
-		_, w := utf8.DecodeLastRune(data[:i])
+		var w int
+		switch any(data).(type) {
+		case []byte:
+			bytes := any(data).([]byte)
+			_, w = utf8.DecodeLastRune(bytes[:i])
+		case string:
+			str := any(data).(string)
+			_, w = utf8.DecodeLastRuneInString(str[:i])
+		}
 
 		i -= w
 
@@ -33,7 +44,7 @@ func previousIndex(properties property, data []byte) int {
 
 // previous works backward in the buffer until it hits a rune in properties,
 // ignoring runes with the _Ignore property per WB4
-func previous(properties property, data []byte) bool {
+func previous[T stringish](properties property, data T) bool {
 	return previousIndex(properties, data) != -1
 }
 
@@ -41,7 +52,10 @@ const notfound = -1
 
 // subsequent looks ahead in the buffer until it hits a rune in properties,
 // ignoring runes with the _Ignore property per WB4
-func subsequent(properties property, data []byte, atEOF bool) (advance int, more bool) {
+func subsequent[T stringish](properties property, data T, atEOF bool) (advance int, more bool) {
+	// Create a trie instance for this type
+	trie := &wordsTrie[T]{}
+
 	i := 0
 	for i < len(data) {
 		lookup, w := trie.lookup(data[i:])

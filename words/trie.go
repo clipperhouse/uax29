@@ -31,7 +31,7 @@ const (
 // lookup returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
-func (t *wordsTrie) lookup(s []byte) (v property, sz int) {
+func (t *wordsTrie[T]) lookup(s T) (v property, sz int) {
 	c0 := s[0]
 	switch {
 	case c0 < 0x80: // is ASCII
@@ -92,14 +92,14 @@ func (t *wordsTrie) lookup(s []byte) (v property, sz int) {
 }
 
 // wordsTrie. Total size: 94464 bytes (92.25 KiB). Checksum: ef6ff72028f76377.
-type wordsTrie struct{}
+type wordsTrie[T stringish] struct{}
 
 // func newWordsTrie(i int) *wordsTrie {
 // 	return &wordsTrie{}
 // }
 
 // lookupValue determines the type of block n and looks up the value for b.
-func (t *wordsTrie) lookupValue(n uint32, b byte) property {
+func (t *wordsTrie[T]) lookupValue(n uint32, b byte) property {
 	switch {
 	default:
 		return property(wordsValues[n<<6+uint32(b)])

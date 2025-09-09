@@ -5,8 +5,6 @@ import (
 	"unicode/utf8"
 )
 
-var trie = &wordsTrie{}
-
 // is determines if lookup intersects propert(ies)
 func (lookup property) is(properties property) bool {
 	return (lookup & properties) != 0
@@ -21,12 +19,22 @@ const (
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner.
 //
 // See https://unicode.org/reports/tr29/#Word_Boundaries.
-var SplitFunc bufio.SplitFunc = none.splitFunc
+var SplitFunc bufio.SplitFunc = func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	return none.splitFunc(data, atEOF)
+}
 
-func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
+type stringish interface {
+	~[]byte | ~string
+}
+
+func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err error) {
+	var empty T
 	if len(data) == 0 {
-		return 0, nil, nil
+		return 0, empty, nil
 	}
+
+	// Create a trie instance for this type
+	trie := &wordsTrie[T]{}
 
 	// These vars are stateful across loop iterations
 	var pos int
@@ -41,14 +49,22 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 	if w == 0 {
 		if !atEOF {
 			// Rune extends past current data, request more
-			return 0, nil, nil
+			return 0, empty, nil
 		}
 		pos = len(data)
 		return pos, data[:pos], nil
 	}
 
 	if j != nil && j.Leading != nil {
-		r, _ := utf8.DecodeRune(data[pos:])
+		var r rune
+		switch any(data).(type) {
+		case []byte:
+			bytes := any(data).([]byte)
+			r, _ = utf8.DecodeRune(bytes[pos:])
+		case string:
+			str := any(data).(string)
+			r, _ = utf8.DecodeRuneInString(str[pos:])
+		}
 		if runesContain(j.Leading, r) {
 			// treat leading joiners as if they are letter,
 			// then depend on the existing logic below
@@ -66,7 +82,7 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 		if eot {
 			if !atEOF {
 				// Token extends past current data, request more
-				return 0, nil, nil
+				return 0, empty, nil
 			}
 
 			// https://unicode.org/reports/tr29/#WB2
@@ -88,11 +104,19 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 				break
 			}
 			// Rune extends past current data, request more
-			return 0, nil, nil
+			return 0, empty, nil
 		}
 
 		if j != nil && j.Middle != nil {
-			r, _ := utf8.DecodeRune(data[pos:])
+			var r rune
+			switch any(data).(type) {
+			case []byte:
+				bytes := any(data).([]byte)
+				r, _ = utf8.DecodeRune(bytes[pos:])
+			case string:
+				str := any(data).(string)
+				r, _ = utf8.DecodeRuneInString(str[pos:])
+			}
 			if runesContain(j.Middle, r) {
 				// treat middle joiners as if they are middle letters/numbers,
 				// then depend on the existing logic below
@@ -149,7 +173,7 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 
 			if more {
 				// Token extends past current data, request more
-				return 0, nil, nil
+				return 0, empty, nil
 			}
 
 			found := advance != notfound
@@ -177,7 +201,7 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 
 			if more {
 				// Token extends past current data, request more
-				return 0, nil, nil
+				return 0, empty, nil
 			}
 
 			found := advance != notfound
@@ -205,7 +229,7 @@ func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte,
 
 			if more {
 				// Token extends past current data, request more
-				return 0, nil, nil
+				return 0, empty, nil
 			}
 
 			if advance != notfound {
