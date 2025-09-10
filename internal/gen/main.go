@@ -398,16 +398,20 @@ func writeTrie(prop prop, trie *triegen.Trie, iotasByProperty map[string]uint64)
 	typename := prop.PackageName() + "Trie"
 
 	typeDefSig := `type ` + typename + ` struct`
-	genericTypeDefSig := `type ` + typename + `[T iterators.Stringish] struct`
-	b = bytes.ReplaceAll(b, []byte(typeDefSig), []byte(genericTypeDefSig))
+	noTypeDef := `// ` + typeDefSig
+	b = bytes.ReplaceAll(b, []byte(typeDefSig), []byte(noTypeDef))
 
 	lookupSig := `(t *` + typename + `) lookup(s []byte)`
-	genericLookupSig := `(t *` + typename + `[T]) lookup(s T)`
+	genericLookupSig := `lookup[T iterators.Stringish](s T)`
 	b = bytes.ReplaceAll(b, []byte(lookupSig), []byte(genericLookupSig))
 
 	lookupValueSig := `(t *` + typename + `) lookupValue`
-	genericLookupValueSig := `(t *` + typename + `[T]) lookupValue`
+	genericLookupValueSig := `lookupValue`
 	b = bytes.ReplaceAll(b, []byte(lookupValueSig), []byte(genericLookupValueSig))
+
+	lookupCallSig := `t.lookupValue(`
+	genericLookupCallSig := `lookupValue(`
+	b = bytes.ReplaceAll(b, []byte(lookupCallSig), []byte(genericLookupCallSig))
 
 	formatted, err := format.Source(b)
 	if err != nil {

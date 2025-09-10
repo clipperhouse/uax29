@@ -4,14 +4,13 @@ package words
 // definition, see: https://github.com/blevesearch/segment/blob/master/segment_words.rl#L199-L207
 // This API is experimental.
 func BleveNumeric(token []byte) bool {
-	trie := &wordsTrie[[]byte]{}
 	var pos, w int
 	var current property
 
 	for pos < len(token) {
 		last := current
 
-		current, w = trie.lookup(token[pos:])
+		current, w = lookup(token[pos:])
 
 		if pos == 0 {
 			// must start with Numeric|ExtendNumLet
@@ -89,11 +88,10 @@ func BleveNumeric(token []byte) bool {
 // See https://github.com/blevesearch/segment/blob/master/segment_words.rl
 // ...and search for uses of "Ideo". This API is experimental.
 func BleveIdeographic(token []byte) bool {
-	trie := &wordsTrie[[]byte]{}
 	var pos int
 
 	for pos < len(token) {
-		current, w := trie.lookup(token[pos:])
+		current, w := lookup(token[pos:])
 
 		if pos == 0 {
 			// must start with ideo

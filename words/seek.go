@@ -25,16 +25,13 @@ func decodeLastRune[T iterators.Stringish](data T) (rune, int) {
 // ignoring runes with the _Ignore property (per WB4), and returns
 // the index in data. It returns -1 if such a rune is not found.
 func previousIndex[T iterators.Stringish](properties property, data T) int {
-	// Create a trie instance for this type
-	trie := &wordsTrie[T]{}
-
 	// Start at the end of the buffer and move backwards
 	i := len(data)
 	for i > 0 {
 		_, w := decodeLastRune(data[:i])
 		i -= w
 
-		lookup, _ := trie.lookup(data[i:])
+		lookup, _ := lookup(data[i:])
 		// I think it's OK to elide width here; will fall through to break
 
 		if lookup.is(_Ignore) {
@@ -63,12 +60,10 @@ const notfound = -1
 // subsequent looks ahead in the buffer until it hits a rune in properties,
 // ignoring runes with the _Ignore property per WB4
 func subsequent[T iterators.Stringish](properties property, data T, atEOF bool) (advance int, more bool) {
-	// Create a trie instance for this type
-	trie := &wordsTrie[T]{}
 
 	i := 0
 	for i < len(data) {
-		lookup, w := trie.lookup(data[i:])
+		lookup, w := lookup(data[i:])
 		if w == 0 {
 			if atEOF {
 				// Nothing more to evaluate

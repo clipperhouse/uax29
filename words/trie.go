@@ -33,7 +33,7 @@ const (
 // lookup returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
-func (t *wordsTrie[T]) lookup(s T) (v property, sz int) {
+func lookup[T iterators.Stringish](s T) (v property, sz int) {
 	c0 := s[0]
 	switch {
 	case c0 < 0x80: // is ASCII
@@ -49,7 +49,7 @@ func (t *wordsTrie[T]) lookup(s T) (v property, sz int) {
 		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
 		}
-		return t.lookupValue(uint32(i), c1), 2
+		return lookupValue(uint32(i), c1), 2
 	case c0 < 0xF0: // 3-byte UTF-8
 		if len(s) < 3 {
 			return 0, 0
@@ -65,7 +65,7 @@ func (t *wordsTrie[T]) lookup(s T) (v property, sz int) {
 		if c2 < 0x80 || 0xC0 <= c2 {
 			return 0, 2 // Illegal UTF-8: not a continuation byte.
 		}
-		return t.lookupValue(uint32(i), c2), 3
+		return lookupValue(uint32(i), c2), 3
 	case c0 < 0xF8: // 4-byte UTF-8
 		if len(s) < 4 {
 			return 0, 0
@@ -87,21 +87,21 @@ func (t *wordsTrie[T]) lookup(s T) (v property, sz int) {
 		if c3 < 0x80 || 0xC0 <= c3 {
 			return 0, 3 // Illegal UTF-8: not a continuation byte.
 		}
-		return t.lookupValue(uint32(i), c3), 4
+		return lookupValue(uint32(i), c3), 4
 	}
 	// Illegal rune
 	return 0, 1
 }
 
 // wordsTrie. Total size: 94464 bytes (92.25 KiB). Checksum: ef6ff72028f76377.
-type wordsTrie[T iterators.Stringish] struct{}
+// type wordsTrie struct { }
 
 // func newWordsTrie(i int) *wordsTrie {
 // 	return &wordsTrie{}
 // }
 
 // lookupValue determines the type of block n and looks up the value for b.
-func (t *wordsTrie[T]) lookupValue(n uint32, b byte) property {
+func lookupValue(n uint32, b byte) property {
 	switch {
 	default:
 		return property(wordsValues[n<<6+uint32(b)])

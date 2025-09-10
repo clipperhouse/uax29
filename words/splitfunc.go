@@ -36,9 +36,6 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 		return 0, empty, nil
 	}
 
-	// Create a trie instance for this type
-	trie := &wordsTrie[T]{}
-
 	// These vars are stateful across loop iterations
 	var pos int
 	var lastExIgnore property     // "last excluding ignored categories"
@@ -48,7 +45,7 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 	// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 	// to the right of the ×, from which we look back or forward
 
-	current, w := trie.lookup(data[pos:])
+	current, w := lookup(data[pos:])
 	if w == 0 {
 		if !atEOF {
 			// Rune extends past current data, request more
@@ -91,7 +88,7 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 			lastExIgnore = last
 		}
 
-		current, w = trie.lookup(data[pos:])
+		current, w = lookup(data[pos:])
 		if w == 0 {
 			if atEOF {
 				// Just return the bytes, we can't do anything with them

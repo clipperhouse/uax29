@@ -26,14 +26,13 @@ func decodeLastRune[T iterators.Stringish](data T) (rune, int) {
 // the index of the rune in data. It returns -1 if such a rune is not found.
 func previousIndex[T iterators.Stringish](properties property, data T) int {
 	// Start at the end of the buffer and move backwards
-	trie := &sentencesTrie[T]{}
 
 	i := len(data)
 	for i > 0 {
 		_, w := decodeLastRune(data[:i])
 		i -= w
 
-		lookup, _ := trie.lookup(data[i:])
+		lookup, _ := lookup(data[i:])
 
 		if lookup.is(_Ignore) {
 			continue
@@ -59,11 +58,9 @@ func previous[T iterators.Stringish](properties property, data T) bool {
 // subsequent looks ahead in the buffer until it hits a rune in properties,
 // ignoring runes in the _Ignore property per SB5
 func subsequent[T iterators.Stringish](properties property, data T, atEOF bool) (found bool, pos int, requestMore bool) {
-	trie := &sentencesTrie[T]{}
-
 	i := 0
 	for i < len(data) {
-		lookup, w := trie.lookup(data[i:])
+		lookup, w := lookup(data[i:])
 		if w == 0 {
 			if atEOF {
 				// Nothing more to evaluate

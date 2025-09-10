@@ -39,9 +39,7 @@ func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T,
 	// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 	// to the right of the ×, from which we look back or forward
 
-	trie := &sentencesTrie[T]{}
-
-	current, w := trie.lookup(data[pos:])
+	current, w := lookup(data[pos:])
 	if w == 0 {
 		if !atEOF {
 			// Rune extends past current data, request more
@@ -89,7 +87,7 @@ main:
 			lastExIgnoreSpClose = lastExIgnoreSp
 		}
 
-		current, w = trie.lookup(data[pos:])
+		current, w = lookup(data[pos:])
 		if w == 0 {
 			if atEOF {
 				// Just return the bytes, we can't do anything with them
@@ -146,7 +144,7 @@ main:
 			// ( ¬(OLetter | Upper | Lower | ParaSep | SATerm) )*
 			// Zero or more of not-the-above properties
 			for p < len(data) {
-				lookup, w := trie.lookup(data[p:])
+				lookup, w := lookup(data[p:])
 				if w == 0 {
 					if atEOF {
 						// Just return the bytes, we can't do anything with them

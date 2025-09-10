@@ -26,8 +26,6 @@ func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T,
 		return 0, empty, nil
 	}
 
-	trie := &graphemesTrie[T]{}
-
 	// These vars are stateful across loop iterations
 	var pos int
 	var lastExIgnore property = 0     // "last excluding ignored categories"
@@ -37,7 +35,7 @@ func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T,
 	// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 	// to the right of the ×, from which we look back or forward
 
-	current, w := trie.lookup(data[pos:])
+	current, w := lookup(data[pos:])
 	if w == 0 {
 		if !atEOF {
 			// Rune extends past current data, request more
@@ -80,7 +78,7 @@ func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T,
 			lastExIgnore = last
 		}
 
-		current, w = trie.lookup(data[pos:])
+		current, w = lookup(data[pos:])
 		if w == 0 {
 			if atEOF {
 				// Just return the bytes, we can't do anything with them
