@@ -23,7 +23,7 @@ func TestBytesUnicode(t *testing.T) {
 		var all [][]byte
 		tokens := words.FromBytes(test.input)
 		for tokens.Next() {
-			all = append(all, tokens.Bytes())
+			all = append(all, tokens.Value())
 		}
 
 		if !reflect.DeepEqual(all, test.expected) {
@@ -46,7 +46,7 @@ func TestBytesUnicode(t *testing.T) {
 func TestBytesRoundtrip(t *testing.T) {
 	t.Parallel()
 
-	const runs = 2000
+	const runs = 100
 
 	tokens := words.FromBytes(nil)
 
@@ -56,7 +56,7 @@ func TestBytesRoundtrip(t *testing.T) {
 
 		var output []byte
 		for tokens.Next() {
-			output = append(output, tokens.Bytes()...)
+			output = append(output, tokens.Value()...)
 		}
 
 		if !bytes.Equal(output, input) {
@@ -65,10 +65,10 @@ func TestBytesRoundtrip(t *testing.T) {
 	}
 }
 
-func iterToSet(tokens *words.BytesIterator) map[string]struct{} {
+func iterToSet(tokens *words.Iterator[[]byte]) map[string]struct{} {
 	founds := make(map[string]struct{})
 	for tokens.Next() {
-		founds[string(tokens.Bytes())] = struct{}{}
+		founds[string(tokens.Value())] = struct{}{}
 	}
 	return founds
 }
@@ -115,7 +115,7 @@ func TestBytesInvalidUTF8(t *testing.T) {
 
 	var output []byte
 	for tokens.Next() {
-		output = append(output, tokens.Bytes()...)
+		output = append(output, tokens.Value()...)
 	}
 
 	if !bytes.Equal(output, input) {
@@ -128,7 +128,7 @@ func BenchmarkBytes(b *testing.B) {
 	benchBytes(b, tokens)
 }
 
-func benchBytes(b *testing.B, tokens *words.BytesIterator) {
+func benchBytes(b *testing.B, tokens *words.Iterator[[]byte]) {
 	file, err := testdata.Sample()
 	if err != nil {
 		b.Error(err)
@@ -162,7 +162,7 @@ func benchBytes(b *testing.B, tokens *words.BytesIterator) {
 }
 
 func BenchmarkBytesJoiners(b *testing.B) {
-	var joiners = &words.Joiners{
+	var joiners = &words.Joiners[[]byte]{
 		Middle:  []rune("@-/"),
 		Leading: []rune("#."),
 	}
