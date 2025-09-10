@@ -20,7 +20,8 @@ for tokens.Next() {                          // Next() returns true until end of
 
 [![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/v2/words.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/v2/words)
 
-_Note: this package returns all tokens, including whitespace and punctuation — it's not strictly “words” in the common sense._
+_Note: this package returns all tokens, including whitespace and punctuation. It's not strictly “words” in the common sense,
+it's “split on word boundaries”._
 
 ## Conformance
 
@@ -71,15 +72,13 @@ b := []byte("Hello, 世界. Nice dog! 👍🐶")
 tokens := words.FromBytes(b)
 
 for tokens.Next() {                            // Next() returns true until end of data
-	fmt.Printf("%q\n", tokens.Bytes())         // Do something with the current word
+	fmt.Printf("%q\n", tokens.Value())         // Do something with the current word
 }
 ```
 
 ### Performance
 
-On a Mac M2 laptop, we see around 150MB/s, which works out to around 40 million words (tokens, really) per second.
-
-You should see approximately constant memory, independent of data size. We iterate tokens instead of collecting them into a slice.
+On a Mac M2 laptop, we see around 180MB/s, or around 40 million words (tokens, really) per second. You should see ~constant memory, and no allocations.
 
 ### Invalid inputs
 
