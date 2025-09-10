@@ -263,12 +263,10 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 func decodeRune[T iterators.Stringish](data T) (rune, int) {
 	// This casting is a bit gross but it works
 	// and is surprisingly fast
-	switch any(data).(type) {
+	switch s := any(data).(type) {
 	case []byte:
-		b := any(data).([]byte)
-		return utf8.DecodeRune(b)
+		return utf8.DecodeRune(s)
 	case string:
-		s := any(data).(string)
 		return utf8.DecodeRuneInString(s)
 	default:
 		panic("unsupported type")

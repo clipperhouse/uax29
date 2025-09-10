@@ -9,12 +9,10 @@ import (
 func decodeLastRune[T iterators.Stringish](data T) (rune, int) {
 	// This casting is a bit gross but it works
 	// and is surprisingly fast
-	switch any(data).(type) {
+	switch s := any(data).(type) {
 	case []byte:
-		b := any(data).([]byte)
-		return utf8.DecodeLastRune(b)
+		return utf8.DecodeLastRune(s)
 	case string:
-		s := any(data).(string)
 		return utf8.DecodeLastRuneInString(s)
 	default:
 		panic("unsupported type")

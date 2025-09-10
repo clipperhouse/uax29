@@ -1,7 +1,7 @@
 package iterators
 
 type Stringish interface {
-	~[]byte | ~string
+	[]byte | string
 }
 
 type SplitFunc[T Stringish] func(T, bool) (int, T, error)
