@@ -15,7 +15,7 @@ import (
 func TestStringRoundtrip(t *testing.T) {
 	t.Parallel()
 
-	const runs = 100
+	const runs = 2000
 
 	tokens := phrases.FromString("")
 
@@ -25,7 +25,7 @@ func TestStringRoundtrip(t *testing.T) {
 
 		var output string
 		for tokens.Next() {
-			output += tokens.Value()
+			output += tokens.Text()
 		}
 
 		if output != input {
@@ -56,7 +56,7 @@ func TestStringInvalidUTF8(t *testing.T) {
 
 	var output []byte
 	for tokens.Next() {
-		output = append(output, tokens.Value()...)
+		output = append(output, tokens.Bytes()...)
 	}
 
 	if !bytes.Equal(output, input) {
@@ -64,10 +64,10 @@ func TestStringInvalidUTF8(t *testing.T) {
 	}
 }
 
-func stringIterToSetTrimmed(tokens *phrases.Iterator[string]) map[string]struct{} {
+func stringIterToSetTrimmed(tokens *phrases.StringIterator) map[string]struct{} {
 	founds := make(map[string]struct{})
 	for tokens.Next() {
-		key := strings.TrimSpace(tokens.Value())
+		key := strings.TrimSpace(tokens.Text())
 		founds[key] = exists
 	}
 	return founds

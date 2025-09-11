@@ -22,7 +22,7 @@ func TestStringUnicode(t *testing.T) {
 		var all []string
 		tokens := sentences.FromString(string(test.input))
 		for tokens.Next() {
-			all = append(all, tokens.Value())
+			all = append(all, tokens.Text())
 		}
 
 		expected := make([]string, len(test.expected))
@@ -50,7 +50,7 @@ func TestStringUnicode(t *testing.T) {
 func TestStringRoundtrip(t *testing.T) {
 	t.Parallel()
 
-	const runs = 100
+	const runs = 2000
 
 	for i := 0; i < runs; i++ {
 		input := string(getRandomBytes())
@@ -58,7 +58,7 @@ func TestStringRoundtrip(t *testing.T) {
 
 		var output string
 		for tokens.Next() {
-			output += tokens.Value()
+			output += tokens.Text()
 		}
 
 		if output != input {
@@ -89,7 +89,7 @@ func TestStringInvalidUTF8(t *testing.T) {
 
 	var output string
 	for tokens.Next() {
-		output += tokens.Value()
+		output += tokens.Text()
 	}
 
 	if output != string(input) {

@@ -32,7 +32,7 @@ func FuzzValidShort(f *testing.F) {
 		valid1 := utf8.Valid(original)
 		tokens := phrases.FromBytes(original)
 		for tokens.Next() {
-			all = append(all, tokens.Value())
+			all = append(all, tokens.Bytes())
 		}
 
 		roundtrip := make([]byte, 0, len(original))
@@ -72,7 +72,7 @@ func FuzzValidLong(f *testing.F) {
 		valid1 := utf8.Valid(original)
 		tokens := phrases.FromBytes(original)
 		for tokens.Next() {
-			all = append(all, tokens.Value())
+			all = append(all, tokens.Bytes())
 		}
 
 		roundtrip := make([]byte, 0, len(original))
@@ -130,7 +130,7 @@ func FuzzInvalid(f *testing.F) {
 		valid1 := utf8.Valid(original)
 		tokens := phrases.FromBytes(original)
 		for tokens.Next() {
-			all = append(all, tokens.Value())
+			all = append(all, tokens.Bytes())
 		}
 
 		roundtrip := make([]byte, 0, len(original))

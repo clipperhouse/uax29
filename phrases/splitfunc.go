@@ -1,10 +1,6 @@
 package phrases
 
-import (
-	"bufio"
-
-	"github.com/clipperhouse/uax29/v2/internal/iterators"
-)
+var trie = &phrasesTrie{}
 
 // is determines if lookup intersects propert(ies)
 func (lookup property) is(properties property) bool {
@@ -18,15 +14,9 @@ const (
 )
 
 // SplitFunc is a bufio.SplitFunc implementation of phrase segmentation, for use with bufio.Scanner.
-var SplitFunc bufio.SplitFunc = func(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	return splitFunc(data, atEOF)
-}
-
-// splitFunc is a bufio.SplitFunc implementation of phrase segmentation, for use with bufio.Scanner.
-func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T, err error) {
-	var empty T
+func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if len(data) == 0 {
-		return 0, empty, nil
+		return 0, nil, nil
 	}
 
 	// These vars are stateful across loop iterations
@@ -38,11 +28,11 @@ func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T,
 	// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 	// to the right of the ×, from which we look back or forward
 
-	current, w := lookup(data[pos:])
+	current, w := trie.lookup(data[pos:])
 	if w == 0 {
 		if !atEOF {
 			// Rune extends past current data, request more
-			return 0, empty, nil
+			return 0, nil, nil
 		}
 		pos = len(data)
 		return pos, data[:pos], nil
@@ -58,7 +48,7 @@ func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T,
 		if eot {
 			if !atEOF {
 				// Token extends past current data, request more
-				return 0, empty, nil
+				return 0, nil, nil
 			}
 
 			// https://unicode.org/reports/tr29/#WB2
@@ -72,7 +62,7 @@ func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T,
 			lastExIgnore = last
 		}
 
-		current, w = lookup(data[pos:])
+		current, w = trie.lookup(data[pos:])
 		if w == 0 {
 			if atEOF {
 				// Just return the bytes, we can't do anything with them
@@ -80,7 +70,7 @@ func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T,
 				break
 			}
 			// Rune extends past current data, request more
-			return 0, empty, nil
+			return 0, nil, nil
 		}
 
 		// Optimization: no rule can possibly apply
@@ -134,7 +124,7 @@ func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T,
 
 			if more {
 				// Token extends past current data, request more
-				return 0, empty, nil
+				return 0, nil, nil
 			}
 
 			if found {
@@ -161,7 +151,7 @@ func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T,
 
 			if more {
 				// Token extends past current data, request more
-				return 0, empty, nil
+				return 0, nil, nil
 			}
 
 			if found {
@@ -197,7 +187,7 @@ func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T,
 
 			if more {
 				// Token extends past current data, request more
-				return 0, empty, nil
+				return 0, nil, nil
 			}
 
 			if found {

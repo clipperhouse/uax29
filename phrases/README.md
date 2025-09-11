@@ -65,13 +65,15 @@ b := []byte("Hello, 世界. Nice dog! 👍🐶")
 tokens := phrases.FromBytes(b)
 
 for tokens.Next() {                            // Next() returns true until end of data
-	fmt.Printf("%q\n", tokens.Value())         // Do something with the current phrase
+	fmt.Printf("%q\n", tokens.Bytes())         // Do something with the current phrase
 }
 ```
 
 ### Performance
 
-On a Mac M2 laptop, we see around 240MB/s, or around 30 million phrases (tokens, really) per second. You should see ~constant memory, and no allocations.
+On a Mac M2 laptop, we see around 240MB/s, which works out to around 30 million phrases (tokens, really) per second.
+
+You should see approximately constant memory, independent of data size. We iterate tokens instead of collecting them into a slice.
 
 ### Invalid inputs
 

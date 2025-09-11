@@ -27,8 +27,6 @@ func FromReader(r io.Reader) *Scanner {
 
 // Joiners sets runes that should be treated like word characters, where
 // otherwsie words sill be split. See the [Joiners] type.
-func (sc *Scanner) Joiners(j *Joiners[[]byte]) {
-	sc.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
-		return j.splitFunc(data, atEOF)
-	})
+func (sc *Scanner) Joiners(j *Joiners) {
+	sc.Split(j.splitFunc)
 }

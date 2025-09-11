@@ -22,7 +22,7 @@ func TestBytesUnicode(t *testing.T) {
 		var all [][]byte
 		tokens := sentences.FromBytes(test.input)
 		for tokens.Next() {
-			all = append(all, tokens.Value())
+			all = append(all, tokens.Bytes())
 		}
 
 		if !reflect.DeepEqual(all, test.expected) {
@@ -45,7 +45,7 @@ func TestBytesUnicode(t *testing.T) {
 func TestBytesRoundtrip(t *testing.T) {
 	t.Parallel()
 
-	const runs = 100
+	const runs = 2000
 
 	tokens := sentences.FromBytes(nil)
 
@@ -55,7 +55,7 @@ func TestBytesRoundtrip(t *testing.T) {
 
 		var output []byte
 		for tokens.Next() {
-			output = append(output, tokens.Value()...)
+			output = append(output, tokens.Bytes()...)
 		}
 
 		if !bytes.Equal(output, input) {
@@ -86,7 +86,7 @@ func TestBytesInvalidUTF8(t *testing.T) {
 
 	var output []byte
 	for tokens.Next() {
-		output = append(output, tokens.Value()...)
+		output = append(output, tokens.Bytes()...)
 	}
 
 	if !bytes.Equal(output, input) {

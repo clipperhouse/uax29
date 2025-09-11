@@ -46,7 +46,7 @@ func TestScannerUnicode(t *testing.T) {
 func TestScannerRoundtrip(t *testing.T) {
 	t.Parallel()
 
-	const runs = 100
+	const runs = 2000
 
 	for i := 0; i < runs; i++ {
 

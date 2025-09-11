@@ -3,9 +3,9 @@ package words
 import (
 	"bufio"
 	"unicode/utf8"
-
-	"github.com/clipperhouse/uax29/v2/internal/iterators"
 )
+
+var trie = &wordsTrie{}
 
 // is determines if lookup intersects propert(ies)
 func (lookup property) is(properties property) bool {
@@ -21,19 +21,11 @@ const (
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner.
 //
 // See https://unicode.org/reports/tr29/#Word_Boundaries.
-var SplitFunc bufio.SplitFunc = func(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	return splitFunc(data, atEOF)
-}
+var SplitFunc bufio.SplitFunc = none.splitFunc
 
-func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T, err error) {
-	var none Joiners[T]
-	return none.splitFunc(data, atEOF)
-}
-
-func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err error) {
-	var empty T
+func (j *Joiners) splitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if len(data) == 0 {
-		return 0, empty, nil
+		return 0, nil, nil
 	}
 
 	// These vars are stateful across loop iterations
@@ -45,18 +37,18 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 	// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 	// to the right of the ×, from which we look back or forward
 
-	current, w := lookup(data[pos:])
+	current, w := trie.lookup(data[pos:])
 	if w == 0 {
 		if !atEOF {
 			// Rune extends past current data, request more
-			return 0, empty, nil
+			return 0, nil, nil
 		}
 		pos = len(data)
 		return pos, data[:pos], nil
 	}
 
 	if j != nil && j.Leading != nil {
-		r, _ := decodeRune(data[pos:])
+		r, _ := utf8.DecodeRune(data[pos:])
 		if runesContain(j.Leading, r) {
 			// treat leading joiners as if they are letter,
 			// then depend on the existing logic below
@@ -74,7 +66,7 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 		if eot {
 			if !atEOF {
 				// Token extends past current data, request more
-				return 0, empty, nil
+				return 0, nil, nil
 			}
 
 			// https://unicode.org/reports/tr29/#WB2
@@ -88,7 +80,7 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 			lastExIgnore = last
 		}
 
-		current, w = lookup(data[pos:])
+		current, w = trie.lookup(data[pos:])
 		if w == 0 {
 			if atEOF {
 				// Just return the bytes, we can't do anything with them
@@ -96,11 +88,11 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 				break
 			}
 			// Rune extends past current data, request more
-			return 0, empty, nil
+			return 0, nil, nil
 		}
 
 		if j != nil && j.Middle != nil {
-			r, _ := decodeRune(data[pos:])
+			r, _ := utf8.DecodeRune(data[pos:])
 			if runesContain(j.Middle, r) {
 				// treat middle joiners as if they are middle letters/numbers,
 				// then depend on the existing logic below
@@ -157,7 +149,7 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 
 			if more {
 				// Token extends past current data, request more
-				return 0, empty, nil
+				return 0, nil, nil
 			}
 
 			found := advance != notfound
@@ -185,7 +177,7 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 
 			if more {
 				// Token extends past current data, request more
-				return 0, empty, nil
+				return 0, nil, nil
 			}
 
 			found := advance != notfound
@@ -213,7 +205,7 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 
 			if more {
 				// Token extends past current data, request more
-				return 0, empty, nil
+				return 0, nil, nil
 			}
 
 			if advance != notfound {
@@ -258,17 +250,4 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 	}
 
 	return pos, data[:pos], nil
-}
-
-func decodeRune[T iterators.Stringish](data T) (rune, int) {
-	// This casting is a bit gross but it works
-	// and is surprisingly fast
-	switch s := any(data).(type) {
-	case []byte:
-		return utf8.DecodeRune(s)
-	case string:
-		return utf8.DecodeRuneInString(s)
-	default:
-		panic("unsupported type")
-	}
 }

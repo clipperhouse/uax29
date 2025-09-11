@@ -51,7 +51,7 @@ r := getYourReader()                            // from a file or network maybe
 tokens := sentences.FromReader(r)
 
 for tokens.Scan() {                             // Scan() returns true until error or EOF
-	fmt.Println(tokens.Value())                 // Do something with the current sentence
+	fmt.Println(tokens.Bytes())                 // Do something with the current sentence
 }
 
 if tokens.Err() != nil {                        // Check the error
@@ -69,13 +69,15 @@ b := []byte("Hello, 世界. Nice dog! 👍🐶")
 tokens := sentences.FromBytes(b)
 
 for tokens.Next() {                            // Next() returns true until end of data
-	fmt.Printf("%q\n", tokens.Value())         // Do something with the current sentence
+	fmt.Printf("%q\n", tokens.Bytes())         // Do something with the current sentence
 }
 ```
 
 ### Performance
 
-On a Mac M2 laptop, we see around 35MB/s, or around 180 thousand sentences per second. You should see ~constant memory, and no allocations.
+On a Mac laptop, we see around 35MB/s, which works out to around 180 thousand sentences per second.
+
+You should see approximately constant memory, independent of data size.
 
 ### Invalid inputs
 

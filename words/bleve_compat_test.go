@@ -171,7 +171,7 @@ func TestAdhocSegmentsWithType(t *testing.T) {
 
 		i := 0
 		for tokens.Next() {
-			got := tokens.Value()
+			got := tokens.Bytes()
 			expected := test.output[i]
 			if !bytes.Equal(expected, got) {
 				t.Fatalf("expected %q, got %q", expected, got)

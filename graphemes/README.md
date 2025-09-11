@@ -53,7 +53,7 @@ r := getYourReader()                            // from a file or network maybe
 tokens := graphemes.FromReader(r)
 
 for tokens.Scan() {                             // Scan() returns true until error or EOF
-	fmt.Println(tokens.Value())                 // Do something with the current grapheme
+	fmt.Println(tokens.Bytes())                 // Do something with the current grapheme
 }
 
 if tokens.Err() != nil {                        // Check the error
@@ -71,13 +71,15 @@ b := []byte("Hello, 世界. Nice dog! 👍🐶")
 tokens := graphemes.FromBytes(b)
 
 for tokens.Next() {                            // Next() returns true until end of data
-	fmt.Printf("%q\n", tokens.Value())         // Do something with the current grapheme
+	fmt.Printf("%q\n", tokens.Bytes())         // Do something with the current grapheme
 }
 ```
 
 ### Performance
 
-On a Mac M2 laptop, we see around 70MB/s, or around 70 million graphemes per second. You should see ~constant memory, and no allocations.
+On a Mac laptop, we see around 70MB/s, which works out to around 70 million graphemes per second.
+
+You should see approximately constant memory, independent of data size.
 
 ### Invalid inputs
 

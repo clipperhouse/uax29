@@ -10,7 +10,7 @@ func BleveNumeric(token []byte) bool {
 	for pos < len(token) {
 		last := current
 
-		current, w = lookup(token[pos:])
+		current, w = trie.lookup(token[pos:])
 
 		if pos == 0 {
 			// must start with Numeric|ExtendNumLet
@@ -91,7 +91,7 @@ func BleveIdeographic(token []byte) bool {
 	var pos int
 
 	for pos < len(token) {
-		current, w := lookup(token[pos:])
+		current, w := trie.lookup(token[pos:])
 
 		if pos == 0 {
 			// must start with ideo
