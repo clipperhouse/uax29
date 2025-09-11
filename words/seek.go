@@ -1,19 +1,35 @@
 package words
 
-import "unicode/utf8"
+import (
+	"unicode/utf8"
+
+	"github.com/clipperhouse/uax29/v2/internal/iterators"
+)
+
+func decodeLastRune[T iterators.Stringish](data T) (rune, int) {
+	// This casting is a bit gross but it works
+	// and is surprisingly fast
+	switch s := any(data).(type) {
+	case []byte:
+		return utf8.DecodeLastRune(s)
+	case string:
+		return utf8.DecodeLastRuneInString(s)
+	default:
+		panic("unsupported type")
+	}
+}
 
 // previousIndex works backward until it hits a rune in properties,
 // ignoring runes with the _Ignore property (per WB4), and returns
 // the index in data. It returns -1 if such a rune is not found.
-func previousIndex(properties property, data []byte) int {
+func previousIndex[T iterators.Stringish](properties property, data T) int {
 	// Start at the end of the buffer and move backwards
 	i := len(data)
 	for i > 0 {
-		_, w := utf8.DecodeLastRune(data[:i])
-
+		_, w := decodeLastRune(data[:i])
 		i -= w
 
-		lookup, _ := trie.lookup(data[i:])
+		lookup, _ := lookup(data[i:])
 		// I think it's OK to elide width here; will fall through to break
 
 		if lookup.is(_Ignore) {
@@ -33,7 +49,7 @@ func previousIndex(properties property, data []byte) int {
 
 // previous works backward in the buffer until it hits a rune in properties,
 // ignoring runes with the _Ignore property per WB4
-func previous(properties property, data []byte) bool {
+func previous[T iterators.Stringish](properties property, data T) bool {
 	return previousIndex(properties, data) != -1
 }
 
@@ -41,10 +57,11 @@ const notfound = -1
 
 // subsequent looks ahead in the buffer until it hits a rune in properties,
 // ignoring runes with the _Ignore property per WB4
-func subsequent(properties property, data []byte, atEOF bool) (advance int, more bool) {
+func subsequent[T iterators.Stringish](properties property, data T, atEOF bool) (advance int, more bool) {
+
 	i := 0
 	for i < len(data) {
-		lookup, w := trie.lookup(data[i:])
+		lookup, w := lookup(data[i:])
 		if w == 0 {
 			if atEOF {
 				// Nothing more to evaluate

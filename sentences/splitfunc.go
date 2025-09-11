@@ -1,6 +1,10 @@
 package sentences
 
-var trie = &sentencesTrie{}
+import (
+	"bufio"
+
+	"github.com/clipperhouse/uax29/v2/internal/iterators"
+)
 
 // is determines if lookup intersects propert(ies)
 func (lookup property) is(properties property) bool {
@@ -13,10 +17,15 @@ const (
 	_Ignore  = _Extend | _Format
 )
 
+var SplitFunc bufio.SplitFunc = func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	return splitFunc(data, atEOF)
+}
+
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner.
-func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
+func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T, err error) {
+	var empty T
 	if len(data) == 0 {
-		return 0, nil, nil
+		return 0, empty, nil
 	}
 
 	// These vars are stateful across loop iterations
@@ -30,11 +39,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 	// to the right of the ×, from which we look back or forward
 
-	current, w := trie.lookup(data[pos:])
+	current, w := lookup(data[pos:])
 	if w == 0 {
 		if !atEOF {
 			// Rune extends past current data, request more
-			return 0, nil, nil
+			return 0, empty, nil
 		}
 		pos = len(data)
 		return pos, data[:pos], nil
@@ -51,7 +60,7 @@ main:
 		if eot {
 			if !atEOF {
 				// Token extends past current data, request more
-				return 0, nil, nil
+				return 0, empty, nil
 			}
 
 			// https://unicode.org/reports/tr29/#SB2
@@ -78,7 +87,7 @@ main:
 			lastExIgnoreSpClose = lastExIgnoreSp
 		}
 
-		current, w = trie.lookup(data[pos:])
+		current, w = lookup(data[pos:])
 		if w == 0 {
 			if atEOF {
 				// Just return the bytes, we can't do anything with them
@@ -86,7 +95,7 @@ main:
 				break
 			}
 			// Rune extends past current data, request more
-			return 0, nil, nil
+			return 0, empty, nil
 		}
 
 		// Optimization: no rule can possibly apply
@@ -135,7 +144,7 @@ main:
 			// ( ¬(OLetter | Upper | Lower | ParaSep | SATerm) )*
 			// Zero or more of not-the-above properties
 			for p < len(data) {
-				lookup, w := trie.lookup(data[p:])
+				lookup, w := lookup(data[p:])
 				if w == 0 {
 					if atEOF {
 						// Just return the bytes, we can't do anything with them
@@ -143,7 +152,7 @@ main:
 						break main
 					}
 					// Rune extends past current data, request more
-					return 0, nil, nil
+					return 0, empty, nil
 				}
 
 				if lookup.is(_OLetter | _Upper | _Lower | _ParaSep | _SATerm) {
@@ -157,7 +166,7 @@ main:
 
 			if more {
 				// Rune or token extends past current data, request more
-				return 0, nil, nil
+				return 0, empty, nil
 			}
 
 			if found {
