@@ -13,7 +13,6 @@ type Iterator[T Stringish] struct {
 	data  T
 	start int
 	pos   int
-	token T
 }
 
 // New creates a new Iterator for the given data and SplitFunc.
@@ -30,8 +29,6 @@ func (iter *Iterator[T]) SetText(data T) {
 	iter.data = data
 	iter.start = 0
 	iter.pos = 0
-	var none T
-	iter.token = none
 }
 
 // Split sets the SplitFunc for the Iterator.
@@ -51,7 +48,7 @@ func (iter *Iterator[T]) Next() bool {
 
 	iter.start = iter.pos
 
-	advance, token, err := iter.split(iter.data[iter.pos:], true)
+	advance, _, err := iter.split(iter.data[iter.pos:], true)
 	if err != nil {
 		panic(err)
 	}
@@ -64,14 +61,12 @@ func (iter *Iterator[T]) Next() bool {
 		panic("SplitFunc advanced beyond the end of the data")
 	}
 
-	iter.token = token
-
 	return true
 }
 
 // Value returns the current token.
 func (iter *Iterator[T]) Value() T {
-	return iter.token
+	return iter.data[iter.start:iter.pos]
 }
 
 // Start returns the byte position of the current token in the original data.
@@ -88,6 +83,4 @@ func (iter *Iterator[T]) End() int {
 func (iter *Iterator[T]) Reset() {
 	iter.pos = 0
 	iter.start = 0
-	var empty T
-	iter.token = empty
 }

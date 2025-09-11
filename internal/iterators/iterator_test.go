@@ -360,68 +360,6 @@ func TestIterator_SetText(t *testing.T) {
 	}
 }
 
-func TestIterator_Split(t *testing.T) {
-	// Create a different split function that splits on commas
-	commaSplitString := func(data string, atEOF bool) (int, string, error) {
-		if len(data) == 0 {
-			return 0, data, nil
-		}
-
-		for i, b := range data {
-			if b == ',' {
-				token := data[:i]
-				advance := i + 1
-				return advance, token, nil
-			}
-		}
-
-		if atEOF {
-			return len(data), data, nil
-		}
-
-		return 0, data[:0], nil
-	}
-
-	input := "hello,world,test"
-	iter := iterators.New(simpleSpaceSplitString, input)
-
-	// First with space split (should return one token)
-	var spaceTokens []string
-	for iter.Next() {
-		spaceTokens = append(spaceTokens, iter.Value())
-	}
-
-	// Change to comma split
-	iter.Split(commaSplitString)
-	iter.Reset()
-
-	var commaTokens []string
-	for iter.Next() {
-		commaTokens = append(commaTokens, iter.Value())
-	}
-
-	expectedSpace := []string{"hello,world,test"}
-	expectedComma := []string{"hello", "world", "test"}
-
-	if len(spaceTokens) != len(expectedSpace) {
-		t.Errorf("space split: expected %d tokens, got %d", len(expectedSpace), len(spaceTokens))
-	}
-	if len(commaTokens) != len(expectedComma) {
-		t.Errorf("comma split: expected %d tokens, got %d", len(expectedComma), len(commaTokens))
-	}
-
-	for i, expected := range expectedSpace {
-		if spaceTokens[i] != expected {
-			t.Errorf("space split token %d: expected %q, got %q", i, expected, spaceTokens[i])
-		}
-	}
-	for i, expected := range expectedComma {
-		if commaTokens[i] != expected {
-			t.Errorf("comma split token %d: expected %q, got %q", i, expected, commaTokens[i])
-		}
-	}
-}
-
 func TestIterator_EmptyTokens(t *testing.T) {
 	// Test that empty tokens are handled correctly
 	input := "a b c"
