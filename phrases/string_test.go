@@ -108,19 +108,20 @@ func BenchmarkString(b *testing.B) {
 
 	len := len(file)
 	b.SetBytes(int64(len))
-	tokens := phrases.FromString(s)
 
 	b.ResetTimer()
 	c := 0
 	start := time.Now()
 
 	for i := 0; i < b.N; i++ {
-		tokens.SetText(s)
+		tokens := phrases.FromString(s)
 
 		for tokens.Next() {
+			_ = tokens.Value()
 			c++
 		}
 	}
+	b.ReportMetric(float64(c), "tokens")
 
 	elapsed := time.Since(start)
 	n := float64(b.N)

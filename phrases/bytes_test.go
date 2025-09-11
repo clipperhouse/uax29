@@ -108,14 +108,15 @@ func BenchmarkBytes(b *testing.B) {
 	b.ResetTimer()
 	bytes := len(file)
 	b.SetBytes(int64(bytes))
-	tokens := phrases.FromBytes(file)
 
 	c := 0
 	start := time.Now()
 
 	for i := 0; i < b.N; i++ {
-		tokens.SetText(file)
+		tokens := phrases.FromBytes(file)
+
 		for tokens.Next() {
+			_ = tokens.Value()
 			c++
 		}
 	}

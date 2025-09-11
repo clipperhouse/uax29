@@ -103,13 +103,13 @@ func BenchmarkBytes(b *testing.B) {
 
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
-	tokens := graphemes.FromBytes(file)
 
 	for i := 0; i < b.N; i++ {
-		tokens.SetText(file)
+		tokens := graphemes.FromBytes(file)
 
 		c := 0
 		for tokens.Next() {
+			_ = tokens.Value()
 			c++
 		}
 
@@ -127,13 +127,12 @@ func BenchmarkBytesUnicodeTests(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 
-	tokens := graphemes.FromBytes(file)
-
 	for i := 0; i < b.N; i++ {
-		tokens.SetText(file)
+		tokens := graphemes.FromBytes(file)
 
 		c := 0
 		for tokens.Next() {
+			_ = tokens.Value()
 			c++
 		}
 

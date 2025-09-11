@@ -102,13 +102,13 @@ func BenchmarkBytes(b *testing.B) {
 
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
-	tokens := sentences.FromBytes(file)
 
 	for i := 0; i < b.N; i++ {
-		tokens.SetText(file)
+		tokens := sentences.FromBytes(file)
 
 		c := 0
 		for tokens.Next() {
+			_ = tokens.Value()
 			c++
 		}
 
@@ -126,13 +126,12 @@ func BenchmarkUnicodeTests(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 
-	tokens := sentences.FromBytes(file)
-
 	for i := 0; i < b.N; i++ {
-		tokens.SetText(file)
+		tokens := sentences.FromBytes(file)
 
 		c := 0
 		for tokens.Next() {
+			_ = tokens.Value()
 			c++
 		}
 

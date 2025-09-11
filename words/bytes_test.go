@@ -124,11 +124,10 @@ func TestBytesInvalidUTF8(t *testing.T) {
 }
 
 func BenchmarkBytes(b *testing.B) {
-	tokens := words.FromBytes(nil)
-	benchBytes(b, tokens)
+	benchBytes(b, nil)
 }
 
-func benchBytes(b *testing.B, tokens *words.Iterator[[]byte]) {
+func benchBytes(b *testing.B, joiners *words.Joiners[[]byte]) {
 	file, err := testdata.Sample()
 	if err != nil {
 		b.Error(err)
@@ -142,12 +141,15 @@ func benchBytes(b *testing.B, tokens *words.Iterator[[]byte]) {
 	start := time.Now()
 
 	for i := 0; i < b.N; i++ {
-		tokens.SetText(file)
-
-		for tokens.Next() {
-			c++
+		tokens := words.FromBytes(file)
+		if joiners != nil {
+			tokens.Joiners(joiners)
 		}
 
+		for tokens.Next() {
+			_ = tokens.Value()
+			c++
+		}
 	}
 
 	elapsed := time.Since(start)
@@ -166,9 +168,7 @@ func BenchmarkBytesJoiners(b *testing.B) {
 		Middle:  []rune("@-/"),
 		Leading: []rune("#."),
 	}
-	tokens := words.FromBytes(nil)
-	tokens.Joiners(joiners)
-	benchBytes(b, tokens)
+	benchBytes(b, joiners)
 }
 
 func BenchmarkBytesUnicodeTests(b *testing.B) {
@@ -181,13 +181,12 @@ func BenchmarkBytesUnicodeTests(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 
-	tokens := words.FromBytes(file)
-
 	for i := 0; i < b.N; i++ {
-		tokens.SetText(file)
+		tokens := words.FromBytes(file)
 
 		c := 0
 		for tokens.Next() {
+			_ = tokens.Value()
 			c++
 		}
 

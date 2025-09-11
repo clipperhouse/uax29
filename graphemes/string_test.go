@@ -107,13 +107,13 @@ func BenchmarkString(b *testing.B) {
 
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
-	tokens := graphemes.FromString(s)
 
 	for i := 0; i < b.N; i++ {
-		tokens.SetText(s)
+		tokens := graphemes.FromString(s)
 
 		c := 0
 		for tokens.Next() {
+			_ = tokens.Value()
 			c++
 		}
 
@@ -244,13 +244,12 @@ func BenchmarkStringUnicodeTests(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 
-	tokens := graphemes.FromString(s)
-
 	for i := 0; i < b.N; i++ {
-		tokens.SetText(s)
+		tokens := graphemes.FromString(s)
 
 		c := 0
 		for tokens.Next() {
+			_ = tokens.Value()
 			c++
 		}
 
