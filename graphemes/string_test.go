@@ -97,30 +97,6 @@ func TestStringInvalidUTF8(t *testing.T) {
 	}
 }
 
-func BenchmarkString(b *testing.B) {
-	file, err := testdata.Sample()
-	if err != nil {
-		b.Error(err)
-	}
-
-	s := string(file)
-
-	b.ResetTimer()
-	b.SetBytes(int64(len(file)))
-
-	for i := 0; i < b.N; i++ {
-		tokens := graphemes.FromString(s)
-
-		c := 0
-		for tokens.Next() {
-			_ = tokens.Value()
-			c++
-		}
-
-		b.ReportMetric(float64(c), "tokens")
-	}
-}
-
 func TestStringUnicode16ForwardCompatibility(t *testing.T) {
 	t.Parallel()
 
@@ -230,6 +206,30 @@ func TestStringUnicode16ForwardCompatibility(t *testing.T) {
 				t.Errorf("Roundtrip failed: input %q != reconstructed %q", tc.input, reconstructed)
 			}
 		})
+	}
+}
+
+func BenchmarkString(b *testing.B) {
+	file, err := testdata.Sample()
+	if err != nil {
+		b.Error(err)
+	}
+
+	s := string(file)
+
+	b.ResetTimer()
+	b.SetBytes(int64(len(file)))
+
+	for i := 0; i < b.N; i++ {
+		tokens := graphemes.FromString(s)
+
+		c := 0
+		for tokens.Next() {
+			_ = tokens.Value()
+			c++
+		}
+
+		b.ReportMetric(float64(c), "tokens")
 	}
 }
 
