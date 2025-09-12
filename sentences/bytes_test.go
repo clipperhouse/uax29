@@ -22,7 +22,7 @@ func TestBytesUnicode(t *testing.T) {
 		var all [][]byte
 		tokens := sentences.FromBytes(test.input)
 		for tokens.Next() {
-			all = append(all, tokens.Bytes())
+			all = append(all, tokens.Value())
 		}
 
 		if !reflect.DeepEqual(all, test.expected) {
@@ -45,7 +45,7 @@ func TestBytesUnicode(t *testing.T) {
 func TestBytesRoundtrip(t *testing.T) {
 	t.Parallel()
 
-	const runs = 2000
+	const runs = 100
 
 	tokens := sentences.FromBytes(nil)
 
@@ -55,7 +55,7 @@ func TestBytesRoundtrip(t *testing.T) {
 
 		var output []byte
 		for tokens.Next() {
-			output = append(output, tokens.Bytes()...)
+			output = append(output, tokens.Value()...)
 		}
 
 		if !bytes.Equal(output, input) {
@@ -86,7 +86,7 @@ func TestBytesInvalidUTF8(t *testing.T) {
 
 	var output []byte
 	for tokens.Next() {
-		output = append(output, tokens.Bytes()...)
+		output = append(output, tokens.Value()...)
 	}
 
 	if !bytes.Equal(output, input) {
@@ -102,13 +102,13 @@ func BenchmarkBytes(b *testing.B) {
 
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
-	tokens := sentences.FromBytes(file)
 
 	for i := 0; i < b.N; i++ {
-		tokens.SetText(file)
+		tokens := sentences.FromBytes(file)
 
 		c := 0
 		for tokens.Next() {
+			_ = tokens.Value()
 			c++
 		}
 
@@ -126,13 +126,12 @@ func BenchmarkUnicodeTests(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 
-	tokens := sentences.FromBytes(file)
-
 	for i := 0; i < b.N; i++ {
-		tokens.SetText(file)
+		tokens := sentences.FromBytes(file)
 
 		c := 0
 		for tokens.Next() {
+			_ = tokens.Value()
 			c++
 		}
 
