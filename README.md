@@ -39,8 +39,8 @@ text := "Hello, 世界. Nice dog! 👍🐶"
 
 tokens := words.FromString(text)
 
-for tokens.Next() {                          // Next() returns true until end of data
-	fmt.Printf("%q\n", tokens.Text())        // Do something with the current token
+for tokens.Next() {                     // Next() returns true until end of data
+	fmt.Println(tokens.Value())         // Do something with the current token
 }
 ```
 

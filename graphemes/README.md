@@ -13,8 +13,8 @@ text := "Hello, 世界. Nice dog! 👍🐶"
 
 tokens := graphemes.FromString(text)
 
-for tokens.Next() {                         // Next() returns true until end of data
-	fmt.Printf("%q\n", tokens.Text())       // Do something with the current grapheme
+for tokens.Next() {                     // Next() returns true until end of data
+	fmt.Println(tokens.Value())         // Do something with the current grapheme
 }
 ```
 
@@ -32,52 +32,48 @@ We use the Unicode [test suite](https://unicode.org/reports/tr41/tr41-26.html#Te
 
 ### If you have a `string`
 
-Use `FromString`:
-
 ```go
 text := "Hello, 世界. Nice dog! 👍🐶"
 
 tokens := graphemes.FromString(text)
 
-for tokens.Next() {                         // Next() returns true until end of data
-	fmt.Printf("%q\n", tokens.Text())       // Do something with the current grapheme
+for tokens.Next() {                     // Next() returns true until end of data
+	fmt.Println(tokens.Value())         // Do something with the current grapheme
 }
 ```
 
 ### If you have an `io.Reader`
 
-Use `FromReader`. It embeds a [`bufio.Scanner`](https://pkg.go.dev/bufio#Scanner), so you can use those methods.
+`FromReader` embeds a [`bufio.Scanner`](https://pkg.go.dev/bufio#Scanner), so just use those methods.
 
 ```go
-r := getYourReader()                            // from a file or network maybe
+r := getYourReader()                        // from a file or network maybe
 tokens := graphemes.FromReader(r)
 
-for tokens.Scan() {                             // Scan() returns true until error or EOF
-	fmt.Println(tokens.Value())                 // Do something with the current grapheme
+for tokens.Scan() {                         // Scan() returns true until error or EOF
+	fmt.Println(tokens.Text())              // Do something with the current grapheme
 }
 
-if tokens.Err() != nil {                        // Check the error
+if tokens.Err() != nil {                    // Check the error
 	log.Fatal(tokens.Err())
 }
 ```
 
 ### If you have a `[]byte`
 
-Use `FromBytes`.
-
 ```go
 b := []byte("Hello, 世界. Nice dog! 👍🐶")
 
 tokens := graphemes.FromBytes(b)
 
-for tokens.Next() {                            // Next() returns true until end of data
-	fmt.Printf("%q\n", tokens.Value())         // Do something with the current grapheme
+for tokens.Next() {                     // Next() returns true until end of data
+	fmt.Println(tokens.Value())         // Do something with the current grapheme
 }
 ```
 
 ### Performance
 
-On a Mac M2 laptop, we see around 70MB/s, or around 70 million graphemes per second. You should see ~constant memory, and no allocations.
+On a Mac M2 laptop, we see around 200MB/s, or around 100 million graphemes per second. You should see ~constant memory, and no allocations.
 
 ### Invalid inputs
 

@@ -13,15 +13,14 @@ text := "Hello, 世界. Nice dog! 👍🐶"
 
 tokens := words.FromString(text)
 
-for tokens.Next() {                          // Next() returns true until end of data or error
-	fmt.Printf("%q\n", tokens.Text())        // Do something with the current token
+for tokens.Next() {                     // Next() returns true until end of data or error
+	fmt.Println(tokens.Value())         // Do something with the current token
 }
 ```
 
 [![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/v2/words.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/v2/words)
 
-_Note: this package returns all tokens, including whitespace and punctuation. It's not strictly “words” in the common sense,
-it's “split on word boundaries”._
+_Note: this package returns all tokens, including whitespace and punctuation. It's not strictly “words” in the common sense, it's “split on word boundaries”._
 
 ## Conformance
 
@@ -33,46 +32,42 @@ We use the Unicode [test suite](https://unicode.org/reports/tr41/tr41-26.html#Te
 
 #### If you have a `string`
 
-Use `FromString` for bounded memory and best performance:
-
 ```go
 text := "Hello, 世界. Nice dog! 👍🐶"
 
 tokens := words.FromString(text)
 
 for tokens.Next() {                          // Next() returns true until end of data
-	fmt.Printf("%q\n", tokens.Text())        // Do something with the current word
+	fmt.Println(tokens.Value())        // Do something with the current word
 }
 ```
 
 #### If you have an `io.Reader`
 
-Use `FromReader`. It embeds a [`bufio.Scanner`](https://pkg.go.dev/bufio#Scanner), so you can use those methods.
+`FromReader` embeds a [`bufio.Scanner`](https://pkg.go.dev/bufio#Scanner), so just use those methods.
 
 ```go
-r := getYourReader()                           // from a file or network maybe
+r := getYourReader()                   // from a file or network maybe
 tokens := words.FromReader(r)
 
-for tokens.Scan() {                            // Scan() returns true until end of data or error
-	fmt.Printf("%q\n", tokens.Text())          // Do something with the current word
+for tokens.Scan() {                    // Scan() returns true until end of data or error
+	fmt.Println(tokens.Text())         // Do something with the current word
 }
 
-if tokens.Err() != nil {                       // Check the error
+if tokens.Err() != nil {               // Check the error
 	log.Fatal(tokens.Err())
 }
 ```
 
 #### If you have a `[]byte`
 
-Use `FromBytes`.
-
 ```go
 b := []byte("Hello, 世界. Nice dog! 👍🐶")
 
 tokens := words.FromBytes(b)
 
-for tokens.Next() {                            // Next() returns true until end of data
-	fmt.Printf("%q\n", tokens.Value())         // Do something with the current word
+for tokens.Next() {                     // Next() returns true until end of data
+	fmt.Println(tokens.Value())         // Do something with the current word
 }
 ```
 
@@ -101,7 +96,7 @@ tokens := words.FromString(text)
 tokens.Joiners(joiners)
 
 for tokens.Next() {
-	fmt.Println(tokens.Text())
+	fmt.Println(tokens.Value())
 }
 ```
 

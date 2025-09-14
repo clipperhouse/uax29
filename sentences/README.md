@@ -14,7 +14,7 @@ text := "Hello, 世界. Nice dog! 👍🐶"
 tokens := sentences.FromString(text)
 
 for tokens.Next() {                         // Next() returns true until end of data
-	fmt.Printf("%q\n", tokens.Text())       // Do something with the current sentence
+	fmt.Println(tokens.Value())        // Do something with the current sentence
 }
 ```
 
@@ -30,46 +30,42 @@ We use the Unicode [test suite](https://unicode.org/reports/tr41/tr41-26.html#Te
 
 ### If you have a `string`
 
-Use `FromString`:
-
 ```go
 text := "Hello, 世界. Nice dog! 👍🐶"
 
 tokens := sentences.FromString(text)
 
-for tokens.Next() {                         // Next() returns true until end of data
-	fmt.Printf("%q\n", tokens.Text())       // Do something with the current sentence
+for tokens.Next() {                      // Next() returns true until end of data
+	fmt.Println(tokens.Value())          // Do something with the current sentence
 }
 ```
 
 ### If you have an `io.Reader`
 
-Use `FromReader`. It embeds a [`bufio.Scanner`](https://pkg.go.dev/bufio#Scanner), so you can use those methods.
+`FromReader` embeds a [`bufio.Scanner`](https://pkg.go.dev/bufio#Scanner), so just use those methods.
 
 ```go
-r := getYourReader()                            // from a file or network maybe
+r := getYourReader()                       // from a file or network maybe
 tokens := sentences.FromReader(r)
 
-for tokens.Scan() {                             // Scan() returns true until error or EOF
-	fmt.Println(tokens.Value())                 // Do something with the current sentence
+for tokens.Scan() {                        // Scan() returns true until error or EOF
+	fmt.Println(tokens.Text())             // Do something with the current sentence
 }
 
-if tokens.Err() != nil {                        // Check the error
+if tokens.Err() != nil {                   // Check the error
 	log.Fatal(tokens.Err())
 }
 ```
 
 ### If you have a `[]byte`
 
-Use `FromBytes`.
-
 ```go
 b := []byte("Hello, 世界. Nice dog! 👍🐶")
 
 tokens := sentences.FromBytes(b)
 
-for tokens.Next() {                            // Next() returns true until end of data
-	fmt.Printf("%q\n", tokens.Value())         // Do something with the current sentence
+for tokens.Next() {                     // Next() returns true until end of data
+	fmt.Println(tokens.Value())         // Do something with the current sentence
 }
 ```
 
