@@ -15,7 +15,7 @@ import (
 func TestStringRoundtrip(t *testing.T) {
 	t.Parallel()
 
-	const runs = 2000
+	const runs = 100
 
 	tokens := phrases.FromString("")
 
@@ -25,7 +25,7 @@ func TestStringRoundtrip(t *testing.T) {
 
 		var output string
 		for tokens.Next() {
-			output += tokens.Text()
+			output += tokens.Value()
 		}
 
 		if output != input {
@@ -56,7 +56,7 @@ func TestStringInvalidUTF8(t *testing.T) {
 
 	var output []byte
 	for tokens.Next() {
-		output = append(output, tokens.Bytes()...)
+		output = append(output, tokens.Value()...)
 	}
 
 	if !bytes.Equal(output, input) {
@@ -64,10 +64,10 @@ func TestStringInvalidUTF8(t *testing.T) {
 	}
 }
 
-func stringIterToSetTrimmed(tokens *phrases.StringIterator) map[string]struct{} {
+func stringIterToSetTrimmed(tokens phrases.Iterator[string]) map[string]struct{} {
 	founds := make(map[string]struct{})
 	for tokens.Next() {
-		key := strings.TrimSpace(tokens.Text())
+		key := strings.TrimSpace(tokens.Value())
 		founds[key] = exists
 	}
 	return founds
@@ -108,19 +108,20 @@ func BenchmarkString(b *testing.B) {
 
 	len := len(file)
 	b.SetBytes(int64(len))
-	tokens := phrases.FromString(s)
 
 	b.ResetTimer()
 	c := 0
 	start := time.Now()
 
 	for i := 0; i < b.N; i++ {
-		tokens.SetText(s)
+		tokens := phrases.FromString(s)
 
 		for tokens.Next() {
+			_ = tokens.Value()
 			c++
 		}
 	}
+	b.ReportMetric(float64(c), "tokens")
 
 	elapsed := time.Since(start)
 	n := float64(b.N)

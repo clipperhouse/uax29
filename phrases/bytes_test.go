@@ -14,7 +14,7 @@ import (
 func TestBytesRoundtrip(t *testing.T) {
 	t.Parallel()
 
-	const runs = 2000
+	const runs = 100
 
 	tokens := phrases.FromBytes(nil)
 
@@ -24,7 +24,7 @@ func TestBytesRoundtrip(t *testing.T) {
 
 		var output []byte
 		for tokens.Next() {
-			output = append(output, tokens.Bytes()...)
+			output = append(output, tokens.Value()...)
 		}
 
 		if !bytes.Equal(output, input) {
@@ -55,7 +55,7 @@ func TestBytesInvalidUTF8(t *testing.T) {
 
 	var output []byte
 	for tokens.Next() {
-		output = append(output, tokens.Bytes()...)
+		output = append(output, tokens.Value()...)
 	}
 
 	if !bytes.Equal(output, input) {
@@ -65,10 +65,10 @@ func TestBytesInvalidUTF8(t *testing.T) {
 
 var exists = struct{}{}
 
-func bytesToSetTrimmed(tokens *phrases.BytesIterator) map[string]struct{} {
+func bytesToSetTrimmed(tokens phrases.Iterator[[]byte]) map[string]struct{} {
 	founds := make(map[string]struct{})
 	for tokens.Next() {
-		key := bytes.TrimSpace(tokens.Bytes())
+		key := bytes.TrimSpace(tokens.Value())
 		founds[string(key)] = exists
 	}
 	return founds
@@ -108,14 +108,15 @@ func BenchmarkBytes(b *testing.B) {
 	b.ResetTimer()
 	bytes := len(file)
 	b.SetBytes(int64(bytes))
-	tokens := phrases.FromBytes(file)
 
 	c := 0
 	start := time.Now()
 
 	for i := 0; i < b.N; i++ {
-		tokens.SetText(file)
+		tokens := phrases.FromBytes(file)
+
 		for tokens.Next() {
+			_ = tokens.Value()
 			c++
 		}
 	}

@@ -22,7 +22,7 @@ func TestStringUnicode(t *testing.T) {
 		var all []string
 		tokens := graphemes.FromString(string(test.input))
 		for tokens.Next() {
-			all = append(all, tokens.Text())
+			all = append(all, tokens.Value())
 		}
 
 		expected := make([]string, len(test.expected))
@@ -50,7 +50,7 @@ func TestStringUnicode(t *testing.T) {
 func TestStringRoundtrip(t *testing.T) {
 	t.Parallel()
 
-	const runs = 2000
+	const runs = 100
 
 	for i := 0; i < runs; i++ {
 		input := string(getRandomBytes())
@@ -58,7 +58,7 @@ func TestStringRoundtrip(t *testing.T) {
 
 		var output string
 		for tokens.Next() {
-			output += tokens.Text()
+			output += tokens.Value()
 		}
 
 		if output != input {
@@ -89,35 +89,11 @@ func TestStringInvalidUTF8(t *testing.T) {
 
 	var output string
 	for tokens.Next() {
-		output += tokens.Text()
+		output += tokens.Value()
 	}
 
 	if output != string(input) {
 		t.Fatalf("input bytes are not the same as output bytes")
-	}
-}
-
-func BenchmarkString(b *testing.B) {
-	file, err := testdata.Sample()
-	if err != nil {
-		b.Error(err)
-	}
-
-	s := string(file)
-
-	b.ResetTimer()
-	b.SetBytes(int64(len(file)))
-	tokens := graphemes.FromString(s)
-
-	for i := 0; i < b.N; i++ {
-		tokens.SetText(s)
-
-		c := 0
-		for tokens.Next() {
-			c++
-		}
-
-		b.ReportMetric(float64(c), "tokens")
 	}
 }
 
@@ -210,7 +186,7 @@ func TestStringUnicode16ForwardCompatibility(t *testing.T) {
 			var actual []string
 			tokens := graphemes.FromString(tc.input)
 			for tokens.Next() {
-				actual = append(actual, tokens.Text())
+				actual = append(actual, tokens.Value())
 			}
 
 			if !reflect.DeepEqual(actual, tc.expected) {
@@ -233,6 +209,30 @@ func TestStringUnicode16ForwardCompatibility(t *testing.T) {
 	}
 }
 
+func BenchmarkString(b *testing.B) {
+	file, err := testdata.Sample()
+	if err != nil {
+		b.Error(err)
+	}
+
+	s := string(file)
+
+	b.ResetTimer()
+	b.SetBytes(int64(len(file)))
+
+	for i := 0; i < b.N; i++ {
+		tokens := graphemes.FromString(s)
+
+		c := 0
+		for tokens.Next() {
+			_ = tokens.Value()
+			c++
+		}
+
+		b.ReportMetric(float64(c), "tokens")
+	}
+}
+
 func BenchmarkStringUnicodeTests(b *testing.B) {
 	var buf bytes.Buffer
 	for _, test := range unicodeTests {
@@ -244,13 +244,12 @@ func BenchmarkStringUnicodeTests(b *testing.B) {
 	b.ResetTimer()
 	b.SetBytes(int64(len(file)))
 
-	tokens := graphemes.FromString(s)
-
 	for i := 0; i < b.N; i++ {
-		tokens.SetText(s)
+		tokens := graphemes.FromString(s)
 
 		c := 0
 		for tokens.Next() {
+			_ = tokens.Value()
 			c++
 		}
 

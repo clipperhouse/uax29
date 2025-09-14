@@ -1,6 +1,10 @@
 package graphemes
 
-var trie = &graphemesTrie{}
+import (
+	"bufio"
+
+	"github.com/clipperhouse/uax29/v2/internal/iterators"
+)
 
 // is determines if lookup intersects propert(ies)
 func (lookup property) is(properties property) bool {
@@ -9,13 +13,15 @@ func (lookup property) is(properties property) bool {
 
 const _Ignore = _Extend
 
-// SplitFunc is a bufio.SplitFunc implementation of Unicode grapheme cluster
-// segmentation, for use with bufio.Scanner.
+// SplitFunc is a bufio.SplitFunc implementation of Unicode grapheme cluster segmentation, for use with bufio.Scanner.
 //
 // See https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries.
-func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
+var SplitFunc bufio.SplitFunc = splitFunc[[]byte]
+
+func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T, err error) {
+	var empty T
 	if len(data) == 0 {
-		return 0, nil, nil
+		return 0, empty, nil
 	}
 
 	// These vars are stateful across loop iterations
@@ -27,11 +33,11 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 	// to the right of the ×, from which we look back or forward
 
-	current, w := trie.lookup(data[pos:])
+	current, w := lookup(data[pos:])
 	if w == 0 {
 		if !atEOF {
 			// Rune extends past current data, request more
-			return 0, nil, nil
+			return 0, empty, nil
 		}
 		pos = len(data)
 		return pos, data[:pos], nil
@@ -47,7 +53,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		if eot {
 			if !atEOF {
 				// Token extends past current data, request more
-				return 0, nil, nil
+				return 0, empty, nil
 			}
 
 			// https://unicode.org/reports/tr29/#GB2
@@ -70,7 +76,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 			lastExIgnore = last
 		}
 
-		current, w = trie.lookup(data[pos:])
+		current, w = lookup(data[pos:])
 		if w == 0 {
 			if atEOF {
 				// Just return the bytes, we can't do anything with them
@@ -78,7 +84,7 @@ func SplitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
 				break
 			}
 			// Rune extends past current data, request more
-			return 0, nil, nil
+			return 0, empty, nil
 		}
 
 		// Optimization: no rule can possibly apply
