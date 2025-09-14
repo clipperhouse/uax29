@@ -21,9 +21,7 @@ const (
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner.
 //
 // See https://unicode.org/reports/tr29/#Word_Boundaries.
-var SplitFunc bufio.SplitFunc = func(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	return splitFunc(data, atEOF)
-}
+var SplitFunc bufio.SplitFunc = splitFunc[[]byte]
 
 func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T, err error) {
 	var none Joiners[T]
