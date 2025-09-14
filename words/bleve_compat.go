@@ -6,9 +6,16 @@ package words
 func BleveNumeric(token []byte) bool {
 	var pos, w int
 	var current property
+	var lastExIgnore property     // "last excluding ignored categories"
+	var lastLastExIgnore property // "the last one before that"
 
 	for pos < len(token) {
+		// Remember previous properties to avoid lookups/lookbacks
 		last := current
+		if !last.is(_Ignore) {
+			lastLastExIgnore = lastExIgnore
+			lastExIgnore = last
+		}
 
 		current, w = lookup(token[pos:])
 
@@ -22,58 +29,38 @@ func BleveNumeric(token []byte) bool {
 			return false
 		}
 
-		// WB8.   Numeric × Numeric
 		// https://unicode.org/reports/tr29/#WB8
-		isWB8 := last.is(_Numeric) && current.is(_Numeric)
-		if isWB8 {
+		if last.is(_Numeric) && current.is(_Numeric) {
 			pos += w
 			continue
 		}
 
-		// WB11.  Numeric (MidNum | MidNumLet | Single_Quote) × Numeric
 		// https://unicode.org/reports/tr29/#WB11
-		// Determine if WB11 can possibly apply
-		maybeWB11 := last.is(_MidNum|_MidNumLetQ|_Ignore) && current.is(_Numeric)
-		if maybeWB11 {
-			i := previousIndex(_MidNum|_MidNumLetQ, token[:pos])
-			if i > 0 && previous(_Numeric, token[:i]) {
-				pos += w
-				continue
-			}
+		if current.is(_Numeric) && lastExIgnore.is(_MidNum|_MidNumLetQ) && lastLastExIgnore.is(_Numeric) {
+			pos += w
+			continue
 		}
 
 		// WB12.  Numeric × (MidNum | MidNumLet | Single_Quote) Numeric
 		// https://unicode.org/reports/tr29/#WB12
-		// Optimization: determine if WB12 can possibly apply
-		maybeWB12 := last.is(_Numeric|_Ignore) && current.is(_MidNum|_MidNumLetQ)
-		if maybeWB12 {
-			subseq, _ := subsequent(_Numeric, token[pos+w:], true)
-			if subseq != notfound && previous(_Numeric, token[:pos]) {
-				pos += w + subseq
+		if current.is(_MidNum|_MidNumLetQ) && lastExIgnore.is(_Numeric) {
+			advance, _ := subsequent(_Numeric, token[pos+w:], true)
+			if advance != notfound {
+				pos += w + advance
 				continue
 			}
 		}
 
-		// WB13a. (ALetter | Hebrew_Letter | Numeric | Katakana | ExtendNumLet) × ExtendNumLet
 		// https://unicode.org/reports/tr29/#WB13a
-		// Determine if WB13a can possibly apply
-		maybeWB13a := last.is(_Numeric|_ExtendNumLet|_Ignore) && current.is(_ExtendNumLet)
-		if maybeWB13a {
-			if previous(_Numeric|_ExtendNumLet, token[:pos]) {
-				pos += w
-				continue
-			}
+		if current.is(_ExtendNumLet) && lastExIgnore.is(_Numeric|_ExtendNumLet) {
+			pos += w
+			continue
 		}
 
-		// WB13b. ExtendNumLet × (ALetter | Hebrew_Letter | Numeric | Katakana)
 		// https://unicode.org/reports/tr29/#WB13b
-		// Determine if WB13b can possibly apply
-		maybeWB13b := last.is(_ExtendNumLet|_Ignore) && current.is(_Numeric)
-		if maybeWB13b {
-			if previous(_ExtendNumLet, token[:pos]) {
-				pos += w
-				continue
-			}
+		if current.is(_Numeric) && lastExIgnore.is(_ExtendNumLet) {
+			pos += w
+			continue
 		}
 
 		// if we get here, none of the above rules apply
@@ -115,6 +102,3 @@ func BleveIdeographic(token []byte) bool {
 
 	return true
 }
-
-// On the complex topic of CJK & Unicode:
-//  https://www.hieuthi.com/blog/2021/07/22/unicode-categories-cjk-ideographs.html
