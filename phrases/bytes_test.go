@@ -65,7 +65,7 @@ func TestBytesInvalidUTF8(t *testing.T) {
 
 var exists = struct{}{}
 
-func bytesToSetTrimmed(tokens *phrases.Iterator[[]byte]) map[string]struct{} {
+func bytesToSetTrimmed(tokens phrases.Iterator[[]byte]) map[string]struct{} {
 	founds := make(map[string]struct{})
 	for tokens.Next() {
 		key := bytes.TrimSpace(tokens.Value())

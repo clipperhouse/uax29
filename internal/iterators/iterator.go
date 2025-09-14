@@ -10,23 +10,22 @@ type SplitFunc[T Stringish] func(T, bool) (int, T, error)
 // Iterate while Next() is true, and access the word via Value().
 type Iterator[T Stringish] struct {
 	split SplitFunc[T]
-	data  *T
+	data  T
 	start int
 	pos   int
 }
 
 // New creates a new Iterator for the given data and SplitFunc.
 func New[T Stringish](split SplitFunc[T], data T) *Iterator[T] {
-	iter := &Iterator[T]{
+	return &Iterator[T]{
 		split: split,
-		data:  &data,
+		data:  data,
 	}
-	return iter
 }
 
 // SetText sets the text for the iterator to operate on, and resets all state.
 func (iter *Iterator[T]) SetText(data T) {
-	iter.data = &data
+	iter.data = data
 	iter.start = 0
 	iter.pos = 0
 }
@@ -39,17 +38,16 @@ func (iter *Iterator[T]) Split(split SplitFunc[T]) {
 // Next advances the iterator to the next token. It returns false when there
 // are no remaining tokens or an error occurred.
 func (iter *Iterator[T]) Next() bool {
-	d := *iter.data
-	if iter.pos == len(d) {
+	if iter.pos == len(iter.data) {
 		return false
 	}
-	if iter.pos > len(d) {
+	if iter.pos > len(iter.data) {
 		panic("SplitFunc advanced beyond the end of the data")
 	}
 
 	iter.start = iter.pos
 
-	advance, _, err := iter.split(d[iter.pos:], true)
+	advance, _, err := iter.split(iter.data[iter.pos:], true)
 	if err != nil {
 		panic(err)
 	}
@@ -58,7 +56,7 @@ func (iter *Iterator[T]) Next() bool {
 	}
 
 	iter.pos += advance
-	if iter.pos > len(d) {
+	if iter.pos > len(iter.data) {
 		panic("SplitFunc advanced beyond the end of the data")
 	}
 
@@ -67,8 +65,7 @@ func (iter *Iterator[T]) Next() bool {
 
 // Value returns the current token.
 func (iter *Iterator[T]) Value() T {
-	d := *iter.data
-	return d[iter.start:iter.pos]
+	return iter.data[iter.start:iter.pos]
 }
 
 // Start returns the byte position of the current token in the original data.
@@ -83,6 +80,6 @@ func (iter *Iterator[T]) End() int {
 
 // Reset resets the iterator to the beginning of the data.
 func (iter *Iterator[T]) Reset() {
-	iter.pos = 0
 	iter.start = 0
+	iter.pos = 0
 }

@@ -64,7 +64,7 @@ func TestStringInvalidUTF8(t *testing.T) {
 	}
 }
 
-func stringIterToSetTrimmed(tokens *phrases.Iterator[string]) map[string]struct{} {
+func stringIterToSetTrimmed(tokens phrases.Iterator[string]) map[string]struct{} {
 	founds := make(map[string]struct{})
 	for tokens.Next() {
 		key := strings.TrimSpace(tokens.Value())

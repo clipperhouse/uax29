@@ -67,7 +67,7 @@ func TestStringRoundtrip(t *testing.T) {
 	}
 }
 
-func stringIterToSet(tokens *words.Iterator[string]) map[string]struct{} {
+func stringIterToSet(tokens words.Iterator[string]) map[string]struct{} {
 	founds := make(map[string]struct{})
 	for tokens.Next() {
 		founds[tokens.Value()] = struct{}{}

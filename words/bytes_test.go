@@ -65,7 +65,7 @@ func TestBytesRoundtrip(t *testing.T) {
 	}
 }
 
-func iterToSet(tokens *words.Iterator[[]byte]) map[string]struct{} {
+func iterToSet(tokens words.Iterator[[]byte]) map[string]struct{} {
 	founds := make(map[string]struct{})
 	for tokens.Next() {
 		founds[string(tokens.Value())] = struct{}{}
