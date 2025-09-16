@@ -3,7 +3,7 @@ package phrases
 import (
 	"bufio"
 
-	"github.com/clipperhouse/uax29/v2/internal/iterators"
+	"github.com/clipperhouse/uax29/v2/internal/stringish"
 )
 
 // is determines if lookup intersects propert(ies)
@@ -21,7 +21,7 @@ const (
 var SplitFunc bufio.SplitFunc = splitFunc[[]byte]
 
 // splitFunc is a bufio.SplitFunc implementation of phrase segmentation, for use with bufio.Scanner.
-func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T, err error) {
+func splitFunc[T stringish.Interface](data T, atEOF bool) (advance int, token T, err error) {
 	var empty T
 	if len(data) == 0 {
 		return 0, empty, nil
@@ -128,15 +128,15 @@ func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T,
 
 		// https://unicode.org/reports/tr29/#WB6
 		if current.is(_MidLetter|_MidNumLetQ) && lastExIgnore.is(_AHLetter) {
-			found, w2, more := subsequent(_AHLetter, data[pos+w:], atEOF)
+			advance, more := subsequent(_AHLetter, data[pos+w:], atEOF)
 
 			if more {
 				// Token extends past current data, request more
 				return 0, empty, nil
 			}
 
-			if found {
-				pos += w + w2
+			if advance != notfound {
+				pos += w + advance
 				continue
 			}
 		}
@@ -155,15 +155,15 @@ func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T,
 
 		// https://unicode.org/reports/tr29/#WB7b
 		if current.is(_DoubleQuote) && lastExIgnore.is(_HebrewLetter) {
-			found, w2, more := subsequent(_HebrewLetter, data[pos+w:], atEOF)
+			advance, more := subsequent(_HebrewLetter, data[pos+w:], atEOF)
 
 			if more {
 				// Token extends past current data, request more
 				return 0, empty, nil
 			}
 
-			if found {
-				pos += w + w2
+			if advance != notfound {
+				pos += w + advance
 				continue
 			}
 		}
@@ -191,15 +191,15 @@ func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T,
 
 		// https://unicode.org/reports/tr29/#WB12
 		if current.is(_MidNum|_MidNumLetQ) && lastExIgnore.is(_Numeric) {
-			found, w2, more := subsequent(_Numeric, data[pos+w:], atEOF)
+			advance, more := subsequent(_Numeric, data[pos+w:], atEOF)
 
 			if more {
 				// Token extends past current data, request more
 				return 0, empty, nil
 			}
 
-			if found {
-				pos += w + w2
+			if advance != notfound {
+				pos += w + advance
 				continue
 			}
 		}

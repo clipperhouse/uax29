@@ -1,33 +1,21 @@
 package sentences
 
 import (
-	"unicode/utf8"
-
-	"github.com/clipperhouse/uax29/v2/internal/iterators"
+	"github.com/clipperhouse/uax29/v2/internal/stringish"
+	"github.com/clipperhouse/uax29/v2/internal/stringish/utf8"
 )
 
-func decodeLastRune[T iterators.Stringish](data T) (rune, int) {
-	// This casting is a bit gross but it works
-	// and is surprisingly fast
-	switch s := any(data).(type) {
-	case []byte:
-		return utf8.DecodeLastRune(s)
-	case string:
-		return utf8.DecodeLastRuneInString(s)
-	default:
-		panic("unsupported type")
-	}
-}
+const notfound = -1
 
 // previousIndex works backward until it hits a rune in properties,
 // ignoring runes in the _Ignore property (per SB5), and returns
 // the index of the rune in data. It returns -1 if such a rune is not found.
-func previousIndex[T iterators.Stringish](properties property, data T) int {
+func previousIndex[T stringish.Interface](properties property, data T) int {
 	// Start at the end of the buffer and move backwards
 
 	i := len(data)
 	for i > 0 {
-		_, w := decodeLastRune(data[:i])
+		_, w := utf8.DecodeLastRune(data[:i])
 		i -= w
 
 		lookup, _ := lookup(data[i:])
@@ -49,23 +37,23 @@ func previousIndex[T iterators.Stringish](properties property, data T) int {
 
 // previous works backward in the buffer until it hits a rune in properties,
 // ignoring runes with the _Ignore property per SB5
-func previous[T iterators.Stringish](properties property, data T) bool {
+func previous[T stringish.Interface](properties property, data T) bool {
 	return previousIndex(properties, data) != -1
 }
 
 // subsequent looks ahead in the buffer until it hits a rune in properties,
-// ignoring runes in the _Ignore property per SB5
-func subsequent[T iterators.Stringish](properties property, data T, atEOF bool) (found bool, pos int, requestMore bool) {
+// ignoring runes with the _Ignore property per SB5
+func subsequent[T stringish.Interface](properties property, data T, atEOF bool) (advance int, more bool) {
 	i := 0
 	for i < len(data) {
 		lookup, w := lookup(data[i:])
 		if w == 0 {
 			if atEOF {
 				// Nothing more to evaluate
-				return false, 0, false
+				return notfound, false
 			}
-			// More to evaluate
-			return false, 0, true
+			// More to evaluate - return notfound to indicate no match found yet
+			return notfound, true
 		}
 
 		if lookup.is(_Ignore) {
@@ -75,13 +63,20 @@ func subsequent[T iterators.Stringish](properties property, data T, atEOF bool) 
 
 		if lookup.is(properties) {
 			// Found it
-			return true, i + w, false
+			return i, false
 		}
 
-		// If we get this far, it's not immediately subsequent
-		return false, 0, false
+		// If we see a non-ignored character that doesn't match,
+		// the property is definitely not "immediately subsequent"
+		return notfound, false
 	}
 
-	// If not eof, we need more
-	return false, 0, !atEOF
+	// If we reach here, we've only seen ignored characters or incomplete runes
+	if atEOF {
+		// Nothing more to evaluate
+		return notfound, false
+	}
+
+	// Need more - return notfound to indicate no match found yet
+	return notfound, true
 }

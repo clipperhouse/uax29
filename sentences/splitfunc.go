@@ -3,7 +3,7 @@ package sentences
 import (
 	"bufio"
 
-	"github.com/clipperhouse/uax29/v2/internal/iterators"
+	"github.com/clipperhouse/uax29/v2/internal/stringish"
 )
 
 // is determines if lookup intersects propert(ies)
@@ -23,7 +23,7 @@ const (
 var SplitFunc bufio.SplitFunc = splitFunc[[]byte]
 
 // SplitFunc is a bufio.SplitFunc implementation of word segmentation, for use with bufio.Scanner.
-func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T, err error) {
+func splitFunc[T stringish.Interface](data T, atEOF bool) (advance int, token T, err error) {
 	var empty T
 	if len(data) == 0 {
 		return 0, empty, nil
@@ -163,15 +163,15 @@ main:
 				p += w
 			}
 
-			found, w2, more := subsequent(_Lower, data[p:], atEOF)
+			advance, more := subsequent(_Lower, data[p:], atEOF)
 
 			if more {
 				// Rune or token extends past current data, request more
 				return 0, empty, nil
 			}
 
-			if found {
-				pos = p + w2
+			if advance != notfound {
+				pos = p + advance
 				continue
 			}
 		}

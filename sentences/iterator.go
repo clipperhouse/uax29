@@ -1,8 +1,11 @@
 package sentences
 
-import "github.com/clipperhouse/uax29/v2/internal/iterators"
+import (
+	"github.com/clipperhouse/uax29/v2/internal/iterators"
+	"github.com/clipperhouse/uax29/v2/internal/stringish"
+)
 
-type Iterator[T iterators.Stringish] struct {
+type Iterator[T stringish.Interface] struct {
 	*iterators.Iterator[T]
 }
 
