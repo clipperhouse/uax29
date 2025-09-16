@@ -163,15 +163,15 @@ main:
 				p += w
 			}
 
-			found, w2, more := subsequent(_Lower, data[p:], atEOF)
+			advance, more := subsequent(_Lower, data[p:], atEOF)
 
 			if more {
 				// Rune or token extends past current data, request more
 				return 0, empty, nil
 			}
 
-			if found {
-				pos = p + w2
+			if advance != notfound {
+				pos = p + advance
 				continue
 			}
 		}

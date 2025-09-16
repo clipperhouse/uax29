@@ -2,19 +2,21 @@ package phrases
 
 import "github.com/clipperhouse/uax29/v2/internal/stringish"
 
+const notfound = -1
+
 // subsequent looks ahead in the buffer until it hits a rune in properties,
 // ignoring runes with the _Ignore property per WB4
-func subsequent[T stringish.Interface](properties property, data T, atEOF bool) (found bool, pos int, more bool) {
+func subsequent[T stringish.Interface](properties property, data T, atEOF bool) (advance int, more bool) {
 	i := 0
 	for i < len(data) {
 		lookup, w := lookup(data[i:])
 		if w == 0 {
 			if atEOF {
 				// Nothing more to evaluate
-				return false, 0, false
+				return notfound, false
 			}
 			// More to evaluate
-			return false, 0, true
+			return 0, true
 		}
 
 		if lookup.is(_Ignore) {
@@ -24,13 +26,20 @@ func subsequent[T stringish.Interface](properties property, data T, atEOF bool) 
 
 		if lookup.is(properties) {
 			// Found it
-			return true, i + w, false
+			return i, false
 		}
 
-		// If we get this far, it's not immediately subsequent
-		return false, 0, false
+		// If we see a non-ignored character that doesn't match,
+		// the property is definitely not "immediately subsequent"
+		return notfound, false
 	}
 
-	// If not eof, we need more
-	return false, 0, !atEOF
+	// If we reach here, we've only seen ignored characters or incomplete runes
+	if atEOF {
+		// Nothing more to evaluate
+		return notfound, false
+	}
+
+	// Need more
+	return 0, true
 }
