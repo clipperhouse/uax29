@@ -1,23 +1,9 @@
 package sentences
 
 import (
-	"unicode/utf8"
-
 	"github.com/clipperhouse/uax29/v2/internal/stringish"
+	"github.com/clipperhouse/uax29/v2/internal/stringish/utf8"
 )
-
-func decodeLastRune[T stringish.Interface](data T) (rune, int) {
-	// This casting is a bit gross but it works
-	// and is surprisingly fast
-	switch s := any(data).(type) {
-	case []byte:
-		return utf8.DecodeLastRune(s)
-	case string:
-		return utf8.DecodeLastRuneInString(s)
-	default:
-		panic("unsupported type")
-	}
-}
 
 // previousIndex works backward until it hits a rune in properties,
 // ignoring runes in the _Ignore property (per SB5), and returns
@@ -27,7 +13,7 @@ func previousIndex[T stringish.Interface](properties property, data T) int {
 
 	i := len(data)
 	for i > 0 {
-		_, w := decodeLastRune(data[:i])
+		_, w := utf8.DecodeLastRune(data[:i])
 		i -= w
 
 		lookup, _ := lookup(data[i:])

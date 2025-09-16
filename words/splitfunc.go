@@ -2,9 +2,9 @@ package words
 
 import (
 	"bufio"
-	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/v2/internal/stringish"
+	"github.com/clipperhouse/uax29/v2/internal/stringish/utf8"
 )
 
 // is determines if lookup intersects propert(ies)
@@ -54,7 +54,7 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 	}
 
 	if j != nil && j.Leading != nil {
-		r, _ := decodeRune(data[pos:])
+		r, _ := utf8.DecodeRune(data[pos:])
 		if runesContain(j.Leading, r) {
 			// treat leading joiners as if they are letter,
 			// then depend on the existing logic below
@@ -98,7 +98,7 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 		}
 
 		if j != nil && j.Middle != nil {
-			r, _ := decodeRune(data[pos:])
+			r, _ := utf8.DecodeRune(data[pos:])
 			if runesContain(j.Middle, r) {
 				// treat middle joiners as if they are middle letters/numbers,
 				// then depend on the existing logic below
@@ -256,17 +256,4 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 	}
 
 	return pos, data[:pos], nil
-}
-
-func decodeRune[T stringish.Interface](data T) (rune, int) {
-	// This casting is a bit gross but it works
-	// and is surprisingly fast
-	switch s := any(data).(type) {
-	case []byte:
-		return utf8.DecodeRune(s)
-	case string:
-		return utf8.DecodeRuneInString(s)
-	default:
-		panic("unsupported type")
-	}
 }
