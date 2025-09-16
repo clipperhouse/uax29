@@ -52,8 +52,8 @@ func subsequent[T stringish.Interface](properties property, data T, atEOF bool) 
 				// Nothing more to evaluate
 				return notfound, false
 			}
-			// More to evaluate
-			return 0, true
+			// More to evaluate - return notfound to indicate no match found yet
+			return notfound, true
 		}
 
 		if lookup.is(_Ignore) {
@@ -77,6 +77,6 @@ func subsequent[T stringish.Interface](properties property, data T, atEOF bool) 
 		return notfound, false
 	}
 
-	// Need more
-	return 0, true
+	// Need more - return notfound to indicate no match found yet
+	return notfound, true
 }

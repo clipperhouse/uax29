@@ -105,7 +105,7 @@ func TestSubsequent(t *testing.T) {
 			properties:    _Numeric,
 			data:          []byte(""),
 			atEOF:         false,
-			expectAdvance: 0,
+			expectAdvance: notfound,
 			expectMore:    true,
 			description:   "Empty data not at EOF should request more data",
 		},
@@ -125,7 +125,7 @@ func TestSubsequent(t *testing.T) {
 			properties:    _Numeric,
 			data:          []byte("\u200d"), // ZWJ only
 			atEOF:         false,
-			expectAdvance: 0,
+			expectAdvance: notfound,
 			expectMore:    true,
 			description:   "Only ignored chars not at EOF should request more data",
 		},
@@ -145,7 +145,7 @@ func TestSubsequent(t *testing.T) {
 			properties:    _Numeric,
 			data:          []byte{0xE2, 0x80}, // Incomplete ZWJ
 			atEOF:         false,
-			expectAdvance: 0,
+			expectAdvance: notfound,
 			expectMore:    true,
 			description:   "Incomplete rune not at EOF should request more data",
 		},
