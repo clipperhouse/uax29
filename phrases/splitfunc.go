@@ -3,7 +3,7 @@ package phrases
 import (
 	"bufio"
 
-	"github.com/clipperhouse/uax29/v2/internal/iterators"
+	"github.com/clipperhouse/uax29/v2/internal/stringish"
 )
 
 // is determines if lookup intersects propert(ies)
@@ -21,7 +21,7 @@ const (
 var SplitFunc bufio.SplitFunc = splitFunc[[]byte]
 
 // splitFunc is a bufio.SplitFunc implementation of phrase segmentation, for use with bufio.Scanner.
-func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T, err error) {
+func splitFunc[T stringish.Interface](data T, atEOF bool) (advance int, token T, err error) {
 	var empty T
 	if len(data) == 0 {
 		return 0, empty, nil

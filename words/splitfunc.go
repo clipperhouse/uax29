@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/v2/internal/iterators"
+	"github.com/clipperhouse/uax29/v2/internal/stringish"
 )
 
 // is determines if lookup intersects propert(ies)
@@ -23,7 +23,7 @@ const (
 // See https://unicode.org/reports/tr29/#Word_Boundaries.
 var SplitFunc bufio.SplitFunc = splitFunc[[]byte]
 
-func splitFunc[T iterators.Stringish](data T, atEOF bool) (advance int, token T, err error) {
+func splitFunc[T stringish.Interface](data T, atEOF bool) (advance int, token T, err error) {
 	var none Joiners[T]
 	return none.splitFunc(data, atEOF)
 }
@@ -258,7 +258,7 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 	return pos, data[:pos], nil
 }
 
-func decodeRune[T iterators.Stringish](data T) (rune, int) {
+func decodeRune[T stringish.Interface](data T) (rune, int) {
 	// This casting is a bit gross but it works
 	// and is surprisingly fast
 	switch s := any(data).(type) {

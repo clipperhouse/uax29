@@ -1,14 +1,12 @@
 package iterators
 
-type Stringish interface {
-	[]byte | string
-}
+import "github.com/clipperhouse/uax29/v2/internal/stringish"
 
-type SplitFunc[T Stringish] func(T, bool) (int, T, error)
+type SplitFunc[T stringish.Interface] func(T, bool) (int, T, error)
 
 // Iterator is a generic iterator for words that are either []byte or string.
 // Iterate while Next() is true, and access the word via Value().
-type Iterator[T Stringish] struct {
+type Iterator[T stringish.Interface] struct {
 	split SplitFunc[T]
 	data  T
 	start int
@@ -16,7 +14,7 @@ type Iterator[T Stringish] struct {
 }
 
 // New creates a new Iterator for the given data and SplitFunc.
-func New[T Stringish](split SplitFunc[T], data T) *Iterator[T] {
+func New[T stringish.Interface](split SplitFunc[T], data T) *Iterator[T] {
 	return &Iterator[T]{
 		split: split,
 		data:  data,

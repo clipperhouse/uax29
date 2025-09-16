@@ -3,10 +3,10 @@ package sentences
 import (
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/v2/internal/iterators"
+	"github.com/clipperhouse/uax29/v2/internal/stringish"
 )
 
-func decodeLastRune[T iterators.Stringish](data T) (rune, int) {
+func decodeLastRune[T stringish.Interface](data T) (rune, int) {
 	// This casting is a bit gross but it works
 	// and is surprisingly fast
 	switch s := any(data).(type) {
@@ -22,7 +22,7 @@ func decodeLastRune[T iterators.Stringish](data T) (rune, int) {
 // previousIndex works backward until it hits a rune in properties,
 // ignoring runes in the _Ignore property (per SB5), and returns
 // the index of the rune in data. It returns -1 if such a rune is not found.
-func previousIndex[T iterators.Stringish](properties property, data T) int {
+func previousIndex[T stringish.Interface](properties property, data T) int {
 	// Start at the end of the buffer and move backwards
 
 	i := len(data)
@@ -49,13 +49,13 @@ func previousIndex[T iterators.Stringish](properties property, data T) int {
 
 // previous works backward in the buffer until it hits a rune in properties,
 // ignoring runes with the _Ignore property per SB5
-func previous[T iterators.Stringish](properties property, data T) bool {
+func previous[T stringish.Interface](properties property, data T) bool {
 	return previousIndex(properties, data) != -1
 }
 
 // subsequent looks ahead in the buffer until it hits a rune in properties,
 // ignoring runes in the _Ignore property per SB5
-func subsequent[T iterators.Stringish](properties property, data T, atEOF bool) (found bool, pos int, requestMore bool) {
+func subsequent[T stringish.Interface](properties property, data T, atEOF bool) (found bool, pos int, requestMore bool) {
 	i := 0
 	for i < len(data) {
 		lookup, w := lookup(data[i:])

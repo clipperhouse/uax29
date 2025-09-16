@@ -402,7 +402,7 @@ func writeTrie(prop prop, trie *triegen.Trie, iotasByProperty map[string]uint64)
 	b = bytes.ReplaceAll(b, []byte(typeDefSig), []byte(noTypeDef))
 
 	lookupSig := `(t *` + typename + `) lookup(s []byte)`
-	genericLookupSig := `lookup[T iterators.Stringish](s T)`
+	genericLookupSig := `lookup[T stringish.Interface](s T)`
 	b = bytes.ReplaceAll(b, []byte(lookupSig), []byte(genericLookupSig))
 
 	lookupValueSig := `(t *` + typename + `) lookupValue`
