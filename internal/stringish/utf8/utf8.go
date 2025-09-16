@@ -121,7 +121,6 @@ func FullRune[T stringish.Interface](s T) bool {
 		return false
 	}
 
-	// Get the first byte - works for both []byte and string
 	b0 := s[0]
 	x := first[b0]
 	if n >= int(x&7) {
@@ -158,7 +157,6 @@ func DecodeRune[T stringish.Interface](s T) (r rune, size int) {
 		return RuneError, 0
 	}
 
-	// Get the first byte - works for both []byte and string
 	b0 := s[0]
 	x := first[b0]
 	if x >= as {
@@ -174,7 +172,6 @@ func DecodeRune[T stringish.Interface](s T) (r rune, size int) {
 		return RuneError, 1
 	}
 
-	// Get subsequent bytes as needed
 	var b1, b2, b3 byte
 	if sz > 1 {
 		b1 = s[1]
@@ -219,7 +216,6 @@ func DecodeLastRune[T stringish.Interface](s T) (r rune, size int) {
 	}
 	start := end - 1
 
-	// Get the last byte - works for both []byte and string
 	lastByte := s[start]
 	r = rune(lastByte)
 	if r < RuneSelf {
@@ -242,7 +238,6 @@ func DecodeLastRune[T stringish.Interface](s T) (r rune, size int) {
 		start = 0
 	}
 
-	// Use the generic DecodeRune function
 	r, size = DecodeRune(s[start:end])
 	if start+size != end {
 		return RuneError, 1
@@ -345,7 +340,6 @@ func RuneCount[T stringish.Interface](s T) int {
 	for i := 0; i < n; i++ {
 		c := s[i]
 		if c >= RuneSelf {
-			// non-ASCII slow path - use the generic DecodeRune function
 			_, size := DecodeRune(s[i:])
 			if size > 0 {
 				count++
@@ -374,7 +368,6 @@ func Valid[T stringish.Interface](s T) bool {
 
 	// Fast path. Check for and skip 8 bytes of ASCII characters per iteration.
 	for i := 0; i+8 <= n; i += 8 {
-		// Get 8 bytes - works for both []byte and string
 		var bytes [8]byte
 		copy(bytes[:], s[i:i+8])
 
