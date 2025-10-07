@@ -11,6 +11,14 @@ func (lookup property) is(properties property) bool {
 	return (lookup & properties) != 0
 }
 
+// mask returns all-ones (0xFFFF) if p is non-zero, all-zeros otherwise, without branching
+func mask(p property) property {
+	// Branchless: (p | -p) has bit 15 set iff p != 0
+	// Right shift by 15 gives 1 if non-zero, 0 if zero
+	// Negate to get 0xFFFF or 0x0000
+	return -property((p | -p) >> 15)
+}
+
 const _Ignore = _Extend
 
 // SplitFunc is a bufio.SplitFunc implementation of Unicode grapheme cluster segmentation, for use with bufio.Scanner.
@@ -93,7 +101,8 @@ func splitFunc[T stringish.Interface](data T, atEOF bool) (advance int, token T,
 		}
 
 		// https://unicode.org/reports/tr29/#GB3
-		if current.is(_LF) && last.is(_CR) {
+		// Branchless: only check _LF if last has _CR
+		if current.is(_LF & mask(last&_CR)) {
 			pos += w
 			continue
 		}
@@ -105,31 +114,22 @@ func splitFunc[T stringish.Interface](data T, atEOF bool) (advance int, token T,
 		}
 
 		// https://unicode.org/reports/tr29/#GB6
-		if current.is(_L|_V|_LV|_LVT) && last.is(_L) {
-			pos += w
-			continue
-		}
-
 		// https://unicode.org/reports/tr29/#GB7
-		if current.is(_V|_T) && last.is(_LV|_V) {
-			pos += w
-			continue
-		}
-
 		// https://unicode.org/reports/tr29/#GB8
-		if current.is(_T) && last.is(_LVT|_T) {
+		// Combined Hangul syllable rules using bitwise ops to avoid branches
+		// Compute which properties current is allowed to have, based on last
+		allowed := ((_L | _V | _LV | _LVT) & mask(last&_L)) |
+			((_V | _T) & mask(last&(_LV|_V))) |
+			(_T & mask(last&(_LVT|_T)))
+		if current.is(allowed) {
 			pos += w
 			continue
 		}
 
 		// https://unicode.org/reports/tr29/#GB9
-		if current.is(_Extend | _ZWJ) {
-			pos += w
-			continue
-		}
-
 		// https://unicode.org/reports/tr29/#GB9a
-		if current.is(_SpacingMark) {
+		// Combined: don't break after Extend, ZWJ, or SpacingMark
+		if current.is(_Extend | _ZWJ | _SpacingMark) {
 			pos += w
 			continue
 		}
@@ -148,7 +148,8 @@ func splitFunc[T stringish.Interface](data T, atEOF bool) (advance int, token T,
 		// out of scope for now
 
 		// https://unicode.org/reports/tr29/#GB11
-		if current.is(_ExtendedPictographic) && last.is(_ZWJ) && lastLastExIgnore.is(_ExtendedPictographic) {
+		// Branchless: check _ExtendedPictographic only if last has _ZWJ and lastLastExIgnore has _ExtendedPictographic
+		if current.is(_ExtendedPictographic & mask(last&_ZWJ) & mask(lastLastExIgnore&_ExtendedPictographic)) {
 			pos += w
 			continue
 		}
