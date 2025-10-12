@@ -1,12 +1,12 @@
 This package tokenizes (splits) words, sentences and graphemes, based on [Unicode text segmentation](https://unicode.org/reports/tr29/) (UAX #29), for Unicode version 15.0.0. Details and usage are in the respective packages:
 
-[uax29/words](https://github.com/clipperhouse/uax29/tree/master/words)
-
-[uax29/sentences](https://github.com/clipperhouse/uax29/tree/master/sentences)
-
 [uax29/graphemes](https://github.com/clipperhouse/uax29/tree/master/graphemes)
 
+[uax29/words](https://github.com/clipperhouse/uax29/tree/master/words)
+
 [uax29/phrases](https://github.com/clipperhouse/uax29/tree/master/phrases)
+
+[uax29/sentences](https://github.com/clipperhouse/uax29/tree/master/sentences)
 
 ### Why tokenize?
 
@@ -14,9 +14,9 @@ Any time our code operates on individual words, we are tokenizing. Often, we do 
 
 ### Uses
 
-The uax29 module has 4 tokenizers. In decreasing granularity: sentences → phrases → words → graphemes. Words is the most common use.
+The uax29 module has 4 tokenizers. In decreasing granularity: sentences → phrases → words → graphemes. Words and graphemes are the most common uses.
 
-You might use this for inverted indexes, full-text search, TF-IDF, BM25, embeddings, etc. Anything that needs word boundaries.
+You might use `words` for inverted indexes, full-text search, TF-IDF, BM25, embeddings, etc.
 
 If you're doing embeddings, the definition of “meaningful unit” will depend on your application. You might choose sentences, phrases, words, or a combination.
 
