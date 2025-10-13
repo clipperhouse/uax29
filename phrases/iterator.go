@@ -1,8 +1,8 @@
 package phrases
 
 import (
+	"github.com/clipperhouse/stringish"
 	"github.com/clipperhouse/uax29/v2/internal/iterators"
-	"github.com/clipperhouse/uax29/v2/internal/stringish"
 )
 
 type Iterator[T stringish.Interface] struct {

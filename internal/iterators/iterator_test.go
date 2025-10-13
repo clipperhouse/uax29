@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/clipperhouse/stringish"
 	"github.com/clipperhouse/uax29/v2/internal/iterators"
-	"github.com/clipperhouse/uax29/v2/internal/stringish"
 )
 
 // simpleSpaceSplitString is a lossless SplitFunc that splits on spaces for strings

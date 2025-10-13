@@ -3,7 +3,7 @@ package phrases
 import (
 	"bufio"
 
-	"github.com/clipperhouse/uax29/v2/internal/stringish"
+	"github.com/clipperhouse/stringish"
 )
 
 // is determines if lookup intersects propert(ies)

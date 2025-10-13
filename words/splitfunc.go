@@ -3,8 +3,8 @@ package words
 import (
 	"bufio"
 
-	"github.com/clipperhouse/uax29/v2/internal/stringish"
-	"github.com/clipperhouse/uax29/v2/internal/stringish/utf8"
+	"github.com/clipperhouse/stringish"
+	"github.com/clipperhouse/stringish/utf8"
 )
 
 // is determines if lookup intersects propert(ies)

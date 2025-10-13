@@ -1,6 +1,6 @@
 package iterators
 
-import "github.com/clipperhouse/uax29/v2/internal/stringish"
+import "github.com/clipperhouse/stringish"
 
 type SplitFunc[T stringish.Interface] func(T, bool) (int, T, error)
 

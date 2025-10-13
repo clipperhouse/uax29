@@ -1,6 +1,6 @@
 package words
 
-import "github.com/clipperhouse/uax29/v2/internal/stringish"
+import "github.com/clipperhouse/stringish"
 
 // Joiners sets runes that should be treated like word characters, where
 // otherwise words will be split. See the [Joiners] type.

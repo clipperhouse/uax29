@@ -1,6 +1,6 @@
 package words
 
-import "github.com/clipperhouse/uax29/v2/internal/stringish"
+import "github.com/clipperhouse/stringish"
 
 const notfound = -1
 
