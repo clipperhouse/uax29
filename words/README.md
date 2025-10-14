@@ -71,9 +71,18 @@ for tokens.Next() {                     // Next() returns true until end of data
 }
 ```
 
-### Performance
+### Benchmarks
 
-On a Mac M2 laptop, we see around 180MB/s, or around 40 million words (tokens, really) per second. You should see ~constant memory, and no allocations.
+On a Mac M2 laptop, we see around 190MB/s, or around 40 million words (tokens, really) per second, and no allocations.
+
+```
+goos: darwin
+goarch: arm64
+pkg: github.com/clipperhouse/uax29/words/comparative
+cpu: Apple M2
+BenchmarkWords/clipperhouse/uax29-8    	    177251 ns/op	 197.25 MB/s	       0 B/op     0 allocs/op
+BenchmarkWords/blevesearch/segment-8   	    658776 ns/op	  53.07 MB/s	   40960 B/op     1 allocs/op
+```
 
 ### Invalid inputs
 

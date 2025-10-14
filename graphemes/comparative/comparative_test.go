@@ -16,7 +16,7 @@ func BenchmarkGraphemes(b *testing.B) {
 	text := string(data)
 
 	b.Run("clipperhouse/uax29", func(b *testing.B) {
-		b.SetBytes(int64(len(data)))
+		b.SetBytes(int64(len(text)))
 		for i := 0; i < b.N; i++ {
 			count := 0
 			tokens := graphemes.FromString(text)
@@ -27,7 +27,7 @@ func BenchmarkGraphemes(b *testing.B) {
 	})
 
 	b.Run("rivo/uniseg", func(b *testing.B) {
-		b.SetBytes(int64(len(data)))
+		b.SetBytes(int64(len(text)))
 		for i := 0; i < b.N; i++ {
 			count := 0
 			gr := uniseg.NewGraphemes(text)
