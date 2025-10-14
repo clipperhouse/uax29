@@ -3,7 +3,6 @@ package phrases_test
 import (
 	"bytes"
 	mathrand "math/rand"
-	"os"
 	"testing"
 	"unicode/utf8"
 
@@ -116,7 +115,7 @@ func FuzzInvalid(f *testing.F) {
 	}
 
 	// known invalid utf-8
-	badUTF8, err := os.ReadFile("../internal/testdata/UTF-8-test.txt")
+	badUTF8, err := testdata.InvalidUTF8()
 	if err != nil {
 		f.Error(err)
 	}

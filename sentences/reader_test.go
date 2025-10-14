@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	mathrand "math/rand"
 
-	"os"
 	"reflect"
 	"testing"
 	"unicode/utf8"
@@ -80,7 +79,7 @@ func TestInvalidUTF8(t *testing.T) {
 
 	// Btw, don't edit UTF-8-test.txt: your editor might turn it into valid UTF-8!
 
-	input, err := os.ReadFile("../internal/testdata/UTF-8-test.txt")
+	input, err := testdata.InvalidUTF8()
 	inlen := len(input)
 
 	if err != nil {
