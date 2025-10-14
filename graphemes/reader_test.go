@@ -10,7 +10,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/v2/graphemes"
-	"github.com/clipperhouse/uax29/v2/internal/testdata"
+	"github.com/clipperhouse/uax29/v2/testdata"
 )
 
 func TestScannerUnicode(t *testing.T) {

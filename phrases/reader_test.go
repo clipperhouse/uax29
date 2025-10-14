@@ -8,8 +8,8 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/v2/internal/testdata"
 	"github.com/clipperhouse/uax29/v2/phrases"
+	"github.com/clipperhouse/uax29/v2/testdata"
 )
 
 func TestScannerRoundtrip(t *testing.T) {
