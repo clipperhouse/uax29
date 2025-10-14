@@ -3,11 +3,10 @@ package words_test
 import (
 	"bytes"
 	mathrand "math/rand"
-	"os"
 	"testing"
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/v2/internal/testdata"
+	"github.com/clipperhouse/uax29/v2/testdata"
 	"github.com/clipperhouse/uax29/v2/words"
 )
 
@@ -121,7 +120,7 @@ func FuzzInvalid(f *testing.F) {
 	}
 
 	// known invalid utf-8
-	badUTF8, err := os.ReadFile("../internal/testdata/UTF-8-test.txt")
+	badUTF8, err := testdata.InvalidUTF8()
 	if err != nil {
 		f.Error(err)
 	}

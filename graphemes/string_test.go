@@ -2,13 +2,12 @@ package graphemes_test
 
 import (
 	"bytes"
-	"os"
 	"reflect"
 	"testing"
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/v2/graphemes"
-	"github.com/clipperhouse/uax29/v2/internal/testdata"
+	"github.com/clipperhouse/uax29/v2/testdata"
 )
 
 func TestStringUnicode(t *testing.T) {
@@ -75,7 +74,7 @@ func TestStringInvalidUTF8(t *testing.T) {
 
 	// Btw, don't edit UTF-8-test.txt: your editor might turn it into valid UTF-8!
 
-	input, err := os.ReadFile("../internal/testdata/UTF-8-test.txt")
+	input, err := testdata.InvalidUTF8()
 
 	if err != nil {
 		t.Error(err)

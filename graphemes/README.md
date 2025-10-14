@@ -71,9 +71,18 @@ for tokens.Next() {                     // Next() returns true until end of data
 }
 ```
 
-### Performance
+### Benchmarks
 
-On a Mac M2 laptop, we see around 200MB/s, or around 100 million graphemes per second. You should see ~constant memory, and no allocations.
+On a Mac M2 laptop, we see around 200MB/s, or around 100 million graphemes per second, and no allocations.
+
+```
+goos: darwin
+goarch: arm64
+pkg: github.com/clipperhouse/uax29/graphemes/comparative
+cpu: Apple M2
+BenchmarkGraphemes/clipperhouse/uax29-8    	    173805 ns/op	 201.16 MB/s      0 B/op	   0 allocs/op
+BenchmarkGraphemes/rivo/uniseg-8           	   2045128 ns/op	  17.10 MB/s      0 B/op	   0 allocs/op
+```
 
 ### Invalid inputs
 
