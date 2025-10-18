@@ -2,6 +2,10 @@ An implementation of "phrase boundaries", a variation on words boundaries from [
 
 "Phrases" are not a Unicode standard, it is our definition that we think may be useful. We define it as "a series of words separated only by spaces". Punctuation breaks phrases. Emojis are treated as words.
 
+[![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/v2/phrases.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/v2/phrases)
+![Tests](https://github.com/clipperhouse/uax29/actions/workflows/gotest.yml/badge.svg)
+![Fuzz](https://github.com/clipperhouse/uax29/actions/workflows/gofuzz.yml/badge.svg)
+
 ## Quick start
 
 ```
@@ -19,8 +23,6 @@ for tokens.Next() {                    // Next() returns true until end of data
 	fmt.Println(tokens.Value())        // Do something with the current phrase
 }
 ```
-
-[![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/v2/phrases.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/v2/phrases)
 
 ## APIs
 

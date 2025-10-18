@@ -1,5 +1,9 @@
 An implementation of sentence boundaries from [Unicode text segmentation](https://unicode.org/reports/tr29/#Sentence_Boundaries) (UAX 29), for Unicode version 15.0.0.
 
+[![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/v2/sentences.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/v2/sentences)
+![Tests](https://github.com/clipperhouse/uax29/actions/workflows/gotest.yml/badge.svg)
+![Fuzz](https://github.com/clipperhouse/uax29/actions/workflows/gofuzz.yml/badge.svg)
+
 ## Quick start
 
 ```
@@ -18,13 +22,12 @@ for tokens.Next() {                         // Next() returns true until end of 
 }
 ```
 
-[![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/v2/sentences.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/v2/sentences)
-
 ## Conformance
 
-We use the Unicode [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
+We use the Unicode [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29).
 
-![Go](https://github.com/clipperhouse/uax29/actions/workflows/gotest.yml/badge.svg)
+![Tests](https://github.com/clipperhouse/uax29/actions/workflows/gotest.yml/badge.svg)
+![Fuzz](https://github.com/clipperhouse/uax29/actions/workflows/gofuzz.yml/badge.svg)
 
 ## APIs
 

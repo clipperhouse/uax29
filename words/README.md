@@ -1,5 +1,9 @@
 An implementation of word boundaries from [Unicode text segmentation](https://unicode.org/reports/tr29/#Word_Boundaries) (UAX 29), for Unicode version 15.0.0.
 
+[![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/v2/words.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/v2/words)
+![Tests](https://github.com/clipperhouse/uax29/actions/workflows/gotest.yml/badge.svg)
+![Fuzz](https://github.com/clipperhouse/uax29/actions/workflows/gofuzz.yml/badge.svg)
+
 ## Quick start
 
 ```
@@ -18,15 +22,14 @@ for tokens.Next() {                     // Next() returns true until end of data
 }
 ```
 
-[![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/v2/words.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/v2/words)
-
-_Note: this package returns all tokens, including whitespace and punctuation. It's not strictly “words” in the common sense, it's “split on word boundaries”._
+_Note: this package returns all tokens, including whitespace and punctuation. It's not strictly "words" in the common sense, it's "split on word boundaries"._
 
 ## Conformance
 
-We use the Unicode [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
+We use the Unicode [test suite](https://unicode.org/reports/tr41/tr41-26.html#Tests29).
 
-![Go](https://github.com/clipperhouse/uax29/actions/workflows/gotest.yml/badge.svg)
+![Tests](https://github.com/clipperhouse/uax29/actions/workflows/gotest.yml/badge.svg)
+![Fuzz](https://github.com/clipperhouse/uax29/actions/workflows/gofuzz.yml/badge.svg)
 
 ## APIs
 
