@@ -9,4 +9,4 @@ retract v2.1.0
 // only exists to revert the regression introduced in v2.1.0.
 retract v2.1.1
 
-require github.com/clipperhouse/stringish v0.1.0
+require github.com/clipperhouse/stringish v0.1.1
