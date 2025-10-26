@@ -81,3 +81,21 @@ func (iter *Iterator[T]) Reset() {
 	iter.start = 0
 	iter.pos = 0
 }
+
+func (iter *Iterator[T]) First() T {
+	if len(iter.data) == 0 {
+		var empty T
+		return empty
+	}
+	advance, _, err := iter.split(iter.data, true)
+	if err != nil {
+		panic(err)
+	}
+	if advance <= 0 {
+		panic("SplitFunc returned a zero or negative advance")
+	}
+	if advance > len(iter.data) {
+		panic("SplitFunc advanced beyond the end of the data")
+	}
+	return iter.data[:advance]
+}

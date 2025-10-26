@@ -880,3 +880,29 @@ func TestIterator_StartEndBeforeNext(t *testing.T) {
 		}
 	})
 }
+
+func TestIterator_First(t *testing.T) {
+	input := "héllo world"
+
+	t.Run("string", func(t *testing.T) {
+		iter := iterators.New(simpleSpaceSplitString[string], input)
+		if iter.First() != "héllo" {
+			t.Errorf("expected %q, got %q", "héllo", iter.First())
+		}
+	})
+
+	t.Run("[]byte", func(t *testing.T) {
+		iter := iterators.New(simpleSpaceSplitString[[]byte], []byte(input))
+		if string(iter.First()) != "héllo" {
+			t.Errorf("expected %q, got %q", "héllo", iter.First())
+		}
+	})
+
+	t.Run("named_string", func(t *testing.T) {
+		type MyString string
+		iter := iterators.New(simpleSpaceSplitString[MyString], MyString(input))
+		if iter.First() != MyString("héllo") {
+			t.Errorf("expected %q, got %q", "héllo", iter.First())
+		}
+	})
+}
