@@ -84,8 +84,7 @@ func (iter *Iterator[T]) Reset() {
 
 func (iter *Iterator[T]) First() T {
 	if len(iter.data) == 0 {
-		var empty T
-		return empty
+		return iter.data
 	}
 	advance, _, err := iter.split(iter.data, true)
 	if err != nil {
