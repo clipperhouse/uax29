@@ -23,12 +23,8 @@ var SplitFunc bufio.SplitFunc = splitFunc[[]byte]
 // splitFunc is a bufio.SplitFunc implementation of phrase segmentation, for use with bufio.Scanner.
 func splitFunc[T stringish.Interface](data T, atEOF bool) (advance int, token T, err error) {
 	var empty T
-
-	switch len(data) {
-	case 0:
+	if len(data) == 0 {
 		return 0, empty, nil
-	case 1:
-		return 1, data, nil
 	}
 
 	// These vars are stateful across loop iterations
