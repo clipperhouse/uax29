@@ -20,12 +20,22 @@ import (
 	"golang.org/x/text/unicode/rangetable"
 )
 
+// unicodeVersion is the Unicode version we generate data for.
+// This is hard-coded rather than using unicode.Version from the Go stdlib,
+// allowing us to support newer Unicode versions before Go does.
+const unicodeVersion = "16.0.0"
+
 func main() {
 	props := []prop{
 		// make sure emoji goes first, subsequent props need it
 		{
 			name: "Emoji",
-			url:  "https://www.unicode.org/Public/" + unicode.Version + "/ucd/emoji/emoji-data.txt",
+			url:  "https://www.unicode.org/Public/" + unicodeVersion + "/ucd/emoji/emoji-data.txt",
+		},
+		// InCB (Indic_Conjunct_Break) is needed for GB9c rule in graphemes
+		{
+			name: "InCB",
+			url:  "https://www.unicode.org/Public/" + unicodeVersion + "/ucd/DerivedCoreProperties.txt",
 		},
 		{
 			name: "Word",
@@ -52,7 +62,7 @@ func main() {
 	}
 }
 
-const baseURL = "https://www.unicode.org/Public/" + unicode.Version + "/ucd/auxiliary"
+const baseURL = "https://www.unicode.org/Public/" + unicodeVersion + "/ucd/auxiliary"
 
 type prop struct {
 	name string
@@ -83,6 +93,13 @@ func (p prop) PackageName() string {
 }
 
 var extendedPictographic []rune
+
+// Indic_Conjunct_Break property values for GB9c rule (Unicode 15.1+)
+var indicConjunctBreak = struct {
+	Consonant []rune
+	Linker    []rune
+	Extend    []rune
+}{}
 
 func (p prop) generateTrie() error {
 	fmt.Println(p.URL())
@@ -117,8 +134,19 @@ func (p prop) generateTrie() error {
 			return err
 		}
 
-		split2 := strings.Split(parts[1], "#")
-		property := strings.TrimSpace(split2[0])
+		var property string
+		if len(parts) >= 3 {
+			// Format: codepoint ; PropertyName ; Value # comment
+			// Used by DerivedCoreProperties.txt for InCB, e.g.: "094D ; InCB; Linker # ..."
+			propName := strings.TrimSpace(parts[1])
+			split2 := strings.Split(parts[2], "#")
+			propValue := strings.TrimSpace(split2[0])
+			property = propName + "_" + propValue
+		} else {
+			// Format: codepoint ; PropertyValue # comment
+			split2 := strings.Split(parts[1], "#")
+			property = strings.TrimSpace(split2[0])
+		}
 
 		runesByProperty[property] = append(runesByProperty[property], runes...)
 	}
@@ -130,11 +158,31 @@ func (p prop) generateTrie() error {
 		// We don't need to generate emoji package
 		return nil
 	}
+
+	// InCB (Indic_Conjunct_Break) is needed for GB9c rule
+	if p.name == "InCB" {
+		indicConjunctBreak.Consonant = runesByProperty["InCB_Consonant"]
+		indicConjunctBreak.Linker = runesByProperty["InCB_Linker"]
+		indicConjunctBreak.Extend = runesByProperty["InCB_Extend"]
+		// We don't need to generate InCB package
+		return nil
+	}
+
 	if p.name == "Word" || p.name == "Phrase" || p.name == "Grapheme" {
 		if len(extendedPictographic) == 0 {
 			panic("didn't get emoji data; make sure it's loaded first")
 		}
 		runesByProperty[key] = extendedPictographic
+	}
+
+	// Graphemes need InCB properties for GB9c rule
+	if p.name == "Grapheme" {
+		if len(indicConjunctBreak.Consonant) == 0 {
+			panic("didn't get InCB data; make sure it's loaded first")
+		}
+		runesByProperty["InCB_Consonant"] = indicConjunctBreak.Consonant
+		runesByProperty["InCB_Linker"] = indicConjunctBreak.Linker
+		runesByProperty["InCB_Extend"] = indicConjunctBreak.Extend
 	}
 
 	if p.name == "Word" {
@@ -190,6 +238,9 @@ type unicodeTest struct {
 
 func (p prop) generateTests() error {
 	if p.name == "Emoji" {
+		return nil
+	}
+	if p.name == "InCB" {
 		return nil
 	}
 	if p.name == "Phrase" {
