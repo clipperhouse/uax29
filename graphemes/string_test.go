@@ -75,7 +75,6 @@ func TestStringInvalidUTF8(t *testing.T) {
 	// Btw, don't edit UTF-8-test.txt: your editor might turn it into valid UTF-8!
 
 	input, err := testdata.InvalidUTF8()
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -99,9 +98,6 @@ func TestStringInvalidUTF8(t *testing.T) {
 func TestStringUnicode16ForwardCompatibility(t *testing.T) {
 	t.Parallel()
 
-	// Test cases for Unicode 16.0 characters that should be segmented as individual graphemes
-	// These characters were introduced in Unicode 16.0 and should be handled gracefully
-	// even though this package was built for Unicode 15
 	testCases := []struct {
 		name     string
 		input    string

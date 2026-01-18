@@ -1,4 +1,4 @@
-An implementation of sentence boundaries from [Unicode text segmentation](https://unicode.org/reports/tr29/#Sentence_Boundaries) (UAX 29), for Unicode version 15.0.0.
+An implementation of sentence boundaries from [Unicode text segmentation](https://unicode.org/reports/tr29/#Sentence_Boundaries) (UAX 29), for Unicode version 16.0.0.
 
 [![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/v2/sentences.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/v2/sentences)
 ![Tests](https://github.com/clipperhouse/uax29/actions/workflows/gotest.yml/badge.svg)

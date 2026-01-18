@@ -1,4 +1,4 @@
-An implementation of word boundaries from [Unicode text segmentation](https://unicode.org/reports/tr29/#Word_Boundaries) (UAX 29), for Unicode version 15.0.0.
+An implementation of word boundaries from [Unicode text segmentation](https://unicode.org/reports/tr29/#Word_Boundaries) (UAX 29), for Unicode version 16.0.0.
 
 [![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/v2/words.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/v2/words)
 ![Tests](https://github.com/clipperhouse/uax29/actions/workflows/gotest.yml/badge.svg)
@@ -83,8 +83,8 @@ goos: darwin
 goarch: arm64
 pkg: github.com/clipperhouse/uax29/words/comparative
 cpu: Apple M2
-BenchmarkWords/clipperhouse/uax29-8    	    177251 ns/op	 197.25 MB/s	       0 B/op     0 allocs/op
-BenchmarkWords/blevesearch/segment-8   	    658776 ns/op	  53.07 MB/s	   40960 B/op     1 allocs/op
+BenchmarkWords/clipperhouse/uax29-8    	178784 ns/op	 195.55 MB/s	     0 B/op     0 allocs/op
+BenchmarkWords/blevesearch/segment-8   	594673 ns/op	  58.79 MB/s	 40960 B/op     1 allocs/op
 ```
 
 ### Invalid inputs
