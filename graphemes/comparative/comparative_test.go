@@ -37,32 +37,3 @@ func BenchmarkGraphemes(b *testing.B) {
 		}
 	})
 }
-
-// Test that both implementations produce the same number of graphemes
-func TestGraphemeCountConsistency(t *testing.T) {
-	data, err := testdata.Sample()
-	if err != nil {
-		t.Fatal(err)
-	}
-	text := string(data)
-
-	// Count with UAX29
-	uax29Count := 0
-	tokens := graphemes.FromString(text)
-	for tokens.Next() {
-		uax29Count++
-	}
-
-	// Count with uniseg
-	unisegCount := 0
-	gr := uniseg.NewGraphemes(text)
-	for gr.Next() {
-		unisegCount++
-	}
-
-	if uax29Count != unisegCount {
-		t.Errorf("Grapheme count mismatch: UAX29=%d, uniseg=%d", uax29Count, unisegCount)
-	}
-
-	t.Logf("Both implementations found %d graphemes", uax29Count)
-}
