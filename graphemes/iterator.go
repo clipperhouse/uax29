@@ -1,15 +1,5 @@
 package graphemes
 
-import (
-	"github.com/clipperhouse/stringish"
-	"github.com/clipperhouse/uax29/v2/internal/iterators"
-)
-
-// Iterator is a generic iterator for grapheme clusters in []byte data.
-type Iterator[T stringish.Interface] struct {
-	*iterators.Iterator[T]
-}
-
 var (
 	splitFuncString = splitFunc[string]
 	splitFuncBytes  = splitFunc[[]byte]
@@ -91,10 +81,78 @@ func (iter *StringIterator) SetText(s string) {
 	iter.pos = 0
 }
 
+// BytesIterator is an iterator for grapheme clusters in byte slices,
+// with an ASCII hot path optimization.
+type BytesIterator struct {
+	data  []byte
+	pos   int
+	start int
+}
+
 // FromBytes returns an iterator for the grapheme clusters in the input bytes.
 // Iterate while Next() is true, and access the grapheme via Value().
-func FromBytes(b []byte) Iterator[[]byte] {
-	return Iterator[[]byte]{
-		iterators.New(splitFuncBytes, b),
+func FromBytes(b []byte) *BytesIterator {
+	return &BytesIterator{
+		data: b,
 	}
+}
+
+// Next advances the iterator to the next grapheme cluster.
+// Returns false when there are no more grapheme clusters.
+func (iter *BytesIterator) Next() bool {
+	if iter.pos >= len(iter.data) {
+		return false
+	}
+	iter.start = iter.pos
+
+	// ASCII hot path: if current byte is printable ASCII and
+	// next byte is also ASCII (or end of data), return single byte
+	b := iter.data[iter.pos]
+	if b >= 0x20 && b < 0x7F {
+		// Check next byte - if non-ASCII, it could be a combining mark
+		if iter.pos+1 >= len(iter.data) || iter.data[iter.pos+1] < 0x80 {
+			iter.pos++
+			return true
+		}
+	}
+
+	// Fall back to splitFunc
+	remaining := iter.data[iter.pos:]
+	advance, _, err := splitFuncBytes(remaining, true)
+	if err != nil {
+		panic(err)
+	}
+	if advance <= 0 {
+		panic("splitFunc returned a zero or negative advance")
+	}
+	iter.pos += advance
+	return true
+}
+
+// Value returns the current grapheme cluster.
+func (iter *BytesIterator) Value() []byte {
+	return iter.data[iter.start:iter.pos]
+}
+
+// Start returns the byte position of the current grapheme in the original data.
+func (iter *BytesIterator) Start() int {
+	return iter.start
+}
+
+// End returns the byte position after the current grapheme in the original data.
+func (iter *BytesIterator) End() int {
+	return iter.pos
+}
+
+// Reset resets the iterator to the beginning of the data.
+func (iter *BytesIterator) Reset() {
+	iter.start = 0
+	iter.pos = 0
+}
+
+// SetText sets the data for the iterator to operate on, and resets all state.
+func (iter *BytesIterator) SetText(b []byte) {
+	iter.data = b
+	iter.start = 0
+	iter.pos = 0
 }

@@ -65,3 +65,37 @@ func BenchmarkGraphemesASCII(b *testing.B) {
 		}
 	})
 }
+
+func BenchmarkGraphemesBytes(b *testing.B) {
+	data, err := testdata.Sample()
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.Run("clipperhouse/uax29", func(b *testing.B) {
+		b.SetBytes(int64(len(data)))
+		for i := 0; i < b.N; i++ {
+			count := 0
+			tokens := graphemes.FromBytes(data)
+			for tokens.Next() {
+				count++
+			}
+		}
+	})
+}
+
+func BenchmarkGraphemesBytesASCII(b *testing.B) {
+	// Pure ASCII text - should benefit from ASCII hot path
+	ascii := []byte(strings.Repeat("The quick brown fox jumps over the lazy dog. ", 100))
+
+	b.Run("clipperhouse/uax29", func(b *testing.B) {
+		b.SetBytes(int64(len(ascii)))
+		for i := 0; i < b.N; i++ {
+			count := 0
+			tokens := graphemes.FromBytes(ascii)
+			for tokens.Next() {
+				count++
+			}
+		}
+	})
+}
