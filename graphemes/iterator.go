@@ -94,3 +94,28 @@ func (iter *Iterator[T]) SetText(data T) {
 	iter.start = 0
 	iter.pos = 0
 }
+
+// First returns the first grapheme cluster without advancing the iterator.
+func (iter *Iterator[T]) First() T {
+	if len(iter.data) == 0 {
+		return iter.data
+	}
+
+	// ASCII hot path: if first byte is printable ASCII and
+	// second byte is also ASCII (or end of data), return single byte
+	b := iter.data[0]
+	if b >= 0x20 && b < 0x7F {
+		if len(iter.data) == 1 || iter.data[1] < 0x80 {
+			return iter.data[:1]
+		}
+	}
+
+	advance, _, err := iter.split(iter.data, true)
+	if err != nil {
+		panic(err)
+	}
+	if advance <= 0 {
+		panic("splitFunc returned a zero or negative advance")
+	}
+	return iter.data[:advance]
+}
