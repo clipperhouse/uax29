@@ -1,6 +1,6 @@
 module github.com/clipperhouse/uax29/v2
 
-go 1.18
+go 1.20
 
 // Surprising allocations in this release, do not use.
 retract v2.1.0
