@@ -61,6 +61,9 @@ func (iter *Iterator[T]) Next() bool {
 		panic("splitFunc returned a zero or negative advance")
 	}
 	iter.pos += advance
+	if iter.pos > len(iter.data) {
+		panic("splitFunc advanced beyond end of data")
+	}
 	return true
 }
 
