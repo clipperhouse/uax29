@@ -229,7 +229,7 @@ func TestFirst(t *testing.T) {
 		t.Run("string", func(t *testing.T) {
 			g := graphemes.FromString(test.input)
 			if g.First() != test.expected {
-				t.Errorf("expected %q, got %q", "héllo", g.First())
+				t.Errorf("expected %q, got %q", test.expected, g.First())
 			}
 		})
 
