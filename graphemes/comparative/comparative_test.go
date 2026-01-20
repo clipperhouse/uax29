@@ -9,30 +9,35 @@ import (
 	"github.com/rivo/uniseg"
 )
 
-func BenchmarkGraphemes(b *testing.B) {
+func BenchmarkGraphemesMixed(b *testing.B) {
 	data, err := testdata.Sample()
 	if err != nil {
 		b.Fatal(err)
 	}
 	text := string(data)
+	n := int64(len(text))
 
 	b.Run("clipperhouse/uax29", func(b *testing.B) {
-		b.SetBytes(int64(len(text)))
+		b.SetBytes(n)
+		b.ReportAllocs()
+		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			count := 0
-			tokens := graphemes.FromString(text)
-			for tokens.Next() {
+			g := graphemes.FromString(text)
+			for g.Next() {
 				count++
 			}
 		}
 	})
 
 	b.Run("rivo/uniseg", func(b *testing.B) {
-		b.SetBytes(int64(len(text)))
+		b.SetBytes(n)
+		b.ReportAllocs()
+		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			count := 0
-			gr := uniseg.NewGraphemes(text)
-			for gr.Next() {
+			g := uniseg.NewGraphemes(text)
+			for g.Next() {
 				count++
 			}
 		}
@@ -42,58 +47,29 @@ func BenchmarkGraphemes(b *testing.B) {
 func BenchmarkGraphemesASCII(b *testing.B) {
 	// Pure ASCII text - should benefit from ASCII hot path
 	ascii := strings.Repeat("The quick brown fox jumps over the lazy dog. ", 100)
+	n := int64(len(ascii))
 
 	b.Run("clipperhouse/uax29", func(b *testing.B) {
-		b.SetBytes(int64(len(ascii)))
+		b.SetBytes(n)
+		b.ReportAllocs()
+		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			count := 0
-			tokens := graphemes.FromString(ascii)
-			for tokens.Next() {
+			g := graphemes.FromString(ascii)
+			for g.Next() {
 				count++
 			}
 		}
 	})
 
 	b.Run("rivo/uniseg", func(b *testing.B) {
-		b.SetBytes(int64(len(ascii)))
+		b.SetBytes(n)
+		b.ReportAllocs()
+		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			count := 0
-			gr := uniseg.NewGraphemes(ascii)
-			for gr.Next() {
-				count++
-			}
-		}
-	})
-}
-
-func BenchmarkGraphemesBytes(b *testing.B) {
-	data, err := testdata.Sample()
-	if err != nil {
-		b.Fatal(err)
-	}
-
-	b.Run("clipperhouse/uax29", func(b *testing.B) {
-		b.SetBytes(int64(len(data)))
-		for i := 0; i < b.N; i++ {
-			count := 0
-			tokens := graphemes.FromBytes(data)
-			for tokens.Next() {
-				count++
-			}
-		}
-	})
-}
-
-func BenchmarkGraphemesBytesASCII(b *testing.B) {
-	// Pure ASCII text - should benefit from ASCII hot path
-	ascii := []byte(strings.Repeat("The quick brown fox jumps over the lazy dog. ", 100))
-
-	b.Run("clipperhouse/uax29", func(b *testing.B) {
-		b.SetBytes(int64(len(ascii)))
-		for i := 0; i < b.N; i++ {
-			count := 0
-			tokens := graphemes.FromBytes(ascii)
-			for tokens.Next() {
+			g := uniseg.NewGraphemes(ascii)
+			for g.Next() {
 				count++
 			}
 		}

@@ -44,14 +44,14 @@ func (iter *Iterator[T]) Next() bool {
 	// next byte is also ASCII (or end of data), return single byte
 	b := iter.data[iter.pos]
 	if b >= 0x20 && b < 0x7F {
-		// Check next byte - if non-ASCII, it could be a combining mark
+		// If next byte is non-ASCII, it could be a combining mark
 		if iter.pos+1 >= len(iter.data) || iter.data[iter.pos+1] < 0x80 {
 			iter.pos++
 			return true
 		}
 	}
 
-	// Fall back to splitFunc
+	// Fall back to actual grapheme parsing
 	remaining := iter.data[iter.pos:]
 	advance, _, err := iter.split(remaining, true)
 	if err != nil {
