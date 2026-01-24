@@ -1,4 +1,4 @@
-This package tokenizes (splits) words, sentences and graphemes, based on [Unicode text segmentation](https://unicode.org/reports/tr29/) (UAX #29), for Unicode version 16.0.0. Details and usage are in the respective packages:
+This package tokenizes (splits) words, sentences and graphemes, based on [Unicode text segmentation](https://unicode.org/reports/tr29/) (UAX #29), for Unicode 16. Details and usage are in the respective packages:
 
 [uax29/graphemes](https://github.com/clipperhouse/uax29/tree/master/graphemes)
 

@@ -1,4 +1,4 @@
-An implementation of word boundaries from [Unicode text segmentation](https://unicode.org/reports/tr29/#Word_Boundaries) (UAX 29), for Unicode version 16.0.0.
+An implementation of word boundaries from [Unicode text segmentation](https://unicode.org/reports/tr29/#Word_Boundaries) (UAX 29), for Unicode 16.
 
 [![Documentation](https://pkg.go.dev/badge/github.com/clipperhouse/uax29/v2/words.svg)](https://pkg.go.dev/github.com/clipperhouse/uax29/v2/words)
 ![Tests](https://github.com/clipperhouse/uax29/actions/workflows/gotest.yml/badge.svg)
