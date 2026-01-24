@@ -173,6 +173,9 @@ func splitFunc[T stringish.Interface](data T, atEOF bool) (advance int, token T,
 		// https://unicode.org/reports/tr29/#GB9c
 		// Do not break within certain combinations with Indic_Conjunct_Break (InCB)=Linker.
 		if incb == incbLinker && current.is(_InCBConsonant) {
+			// After matching the pattern, reset state to start tracking a new pattern
+			// The current Consonant becomes the start of the new pattern
+			incb = incbConsonant
 			pos += w
 			continue
 		}
