@@ -204,6 +204,44 @@ func TestStringUnicode16ForwardCompatibility(t *testing.T) {
 	}
 }
 
+func TestFirst(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{
+			input:    "héllo world",
+			expected: "h",
+		},
+		{
+			input:    "Élvis",
+			expected: "É",
+		},
+		{
+			input:    "",
+			expected: "",
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+
+		t.Run("string", func(t *testing.T) {
+			g := graphemes.FromString(test.input)
+			if g.First() != test.expected {
+				t.Errorf("expected %q, got %q", test.expected, g.First())
+			}
+		})
+
+		t.Run("[]byte", func(t *testing.T) {
+			g := graphemes.FromBytes([]byte(test.input))
+			if string(g.First()) != test.expected {
+				t.Errorf("expected %q, got %q", test.expected, g.First())
+			}
+		})
+	}
+}
+
 func BenchmarkString(b *testing.B) {
 	file, err := testdata.Sample()
 	if err != nil {
