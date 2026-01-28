@@ -23,7 +23,7 @@ import (
 // unicodeVersion is the Unicode version we generate data for.
 // This is hard-coded rather than using unicode.Version from the Go stdlib,
 // allowing us to support newer Unicode versions before Go does.
-const unicodeVersion = "16.0.0"
+const unicodeVersion = "17.0.0"
 
 func main() {
 	props := []prop{
