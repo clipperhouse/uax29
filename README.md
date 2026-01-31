@@ -1,4 +1,4 @@
-This package tokenizes (splits) words, sentences and graphemes, based on [Unicode text segmentation](https://unicode.org/reports/tr29/) (UAX #29), for Unicode 16. Details and usage are in the respective packages:
+This package tokenizes (splits) words, sentences and graphemes, based on [Unicode text segmentation](https://unicode.org/reports/tr29/) (UAX #29), for Unicode 17. Details and usage are in the respective packages:
 
 [uax29/graphemes](https://github.com/clipperhouse/uax29/tree/master/graphemes)
 
@@ -22,7 +22,7 @@ If you're doing embeddings, the definition of “meaningful unit” will depend 
 
 ### Conformance
 
-We use the official [Unicode test suites](https://unicode.org/reports/tr41/tr41-26.html#Tests29). Status:
+We use the official [Unicode test suites](https://unicode.org/reports/tr41/tr41-36.html#Tests29). Status:
 
 ![Go](https://github.com/clipperhouse/uax29/actions/workflows/gotest.yml/badge.svg)
 

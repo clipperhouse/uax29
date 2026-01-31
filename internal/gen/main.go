@@ -188,7 +188,7 @@ func (p prop) generateTrie() error {
 	if p.name == "Word" {
 		// Concatenate UAX 29 definition of Katakana with Han and Hiragana
 		// The rangetable unicode.Katakana isn't complete for
-		// our purposes, see https://www.unicode.org/reports/tr29/tr29-37.html#Katakana
+		// our purposes, see https://www.unicode.org/reports/tr29/tr29-47.html#Katakana
 		table := rangetable.Merge(unicode.Han, unicode.Hiragana)
 		var ideo []rune
 		rangetable.Visit(table, func(r rune) {

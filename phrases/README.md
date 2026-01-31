@@ -1,4 +1,4 @@
-An implementation of "phrase boundaries", a variation on words boundaries from [Unicode text segmentation](https://unicode.org/reports/tr29/#Word_Boundaries) (UAX 29).
+An implementation of "phrase boundaries", a variation on words boundaries from [Unicode text segmentation](https://unicode.org/reports/tr29/#Word_Boundaries) (UAX 29), for Unicode 17.
 
 "Phrases" are not a Unicode standard, it is our definition that we think may be useful. We define it as "a series of words separated only by spaces". Punctuation breaks phrases. Emojis are treated as words.
 

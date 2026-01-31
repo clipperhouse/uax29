@@ -1,4 +1,4 @@
-// Package uax29 provides Unicode text segmentation (UAX #29) for words, sentences and graphemes.
+// Package uax29 provides Unicode text segmentation (UAX #29) for words, sentences and graphemes, Unicode 17.
 //
 // See the words, sentences, and graphemes packages for details and usage.
 //
