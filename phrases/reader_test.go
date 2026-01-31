@@ -46,7 +46,6 @@ func TestInvalidUTF8(t *testing.T) {
 	// Btw, don't edit UTF-8-test.txt: your editor might turn it into valid UTF-8!
 
 	input, err := testdata.InvalidUTF8()
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -124,9 +123,8 @@ func getRandomBytes() []byte {
 	return b
 }
 
-func BenchmarkScanner(b *testing.B) {
+func BenchmarkScannerMultilingual(b *testing.B) {
 	file, err := testdata.Sample()
-
 	if err != nil {
 		b.Error(err)
 	}
@@ -147,7 +145,5 @@ func BenchmarkScanner(b *testing.B) {
 		if err := sc.Err(); err != nil {
 			b.Error(err)
 		}
-
-		b.ReportMetric(float64(c), "tokens")
 	}
 }

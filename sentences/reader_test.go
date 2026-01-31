@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/rand"
 	mathrand "math/rand"
-
 	"reflect"
 	"testing"
 	"unicode/utf8"
@@ -142,7 +141,6 @@ func TestNeverErr(t *testing.T) {
 			input := getRandomBytes()
 
 			_, _, err := sentences.SplitFunc(input, atEOF)
-
 			if err != nil {
 				t.Errorf("SplitFunc should never error (atEOF %t)", atEOF)
 			}
@@ -161,9 +159,8 @@ func getRandomBytes() []byte {
 	return b
 }
 
-func BenchmarkScanner(b *testing.B) {
+func BenchmarkScannerMultilingual(b *testing.B) {
 	file, err := testdata.Sample()
-
 	if err != nil {
 		b.Error(err)
 	}
@@ -177,19 +174,16 @@ func BenchmarkScanner(b *testing.B) {
 		r.Reset(file)
 		sc := sentences.FromReader(r)
 
-		c := 0
 		for sc.Scan() {
-			c++
+			_ = sc.Bytes()
 		}
 		if err := sc.Err(); err != nil {
 			b.Error(err)
 		}
-
-		b.ReportMetric(float64(c), "tokens")
 	}
 }
 
-func BenchmarkUnicodeScanner(b *testing.B) {
+func BenchmarkScannerUnicodeTests(b *testing.B) {
 	var buf bytes.Buffer
 	for _, test := range unicodeTests {
 		buf.Write(test.input)
@@ -205,14 +199,11 @@ func BenchmarkUnicodeScanner(b *testing.B) {
 		r.Reset(file)
 		sc := sentences.FromReader(r)
 
-		c := 0
 		for sc.Scan() {
-			c++
+			_ = sc.Bytes()
 		}
 		if err := sc.Err(); err != nil {
 			b.Error(err)
 		}
-
-		b.ReportMetric(float64(c), "tokens")
 	}
 }
