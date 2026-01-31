@@ -3,7 +3,6 @@ package phrases_test
 import (
 	"bytes"
 	"testing"
-	"time"
 	"unicode/utf8"
 
 	"github.com/clipperhouse/uax29/v2/phrases"
@@ -41,7 +40,6 @@ func TestBytesInvalidUTF8(t *testing.T) {
 	// Btw, don't edit UTF-8-test.txt: your editor might turn it into valid UTF-8!
 
 	input, err := testdata.InvalidUTF8()
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,7 +62,7 @@ func TestBytesInvalidUTF8(t *testing.T) {
 
 var exists = struct{}{}
 
-func bytesToSetTrimmed(tokens phrases.Iterator[[]byte]) map[string]struct{} {
+func bytesToSetTrimmed(tokens *phrases.Iterator[[]byte]) map[string]struct{} {
 	founds := make(map[string]struct{})
 	for tokens.Next() {
 		key := bytes.TrimSpace(tokens.Value())
@@ -97,9 +95,8 @@ func TestPhraseBoundaries(t *testing.T) {
 	}
 }
 
-func BenchmarkBytes(b *testing.B) {
+func BenchmarkBytesMultilingual(b *testing.B) {
 	file, err := testdata.Sample()
-
 	if err != nil {
 		b.Error(err)
 	}
@@ -109,7 +106,6 @@ func BenchmarkBytes(b *testing.B) {
 	b.SetBytes(int64(bytes))
 
 	c := 0
-	start := time.Now()
 
 	for i := 0; i < b.N; i++ {
 		tokens := phrases.FromBytes(file)
@@ -119,14 +115,4 @@ func BenchmarkBytes(b *testing.B) {
 			c++
 		}
 	}
-
-	elapsed := time.Since(start)
-	n := float64(b.N)
-
-	tokensPerOp := float64(c) / n
-	nsPerOp := float64(elapsed.Nanoseconds()) / n
-
-	b.ReportMetric(1e3*tokensPerOp/nsPerOp, "MMtokens/s")
-	b.ReportMetric(tokensPerOp, "tokens/op")
-	b.ReportMetric(float64(bytes)/tokensPerOp, "B/token")
 }
