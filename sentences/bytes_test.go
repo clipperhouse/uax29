@@ -72,7 +72,6 @@ func TestBytesInvalidUTF8(t *testing.T) {
 	// Btw, don't edit UTF-8-test.txt: your editor might turn it into valid UTF-8!
 
 	input, err := testdata.InvalidUTF8()
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -104,14 +103,9 @@ func BenchmarkBytes(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		tokens := sentences.FromBytes(file)
-
-		c := 0
 		for tokens.Next() {
 			_ = tokens.Value()
-			c++
 		}
-
-		b.ReportMetric(float64(c), "tokens")
 	}
 }
 
@@ -127,13 +121,8 @@ func BenchmarkUnicodeTests(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		tokens := sentences.FromBytes(file)
-
-		c := 0
 		for tokens.Next() {
 			_ = tokens.Value()
-			c++
 		}
-
-		b.ReportMetric(float64(c), "tokens")
 	}
 }
