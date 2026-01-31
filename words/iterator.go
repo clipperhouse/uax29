@@ -117,25 +117,10 @@ func (iter *Iterator[T]) First() T {
 		return iter.data
 	}
 
-	// ASCII hot path: consume contiguous ASCII alphanumerics
-	// followed by ASCII space (or end of data)
-	b := iter.data[0]
-	if isASCIIAlphanumeric(b) {
-		end := 1
-		for end < len(iter.data) && isASCIIAlphanumeric(iter.data[end]) {
-			end++
-		}
-		if end >= len(iter.data) || iter.data[end] == ' ' {
-			return iter.data[:end]
-		}
-	}
-
-	advance, _, err := iter.split(iter.data, true)
-	if err != nil {
-		panic(err)
-	}
-	if advance <= 0 {
-		panic("splitFunc returned a zero or negative advance")
-	}
-	return iter.data[:advance]
+	// Use a copy to leverage Next()'s ASCII optimization
+	cp := *iter
+	cp.pos = 0
+	cp.start = 0
+	cp.Next()
+	return cp.Value()
 }

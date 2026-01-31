@@ -129,6 +129,195 @@ func TestStringInvalidUTF8(t *testing.T) {
 	}
 }
 
+func TestFirst(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "ASCII word",
+			input:    "hello world",
+			expected: "hello",
+		},
+		{
+			name:     "ASCII word followed by space at end",
+			input:    "hello ",
+			expected: "hello",
+		},
+		{
+			name:     "Unicode word",
+			input:    "héllo world",
+			expected: "héllo",
+		},
+		{
+			name:     "CJK characters",
+			input:    "日本語 text",
+			expected: "日",
+		},
+		{
+			name:     "empty string",
+			input:    "",
+			expected: "",
+		},
+		{
+			name:     "single ASCII word",
+			input:    "hello",
+			expected: "hello",
+		},
+		{
+			name:     "pure ASCII alphanumeric",
+			input:    "abc123 def456",
+			expected: "abc123",
+		},
+		{
+			name:     "starts with space",
+			input:    " hello",
+			expected: " ",
+		},
+		{
+			name:     "starts with punctuation",
+			input:    "!hello",
+			expected: "!",
+		},
+		{
+			name:     "contraction",
+			input:    "don't stop",
+			expected: "don't",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name+"/string", func(t *testing.T) {
+			iter := words.FromString(tt.input)
+			got := iter.First()
+			if got != tt.expected {
+				t.Errorf("expected %q, got %q", tt.expected, got)
+			}
+		})
+
+		t.Run(tt.name+"/bytes", func(t *testing.T) {
+			iter := words.FromBytes([]byte(tt.input))
+			got := string(iter.First())
+			if got != tt.expected {
+				t.Errorf("expected %q, got %q", tt.expected, got)
+			}
+		})
+	}
+}
+
+func TestFirstASCIIOptimization(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		// Pure ASCII hot path cases
+		{
+			name:     "ASCII word followed by space then end",
+			input:    "hello ",
+			expected: "hello",
+		},
+		{
+			name:     "ASCII word at end of data",
+			input:    "hello",
+			expected: "hello",
+		},
+		{
+			name:     "multiple ASCII words picks first",
+			input:    "hello world foo",
+			expected: "hello",
+		},
+		// Fallback to splitFunc cases
+		{
+			name:     "ASCII followed by non-space punctuation",
+			input:    "hello,world",
+			expected: "hello",
+		},
+		{
+			name:     "ASCII followed by non-ASCII",
+			input:    "hello世界",
+			expected: "hello",
+		},
+		{
+			name:     "ASCII with mid-word apostrophe",
+			input:    "don't",
+			expected: "don't",
+		},
+		{
+			name:     "ASCII with hyphen not supported by hot path",
+			input:    "self-test foo",
+			expected: "self",
+		},
+		// Single character edge cases
+		{
+			name:     "single ASCII letter",
+			input:    "a",
+			expected: "a",
+		},
+		{
+			name:     "single ASCII digit",
+			input:    "5",
+			expected: "5",
+		},
+		{
+			name:     "single space",
+			input:    " ",
+			expected: " ",
+		},
+		// Non-ASCII at start (no hot path)
+		{
+			name:     "starts with non-ASCII letter",
+			input:    "éclair is tasty",
+			expected: "éclair",
+		},
+		{
+			name:     "starts with emoji",
+			input:    "🎉 party",
+			expected: "🎉",
+		},
+		// Numbers
+		{
+			name:     "pure digits",
+			input:    "12345 next",
+			expected: "12345",
+		},
+		{
+			name:     "mixed alphanumeric",
+			input:    "abc123def ",
+			expected: "abc123def",
+		},
+		// Edge: ASCII then combining character
+		{
+			name:     "ASCII then combining mark",
+			input:    "e\u0301cole", // é as e + combining acute
+			expected: "e\u0301cole",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name+"/string", func(t *testing.T) {
+			iter := words.FromString(tt.input)
+			got := iter.First()
+			if got != tt.expected {
+				t.Errorf("expected %q, got %q", tt.expected, got)
+			}
+		})
+
+		t.Run(tt.name+"/bytes", func(t *testing.T) {
+			iter := words.FromBytes([]byte(tt.input))
+			got := string(iter.First())
+			if got != tt.expected {
+				t.Errorf("expected %q, got %q", tt.expected, got)
+			}
+		})
+	}
+}
+
 func BenchmarkString(b *testing.B) {
 	file, err := testdata.Sample()
 	if err != nil {

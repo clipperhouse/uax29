@@ -110,12 +110,10 @@ func (iter *Iterator[T]) First() T {
 		return iter.data
 	}
 
-	advance, _, err := iter.split(iter.data, true)
-	if err != nil {
-		panic(err)
-	}
-	if advance <= 0 {
-		panic("splitFunc returned a zero or negative advance")
-	}
-	return iter.data[:advance]
+	// Use a copy to leverage Next()'s ASCII optimization
+	cp := *iter
+	cp.pos = 0
+	cp.start = 0
+	cp.Next()
+	return cp.Value()
 }

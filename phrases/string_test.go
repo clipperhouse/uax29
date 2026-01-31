@@ -236,6 +236,236 @@ func TestASCIIOptimization(t *testing.T) {
 	}
 }
 
+func TestFirstASCIIOptimization(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		// Pure ASCII hot path - all data consumed
+		{
+			name:     "all ASCII alphanumeric",
+			input:    "hello world",
+			expected: "hello world",
+		},
+		{
+			name:     "all ASCII with numbers",
+			input:    "abc123 def456",
+			expected: "abc123 def456",
+		},
+		{
+			name:     "trailing space",
+			input:    "hello ",
+			expected: "hello ",
+		},
+		{
+			name:     "leading space",
+			input:    " hello",
+			expected: " hello",
+		},
+		{
+			name:     "only spaces",
+			input:    "   ",
+			expected: "   ",
+		},
+		// ASCII then non-ASCII triggers back-up + splitFunc
+		{
+			name:     "ASCII then emoji continues",
+			input:    "hello 🎉 world",
+			expected: "hello 🎉 world",
+		},
+		{
+			name:     "ASCII then accented continues",
+			input:    "hello café",
+			expected: "hello café",
+		},
+		{
+			name:     "ASCII then CJK breaks",
+			input:    "hello 日本",
+			expected: "hello ",
+		},
+		// Punctuation triggers back-up + splitFunc
+		{
+			name:     "comma breaks phrase",
+			input:    "hello, world",
+			expected: "hello",
+		},
+		{
+			name:     "period breaks phrase",
+			input:    "hello. world",
+			expected: "hello",
+		},
+		{
+			name:     "exclamation breaks phrase",
+			input:    "hello! world",
+			expected: "hello",
+		},
+		{
+			name:     "newline breaks phrase",
+			input:    "hello\nworld",
+			expected: "hello",
+		},
+		{
+			name:     "tab breaks phrase",
+			input:    "hello\tworld",
+			expected: "hello",
+		},
+		// Single character edge cases
+		{
+			name:     "single ASCII letter",
+			input:    "a",
+			expected: "a",
+		},
+		{
+			name:     "single space",
+			input:    " ",
+			expected: " ",
+		},
+		{
+			name:     "single punctuation",
+			input:    "!",
+			expected: "!",
+		},
+		// Non-ASCII at start (no hot path)
+		{
+			name:     "starts with non-ASCII",
+			input:    "éclair is tasty",
+			expected: "éclair is tasty",
+		},
+		{
+			name:     "starts with emoji",
+			input:    "🎉 party time",
+			expected: "🎉 party time",
+		},
+		{
+			name:     "starts with punctuation",
+			input:    "!hello world",
+			expected: "!",
+		},
+		// Back-up logic edge cases
+		{
+			name:     "one char before break",
+			input:    "a,b",
+			expected: "a",
+		},
+		{
+			name:     "two chars before break",
+			input:    "ab,cd",
+			expected: "ab",
+		},
+		// Contraction handling
+		{
+			name:     "apostrophe in word",
+			input:    "don't stop",
+			expected: "don't stop",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name+"/string", func(t *testing.T) {
+			iter := phrases.FromString(tt.input)
+			got := iter.First()
+			if got != tt.expected {
+				t.Errorf("expected %q, got %q", tt.expected, got)
+			}
+		})
+
+		t.Run(tt.name+"/bytes", func(t *testing.T) {
+			iter := phrases.FromBytes([]byte(tt.input))
+			got := string(iter.First())
+			if got != tt.expected {
+				t.Errorf("expected %q, got %q", tt.expected, got)
+			}
+		})
+	}
+}
+
+func TestFirst(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "ASCII phrase",
+			input:    "hello world",
+			expected: "hello world",
+		},
+		{
+			name:     "ASCII phrase with comma",
+			input:    "hello, world",
+			expected: "hello",
+		},
+		{
+			name:     "Unicode phrase",
+			input:    "héllo world",
+			expected: "héllo world",
+		},
+		{
+			name:     "empty string",
+			input:    "",
+			expected: "",
+		},
+		{
+			name:     "single word",
+			input:    "hello",
+			expected: "hello",
+		},
+		{
+			name:     "pure ASCII alphanumeric with spaces",
+			input:    "abc123 def456",
+			expected: "abc123 def456",
+		},
+		{
+			name:     "starts with punctuation",
+			input:    "!hello",
+			expected: "!",
+		},
+		{
+			name:     "period breaks phrase",
+			input:    "hello. world",
+			expected: "hello",
+		},
+		{
+			name:     "contraction stays together",
+			input:    "don't stop",
+			expected: "don't stop",
+		},
+		{
+			name:     "ASCII then emoji",
+			input:    "hello 🎉",
+			expected: "hello 🎉",
+		},
+		{
+			name:     "newline breaks phrase",
+			input:    "hello\nworld",
+			expected: "hello",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name+"/string", func(t *testing.T) {
+			iter := phrases.FromString(tt.input)
+			got := iter.First()
+			if got != tt.expected {
+				t.Errorf("expected %q, got %q", tt.expected, got)
+			}
+		})
+
+		t.Run(tt.name+"/bytes", func(t *testing.T) {
+			iter := phrases.FromBytes([]byte(tt.input))
+			got := string(iter.First())
+			if got != tt.expected {
+				t.Errorf("expected %q, got %q", tt.expected, got)
+			}
+		})
+	}
+}
+
 func BenchmarkStringMultilingual(b *testing.B) {
 	file, err := testdata.Sample()
 	if err != nil {
