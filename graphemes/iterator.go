@@ -40,11 +40,10 @@ func (iter *Iterator[T]) Next() bool {
 	}
 	iter.start = iter.pos
 
-	// ASCII hot path: if current byte is printable ASCII and
-	// next byte is also ASCII (or end of data), return single byte
+	// ASCII hot path: any ASCII is one grapheme when next byte is ASCII or end.
+	// Fall through on CR so splitfunc can handle CR+LF as a single cluster.
 	b := iter.data[iter.pos]
-	if b >= 0x20 && b < 0x7F {
-		// If next byte is non-ASCII, it could be a combining mark
+	if b < 0x80 && b != 0x0D {
 		if iter.pos+1 >= len(iter.data) || iter.data[iter.pos+1] < 0x80 {
 			iter.pos++
 			return true
