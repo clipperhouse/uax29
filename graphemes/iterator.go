@@ -27,7 +27,7 @@ type Iterator[T ~string | ~[]byte] struct {
 	data  T
 	pos   int
 	start int
-	// AnsiEscapeSequences treats C0 ANSI escape sequences as single grapheme
+	// AnsiEscapeSequences treats ANSI escape sequences (ECMA-48) as single grapheme
 	// clusters when true. Default is false.
 	AnsiEscapeSequences bool
 }
