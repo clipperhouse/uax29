@@ -62,6 +62,11 @@ func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
 			expected: []string{"\x1b[m", "x"},
 		},
 		{
+			name:     "malformed CSI: param after intermediate",
+			input:    "\x1b[ 1mok",
+			expected: []string{"\x1b", "[", " ", "1", "m", "o", "k"},
+		},
+		{
 			name:     "no ANSI at start",
 			input:    "plain",
 			expected: []string{"p", "l", "a", "i", "n"},
