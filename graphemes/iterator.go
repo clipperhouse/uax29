@@ -21,10 +21,12 @@ func FromBytes(b []byte) *Iterator[[]byte] {
 // Iterator is a generic iterator for grapheme clusters in strings or byte slices,
 // with an ASCII hot path optimization.
 type Iterator[T ~string | ~[]byte] struct {
-	split               func(T, bool) (int, T, error)
-	data                T
-	pos                 int
-	start               int
+	split func(T, bool) (int, T, error)
+	data  T
+	pos   int
+	start int
+	// AnsiEscapeSequences treats C0 ANSI escape sequences as single grapheme
+	// clusters when true. Default is false.
 	AnsiEscapeSequences bool
 }
 
