@@ -13,7 +13,7 @@ func ansiEscapeLength[T ~string | ~[]byte](data T) int {
 	if n < 2 {
 		return 0
 	}
-	if data[0] != 0x1B { // ESC
+	if data[0] != esc {
 		return 0
 	}
 
@@ -88,10 +88,10 @@ func csiLength[T ~string | ~[]byte](data T) int {
 func sequenceLength[T ~string | ~[]byte](data T) int {
 	for i := 0; i < len(data); i++ {
 		b := data[i]
-		if b == 0x07 {
+		if b == bel {
 			return i + 1
 		}
-		if b == 0x1B && i+1 < len(data) && data[i+1] == '\\' {
+		if b == esc && i+1 < len(data) && data[i+1] == '\\' {
 			return i + 2
 		}
 	}
