@@ -6,7 +6,8 @@ package graphemes
 //
 // Recognized forms (ECMA-48 / ISO 6429):
 //   - CSI: ESC [ then parameter bytes (0x30–0x3F), intermediate (0x20–0x2F), final (0x40–0x7E)
-//   - OSC, DCS, SOS, PM, APC: ESC ] / P / X / ^ / _ then payload until ST (ESC \) or BEL (0x07)
+//   - OSC: ESC ] then payload until ST (ESC \) or BEL (0x07)
+//   - DCS, SOS, PM, APC: ESC P / X / ^ / _ then payload until ST (ESC \)
 //   - Two-byte: ESC + Fe (0x40–0x5F excluding above), or Fp (0x30–0x3F), or nF (0x20–0x2F then final)
 func ansiEscapeLength[T ~string | ~[]byte](data T) int {
 	n := len(data)
@@ -25,8 +26,14 @@ func ansiEscapeLength[T ~string | ~[]byte](data T) int {
 			return 0
 		}
 		return 2 + body
-	case ']', 'P', 'X', '^', '_': // OSC, DCS, SOS, PM, APC
-		body := sequenceLength(data[2:])
+	case ']': // OSC – allows BEL or ST as terminator
+		body := oscLength(data[2:])
+		if body == 0 {
+			return 0
+		}
+		return 2 + body
+	case 'P', 'X', '^', '_': // DCS, SOS, PM, APC – require ST (ESC \) only
+		body := stSequenceLength(data[2:])
 		if body == 0 {
 			return 0
 		}
@@ -83,15 +90,28 @@ func csiLength[T ~string | ~[]byte](data T) int {
 	return 0
 }
 
-// sequenceLength returns the length of the string sequence body up to and including
-// the terminator (BEL or ST). data is the slice after "ESC x".
-func sequenceLength[T ~string | ~[]byte](data T) int {
+// oscLength returns the length of the OSC body up to and including
+// the terminator. OSC accepts either BEL (0x07) or ST (ESC \) per
+// widespread terminal convention. data is the slice after "ESC ]".
+func oscLength[T ~string | ~[]byte](data T) int {
 	for i := 0; i < len(data); i++ {
 		b := data[i]
 		if b == bel {
 			return i + 1
 		}
 		if b == esc && i+1 < len(data) && data[i+1] == '\\' {
+			return i + 2
+		}
+	}
+	return 0
+}
+
+// stSequenceLength returns the length of a control-string body up to and
+// including the ST (ESC \) terminator. Used for DCS, SOS, PM, and APC, which
+// per ECMA-48 require ST and do not accept BEL. data is the slice after "ESC x".
+func stSequenceLength[T ~string | ~[]byte](data T) int {
+	for i := 0; i < len(data); i++ {
+		if data[i] == esc && i+1 < len(data) && data[i+1] == '\\' {
 			return i + 2
 		}
 	}

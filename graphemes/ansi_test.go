@@ -42,6 +42,61 @@ func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
 			expected: []string{"\x1b]0;Title\x1b\\"},
 		},
 		{
+			name:     "DCS with ST terminator",
+			input:    "\x1bPq#0;2;0;0;0\x1b\\",
+			expected: []string{"\x1bPq#0;2;0;0;0\x1b\\"},
+		},
+		{
+			name:     "DCS with BEL in payload is not a single sequence",
+			input:    "\x1bPq\x07rest",
+			expected: []string{"\x1b", "P", "q", "\x07", "r", "e", "s", "t"},
+		},
+		{
+			name:     "SOS with ST terminator",
+			input:    "\x1bXhello\x1b\\",
+			expected: []string{"\x1bXhello\x1b\\"},
+		},
+		{
+			name:     "SOS with BEL in payload is not a single sequence",
+			input:    "\x1bXhi\x07",
+			expected: []string{"\x1b", "X", "h", "i", "\x07"},
+		},
+		{
+			name:     "PM with ST terminator",
+			input:    "\x1b^msg\x1b\\",
+			expected: []string{"\x1b^msg\x1b\\"},
+		},
+		{
+			name:     "PM with BEL in payload is not a single sequence",
+			input:    "\x1b^m\x07",
+			expected: []string{"\x1b", "^", "m", "\x07"},
+		},
+		{
+			name:     "APC with ST terminator",
+			input:    "\x1b_data\x1b\\",
+			expected: []string{"\x1b_data\x1b\\"},
+		},
+		{
+			name:     "APC with BEL in payload is not a single sequence",
+			input:    "\x1b_d\x07",
+			expected: []string{"\x1b", "_", "d", "\x07"},
+		},
+		{
+			name:     "OSC empty payload with BEL",
+			input:    "\x1b]\x07",
+			expected: []string{"\x1b]\x07"},
+		},
+		{
+			name:     "DCS unterminated",
+			input:    "\x1bPdata",
+			expected: []string{"\x1b", "P", "d", "a", "t", "a"},
+		},
+		{
+			name:     "OSC unterminated",
+			input:    "\x1b]0;title",
+			expected: []string{"\x1b", "]", "0", ";", "t", "i", "t", "l", "e"},
+		},
+		{
 			name:     "two-byte Fe",
 			input:    "\x1bD", // IND
 			expected: []string{"\x1bD"},
