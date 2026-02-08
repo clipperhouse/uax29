@@ -1,12 +1,10 @@
 package phrases
 
-import "github.com/clipperhouse/stringish"
-
 const notfound = -1
 
 // subsequent looks ahead in the buffer until it hits a rune in properties,
 // ignoring runes with the _Ignore property per WB4
-func subsequent[T stringish.Interface](properties property, data T, atEOF bool) (advance int, more bool) {
+func subsequent[T ~string | ~[]byte](properties property, data T, atEOF bool) (advance int, more bool) {
 	i := 0
 	for i < len(data) {
 		lookup, w := lookup(data[i:])

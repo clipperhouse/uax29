@@ -1,7 +1,5 @@
 package words
 
-import "github.com/clipperhouse/stringish"
-
 // Joiners sets runes that should be treated like word characters, where
 // otherwise words will be split. See the [Joiners] type.
 func (iter *Iterator[T]) Joiners(j *Joiners[T]) {
@@ -11,7 +9,7 @@ func (iter *Iterator[T]) Joiners(j *Joiners[T]) {
 // Joiners allows specification of characters (runes) which will join words (tokens)
 // rather than breaking them. For example, "@" breaks words by default,
 // but you might wish to join words into email addresses.
-type Joiners[T stringish.Interface] struct {
+type Joiners[T ~string | ~[]byte] struct {
 	// Middle specifies which characters (runes) should
 	// join words (tokens) where they would otherwise be split,
 	// in the middle of a word.

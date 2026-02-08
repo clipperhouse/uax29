@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/clipperhouse/stringish"
 	"github.com/clipperhouse/uax29/v2/internal/iterators"
 )
 
 // simpleSpaceSplitString is a lossless SplitFunc that splits on spaces for strings
 // It treats contiguous spaces and contiguous non-spaces as separate tokens
-func simpleSpaceSplitString[T stringish.Interface](data T, atEOF bool) (int, T, error) {
+func simpleSpaceSplitString[T ~string | ~[]byte](data T, atEOF bool) (int, T, error) {
 	if len(data) == 0 {
 		return 0, data, nil
 	}

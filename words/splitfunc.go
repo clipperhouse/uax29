@@ -3,7 +3,6 @@ package words
 import (
 	"bufio"
 
-	"github.com/clipperhouse/stringish"
 	"github.com/clipperhouse/stringish/utf8"
 )
 
@@ -23,7 +22,7 @@ const (
 // See https://unicode.org/reports/tr29/#Word_Boundaries.
 var SplitFunc bufio.SplitFunc = splitFunc[[]byte]
 
-func splitFunc[T stringish.Interface](data T, atEOF bool) (advance int, token T, err error) {
+func splitFunc[T ~string | ~[]byte](data T, atEOF bool) (advance int, token T, err error) {
 	var none Joiners[T]
 	return none.splitFunc(data, atEOF)
 }
