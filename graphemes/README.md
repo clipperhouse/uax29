@@ -74,7 +74,7 @@ for g.Next() {                     // Next() returns true until end of data
 
 ### ANSI escape sequences
 
-By default, ANSI escape sequences (ECMA-48) are not treated as grapheme clusters. To treat them as a single cluster, set the `AnsiEscapeSequences` option to true.
+By the UAX 29 specification, ANSI escape sequences are not grapheme clusters. To treat these sequences as a single cluster, set the `AnsiEscapeSequences` option to true.
 
 ```go
 text := "Hello, \x1b[31mworld\x1b[0m!"
@@ -85,6 +85,8 @@ for g.Next() {
 	fmt.Println(g.Value())
 }
 ```
+
+We implement [ECMA-48](https://ecma-international.org/publications-and-standards/standards/ecma-48/) C0 and C1 control codes, 7-bit and 8-bit, in UTF-8 encoding.
 
 ### Benchmarks
 
