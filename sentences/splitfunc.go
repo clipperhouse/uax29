@@ -34,6 +34,7 @@ func splitFunc[T ~string | ~[]byte](data T, atEOF bool) (advance int, token T, e
 	var lastExIgnoreSp property
 	var lastExIgnoreClose property
 	var lastExIgnoreSpClose property
+	var lastExIgnoreParaSepSpClose property
 
 	// Rules are usually of the form Cat1 × Cat2; "current" refers to the first property
 	// to the right of the ×, from which we look back or forward
@@ -84,6 +85,10 @@ main:
 
 		if !lastExIgnoreSp.is(_Close) {
 			lastExIgnoreSpClose = lastExIgnoreSp
+		}
+
+		if !lastExIgnoreSpClose.is(_ParaSep) {
+			lastExIgnoreParaSepSpClose = lastExIgnoreSpClose
 		}
 
 		current, w = lookup(data[pos:])
@@ -193,40 +198,11 @@ main:
 		}
 
 		// https://unicode.org/reports/tr29/#SB11
-		if lastExIgnore.is(_SATerm | _Close | _Sp | _ParaSep) {
-			p := pos
-
-			// Zero or one ParaSep
-			ps := previousIndex(_ParaSep, data[:p])
-			if ps >= 0 {
-				p = ps
-			}
-
-			// Zero or more Sp's
-			sp := p
-			for {
-				sp = previousIndex(_Sp, data[:sp])
-				if sp < 0 {
-					break
-				}
-				p = sp
-			}
-
-			// Zero or more Close's
-			close := p
-			for {
-				close = previousIndex(_Close, data[:close])
-				if close < 0 {
-					break
-				}
-				p = close
-			}
-
-			// Having looked back past ParaSep, Sp's, Close's, and intervening Extend|Format,
-			// is there an SATerm?
-			if previous(_SATerm, data[:p]) {
-				break
-			}
+		if lastExIgnore.is(_SATerm) ||
+			(lastExIgnore.is(_Close) && lastExIgnoreClose.is(_SATerm)) ||
+			(lastExIgnore.is(_Sp) && lastExIgnoreSpClose.is(_SATerm)) ||
+			(lastExIgnore.is(_ParaSep) && lastExIgnoreParaSepSpClose.is(_SATerm)) {
+			break
 		}
 
 		// https://unicode.org/reports/tr29/#SB998
