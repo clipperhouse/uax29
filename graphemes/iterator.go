@@ -53,19 +53,17 @@ func (iter *Iterator[T]) Next() bool {
 		return false
 	}
 	iter.start = iter.pos
-	b := iter.data[iter.pos]
 
-	if iter.AnsiEscapeSequences {
-		if b == esc || b == c1UTF8Lead {
-			if a := ansiEscapeLength(iter.data[iter.pos:]); a > 0 {
-				iter.pos += a
-				return true
-			}
+	if iter.AnsiEscapeSequences && (iter.data[iter.pos] == esc || iter.data[iter.pos] == c1UTF8Lead) {
+		if a := ansiEscapeLength(iter.data[iter.pos:]); a > 0 {
+			iter.pos += a
+			return true
 		}
 	}
 
 	// ASCII hot path: any ASCII is one grapheme when next byte is ASCII or end.
 	// Fall through on CR so splitfunc can handle CR+LF as a single cluster.
+	b := iter.data[iter.pos]
 	if b < utf8.RuneSelf && b != cr {
 		if iter.pos+1 >= len(iter.data) || iter.data[iter.pos+1] < utf8.RuneSelf {
 			iter.pos++
