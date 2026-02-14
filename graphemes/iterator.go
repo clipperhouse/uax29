@@ -38,9 +38,12 @@ var (
 )
 
 const (
-	esc = 0x1B
-	cr  = 0x0D
-	bel = 0x07
+	esc        = 0x1B
+	cr         = 0x0D
+	bel        = 0x07
+	can        = 0x18
+	sub        = 0x1A
+	c1UTF8Lead = 0xC2
 )
 
 // Next advances the iterator to the next grapheme cluster.
@@ -51,7 +54,7 @@ func (iter *Iterator[T]) Next() bool {
 	}
 	iter.start = iter.pos
 
-	if iter.AnsiEscapeSequences && iter.data[iter.pos] == esc {
+	if iter.AnsiEscapeSequences && (iter.data[iter.pos] == esc || iter.data[iter.pos] == c1UTF8Lead) {
 		if a := ansiEscapeLength(iter.data[iter.pos:]); a > 0 {
 			iter.pos += a
 			return true
@@ -68,7 +71,7 @@ func (iter *Iterator[T]) Next() bool {
 		}
 	}
 
-	// Fall back to actual grapheme parsing
+	// Fall back to UAX29 grapheme parsing
 	remaining := iter.data[iter.pos:]
 	advance, _, err := iter.split(remaining, true)
 	if err != nil {
