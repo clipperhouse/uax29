@@ -52,6 +52,21 @@ func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
 			expected: []string{"\x1b", "P", "q", "\x07", "r", "e", "s", "t"},
 		},
 		{
+			name:     "DCS canceled by CAN",
+			input:    "\x1bPqdata\x18z",
+			expected: []string{"\x1bPqdata", "\x18", "z"},
+		},
+		{
+			name:     "DCS canceled immediately by CAN",
+			input:    "\x1bP\x18z",
+			expected: []string{"\x1bP", "\x18", "z"},
+		},
+		{
+			name:     "DCS canceled by SUB",
+			input:    "\x1bPqdata\x1az",
+			expected: []string{"\x1bPqdata", "\x1a", "z"},
+		},
+		{
 			name:     "SOS with ST terminator",
 			input:    "\x1bXhello\x1b\\",
 			expected: []string{"\x1bXhello\x1b\\"},
@@ -97,6 +112,16 @@ func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
 			expected: []string{"\x1b", "]", "0", ";", "t", "i", "t", "l", "e"},
 		},
 		{
+			name:     "OSC canceled by CAN",
+			input:    "\x1b]0;title\x18x",
+			expected: []string{"\x1b]0;title", "\x18", "x"},
+		},
+		{
+			name:     "OSC canceled by SUB",
+			input:    "\x1b]0;title\x1ax",
+			expected: []string{"\x1b]0;title", "\x1a", "x"},
+		},
+		{
 			name:     "two-byte Fe",
 			input:    "\x1bD", // IND
 			expected: []string{"\x1bD"},
@@ -115,6 +140,56 @@ func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
 			name:     "mixed: CSI then letter",
 			input:    "\x1b[mx",
 			expected: []string{"\x1b[m", "x"},
+		},
+		{
+			name:     "UTF-8 C1 CSI then text",
+			input:    "\xC2\x9B31mhello",
+			expected: []string{"\xC2\x9B31m", "h", "e", "l", "l", "o"},
+		},
+		{
+			name:     "UTF-8 C1 OSC with UTF-8 C1 ST terminator",
+			input:    "\xC2\x9D0;Title\xC2\x9C",
+			expected: []string{"\xC2\x9D0;Title\xC2\x9C"},
+		},
+		{
+			name:     "UTF-8 C1 OSC with 7-bit ST terminator",
+			input:    "\xC2\x9D0;Title\x1b\\",
+			expected: []string{"\xC2\x9D0;Title\x1b\\"},
+		},
+		{
+			name:     "7-bit OSC with UTF-8 C1 ST terminator",
+			input:    "\x1b]0;Title\xC2\x9C",
+			expected: []string{"\x1b]0;Title\xC2\x9C"},
+		},
+		{
+			name:     "UTF-8 C1 DCS with UTF-8 C1 ST terminator",
+			input:    "\xC2\x90qpayload\xC2\x9C",
+			expected: []string{"\xC2\x90qpayload\xC2\x9C"},
+		},
+		{
+			name:     "UTF-8 C1 DCS canceled by CAN",
+			input:    "\xC2\x90qpayload\x18x",
+			expected: []string{"\xC2\x90qpayload", "\x18", "x"},
+		},
+		{
+			name:     "UTF-8 C1 DCS with 7-bit ST terminator",
+			input:    "\xC2\x90qpayload\x1b\\",
+			expected: []string{"\xC2\x90qpayload\x1b\\"},
+		},
+		{
+			name:     "7-bit DCS with UTF-8 C1 ST terminator",
+			input:    "\x1bPqpayload\xC2\x9C",
+			expected: []string{"\x1bPqpayload\xC2\x9C"},
+		},
+		{
+			name:     "UTF-8 C1 Fe IND control",
+			input:    "\xC2\x84",
+			expected: []string{"\xC2\x84"},
+		},
+		{
+			name:     "UTF-8 C1 lead byte for non-C1 codepoint is not ANSI",
+			input:    "\u00A9",
+			expected: []string{"\u00A9"},
 		},
 		{
 			name:     "malformed CSI: param after intermediate",
