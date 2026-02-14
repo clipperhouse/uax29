@@ -2,8 +2,7 @@ package words
 
 import (
 	"bufio"
-
-	"github.com/clipperhouse/stringish/utf8"
+	"unicode/utf8"
 )
 
 // is determines if lookup intersects propert(ies)
@@ -21,6 +20,18 @@ const (
 //
 // See https://unicode.org/reports/tr29/#Word_Boundaries.
 var SplitFunc bufio.SplitFunc = splitFunc[[]byte]
+
+func decodeRune[T ~string | ~[]byte](data T) (rune, int) {
+	switch v := any(data).(type) {
+	case string:
+		return utf8.DecodeRuneInString(v)
+	case []byte:
+		return utf8.DecodeRune(v)
+	default:
+		// Handle named string/[]byte types.
+		return utf8.DecodeRuneInString(string(data))
+	}
+}
 
 func splitFunc[T ~string | ~[]byte](data T, atEOF bool) (advance int, token T, err error) {
 	var none Joiners[T]
@@ -53,7 +64,7 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 	}
 
 	if j != nil && j.Leading != nil {
-		r, _ := utf8.DecodeRune(data[pos:])
+		r, _ := decodeRune(data[pos:])
 		if runesContain(j.Leading, r) {
 			// treat leading joiners as if they are letter,
 			// then depend on the existing logic below
@@ -97,7 +108,7 @@ func (j *Joiners[T]) splitFunc(data T, atEOF bool) (advance int, token T, err er
 		}
 
 		if j != nil && j.Middle != nil {
-			r, _ := utf8.DecodeRune(data[pos:])
+			r, _ := decodeRune(data[pos:])
 			if runesContain(j.Middle, r) {
 				// treat middle joiners as if they are middle letters/numbers,
 				// then depend on the existing logic below
