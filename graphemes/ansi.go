@@ -11,7 +11,7 @@ package graphemes
 //   - CSI: ESC [ then parameter bytes (0x30–0x3F), intermediate (0x20–0x2F), final (0x40–0x7E)
 //   - OSC: ESC ] then payload until ST (ESC \) or BEL (0x07)
 //   - DCS, SOS, PM, APC: ESC P / X / ^ / _ then payload until ST (ESC \)
-//   - Two-byte: ESC + Fe (0x40–0x5F excluding above), or Fp (0x30–0x3F), or nF (0x20–0x2F then final)
+//   - Two-byte: ESC + Fe/Fs (0x40–0x7E excluding above), or Fp (0x30–0x3F), or nF (0x20–0x2F then final)
 func ansiEscapeLength[T ~string | ~[]byte](data T) int {
 	n := len(data)
 	if n < 2 {
@@ -41,8 +41,8 @@ func ansiEscapeLength[T ~string | ~[]byte](data T) int {
 			}
 			return 2 + body
 		}
-		if b1 >= 0x40 && b1 <= 0x5F {
-			// Fe (C1) two-byte; [ ] P X ^ _ handled above
+		if b1 >= 0x40 && b1 <= 0x7E {
+			// Fe/Fs two-byte; [ ] P X ^ _ handled above
 			return 2
 		}
 		if b1 >= 0x30 && b1 <= 0x3F {

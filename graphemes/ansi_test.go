@@ -1,6 +1,7 @@
 package graphemes_test
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 
@@ -127,6 +128,21 @@ func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
 			expected: []string{"\x1bD"},
 		},
 		{
+			name:     "two-byte Fs RIS",
+			input:    "\x1bc",
+			expected: []string{"\x1bc"},
+		},
+		{
+			name:     "two-byte Fs upper boundary 0x7E",
+			input:    "\x1b~x",
+			expected: []string{"\x1b~", "x"},
+		},
+		{
+			name:     "ESC DEL (0x7F) is not Fs",
+			input:    "\x1b\x7f",
+			expected: []string{"\x1b", "\x7f"},
+		},
+		{
 			name:     "two-byte Fp DECSC",
 			input:    "\x1b7",
 			expected: []string{"\x1b7"},
@@ -192,6 +208,66 @@ func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
 			expected: []string{"\u00A9"},
 		},
 		{
+			name:     "nF malformed: no final byte",
+			input:    "\x1b \x1b",
+			expected: []string{"\x1b", " ", "\x1b"},
+		},
+		{
+			name:     "nF with multiple intermediates",
+			input:    "\x1b !Fx",
+			expected: []string{"\x1b !F", "x"},
+		},
+		{
+			name:     "nF with private-use final (0x30)",
+			input:    "\x1b 0",
+			expected: []string{"\x1b 0"},
+		},
+		{
+			name:     "CSI with valid intermediate byte",
+			input:    "\x1b[0 q",
+			expected: []string{"\x1b[0 q"},
+		},
+		{
+			name:     "UTF-8 C1 OSC unterminated",
+			input:    "\xC2\x9D0;title",
+			expected: []string{"\xC2\x9D", "0", ";", "t", "i", "t", "l", "e"},
+		},
+		{
+			name:     "UTF-8 C1 DCS unterminated",
+			input:    "\xC2\x90data",
+			expected: []string{"\xC2\x90", "d", "a", "t", "a"},
+		},
+		{
+			name:     "UTF-8 C1 SOS with UTF-8 C1 ST terminator",
+			input:    "\xC2\x98hello\xC2\x9C",
+			expected: []string{"\xC2\x98hello\xC2\x9C"},
+		},
+		{
+			name:     "UTF-8 C1 PM with 7-bit ST terminator",
+			input:    "\xC2\x9Emsg\x1b\\",
+			expected: []string{"\xC2\x9Emsg\x1b\\"},
+		},
+		{
+			name:     "UTF-8 C1 APC with UTF-8 C1 ST terminator",
+			input:    "\xC2\x9Fdata\xC2\x9C",
+			expected: []string{"\xC2\x9Fdata\xC2\x9C"},
+		},
+		{
+			name:     "single ESC byte",
+			input:    "\x1b",
+			expected: []string{"\x1b"},
+		},
+		{
+			name:     "single C1 lead byte (incomplete UTF-8)",
+			input:    "\xC2",
+			expected: []string{"\xC2"},
+		},
+		{
+			name:     "SOS canceled by CAN",
+			input:    "\x1bXhello\x18z",
+			expected: []string{"\x1bXhello", "\x18", "z"},
+		},
+		{
 			name:     "malformed CSI: param after intermediate",
 			input:    "\x1b[ 1mok",
 			expected: []string{"\x1b", "[", " ", "1", "m", "o", "k"},
@@ -207,46 +283,29 @@ func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			iter := graphemes.FromString(tt.input)
-			iter.AnsiEscapeSequences = true
-			var got []string
-			for iter.Next() {
-				got = append(got, iter.Value())
-			}
-			if len(got) != len(tt.expected) {
-				t.Errorf("len(got)=%d len(expected)=%d\ngot %q\nexpected %q", len(got), len(tt.expected), got, tt.expected)
-				return
-			}
-			for i := range got {
-				if got[i] != tt.expected[i] {
-					t.Errorf("at %d: got %q expected %q", i, got[i], tt.expected[i])
+			assertEqual := func(kind string, got []string) {
+				t.Helper()
+				if !reflect.DeepEqual(got, tt.expected) {
+					t.Errorf("%s mismatch\ngot %q\nexpected %q", kind, got, tt.expected)
 				}
 			}
-		})
-	}
-}
 
-func TestAnsiEscapeSequencesBytes(t *testing.T) {
-	t.Parallel()
-	input := []byte("\x1b[31mhi\x1b[0m")
-	iter := graphemes.FromBytes(input)
-	iter.AnsiEscapeSequences = true
-	var got [][]byte
-	for iter.Next() {
-		got = append(got, iter.Value())
-	}
-	expected := [][]byte{
-		[]byte("\x1b[31m"),
-		[]byte("h"), []byte("i"),
-		[]byte("\x1b[0m"),
-	}
-	if len(got) != len(expected) {
-		t.Fatalf("len(got)=%d len(expected)=%d", len(got), len(expected))
-	}
-	for i := range got {
-		if string(got[i]) != string(expected[i]) {
-			t.Errorf("at %d: got %q expected %q", i, got[i], expected[i])
-		}
+			iterString := graphemes.FromString(tt.input)
+			iterString.AnsiEscapeSequences = true
+			var gotString []string
+			for iterString.Next() {
+				gotString = append(gotString, iterString.Value())
+			}
+			assertEqual("string", gotString)
+
+			iterBytes := graphemes.FromBytes([]byte(tt.input))
+			iterBytes.AnsiEscapeSequences = true
+			var gotBytes []string
+			for iterBytes.Next() {
+				gotBytes = append(gotBytes, string(iterBytes.Value()))
+			}
+			assertEqual("bytes", gotBytes)
+		})
 	}
 }
 
