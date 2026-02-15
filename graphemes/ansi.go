@@ -3,23 +3,27 @@ package graphemes
 // ansiEscapeLength returns the byte length of a valid ANSI escape/control
 // sequence at the start of data, or 0 if none.
 //
-// Input is UTF-8. This recognizes both:
+// This recognizes both:
 //   - 7-bit representations (ESC + final/intermediate bytes), and
-//   - UTF-8 encodings of 8-bit C1 controls (U+0080..U+009F => 0xC2 0x80..0x9F).
+//   - 8-bit C1 controls (raw bytes 0x80..0x9F per ECMA-48).
 //
 // Recognized forms (ECMA-48 / ISO 6429):
-//   - CSI: ESC [ then parameter bytes (0x30–0x3F), intermediate (0x20–0x2F), final (0x40–0x7E)
-//   - OSC: ESC ] then payload until ST (ESC \) or BEL (0x07)
-//   - DCS, SOS, PM, APC: ESC P / X / ^ / _ then payload until ST (ESC \)
+//   - CSI: ESC [ (or 0x9B) then parameter bytes (0x30–0x3F), intermediate (0x20–0x2F), final (0x40–0x7E)
+//   - OSC: ESC ] (or 0x9D) then payload until ST, BEL (0x07), CAN (0x18), or SUB (0x1A)
+//   - DCS, SOS, PM, APC: ESC P/X/^/_ (or 0x90/0x98/0x9E/0x9F) then payload until ST, CAN, or SUB
 //   - Two-byte: ESC + Fe/Fs (0x40–0x7E excluding above), or Fp (0x30–0x3F), or nF (0x20–0x2F then final)
+//   - Standalone C1 controls (0x80..0x9F not listed above): single byte
 func ansiEscapeLength[T ~string | ~[]byte](data T) int {
 	n := len(data)
-	if n < 2 {
+	if n == 0 {
 		return 0
 	}
 
 	switch data[0] {
 	case esc:
+		if n < 2 {
+			return 0
+		}
 		b1 := data[1]
 		switch b1 {
 		case '[': // CSI
@@ -61,34 +65,31 @@ func ansiEscapeLength[T ~string | ~[]byte](data T) int {
 			return 0
 		}
 
-	case c1UTF8Lead:
-		b1 := data[1]
-		if b1 < 0x80 || b1 > 0x9F {
+	case 0x9B: // C1 CSI
+		body := csiLength(data[1:])
+		if body == 0 {
 			return 0
 		}
+		return 1 + body
 
-		switch b1 {
-		case 0x9B: // CSI
-			body := csiLength(data[2:])
-			if body == 0 {
-				return 0
-			}
-			return 2 + body
-		case 0x9D: // OSC – allows BEL or ST as terminator
-			body := oscLength(data[2:])
-			if body < 0 {
-				return 0
-			}
-			return 2 + body
-		case 0x90, 0x98, 0x9E, 0x9F: // DCS, SOS, PM, APC – require ST only
-			body := stSequenceLength(data[2:])
-			if body < 0 {
-				return 0
-			}
-			return 2 + body
-		default:
-			// Any other C1 control (UTF-8 encoded) is one control sequence token.
-			return 2
+	case 0x9D: // C1 OSC
+		body := oscLength(data[1:])
+		if body < 0 {
+			return 0
+		}
+		return 1 + body
+
+	case 0x90, 0x98, 0x9E, 0x9F: // C1 DCS, SOS, PM, APC
+		body := stSequenceLength(data[1:])
+		if body < 0 {
+			return 0
+		}
+		return 1 + body
+
+	default:
+		if data[0] >= 0x80 && data[0] <= 0x9F {
+			// Any other C1 control is a single-byte sequence.
+			return 1
 		}
 	}
 
@@ -132,21 +133,19 @@ func csiLength[T ~string | ~[]byte](data T) int {
 //   - -1: not terminated in the provided data
 //
 // OSC accepts BEL (0x07) or ST as terminator by widespread convention.
+// ST may be 7-bit (ESC \) or C1 (0x9C).
 // Per ECMA-48, CAN (0x18) and SUB (0x1A) cancel the control string; in that
 // case they are not part of the OSC sequence length.
 func oscLength[T ~string | ~[]byte](data T) int {
 	for i := 0; i < len(data); i++ {
 		b := data[i]
-		if b == bel {
+		if b == bel || b == st {
 			return i + 1
 		}
 		if b == can || b == sub {
 			return i
 		}
 		if b == esc && i+1 < len(data) && data[i+1] == '\\' {
-			return i + 2
-		}
-		if b == c1UTF8Lead && i+1 < len(data) && data[i+1] == 0x9C {
 			return i + 2
 		}
 	}
@@ -161,6 +160,7 @@ func oscLength[T ~string | ~[]byte](data T) int {
 //   - -1: not terminated in the provided data
 //
 // Used for DCS, SOS, PM, and APC, which per ECMA-48 terminate with ST.
+// ST may be 7-bit (ESC \) or C1 (0x9C).
 // CAN (0x18) and SUB (0x1A) cancel the control string; in that case they are
 // not part of the sequence length.
 func stSequenceLength[T ~string | ~[]byte](data T) int {
@@ -168,10 +168,10 @@ func stSequenceLength[T ~string | ~[]byte](data T) int {
 		if data[i] == can || data[i] == sub {
 			return i
 		}
-		if data[i] == esc && i+1 < len(data) && data[i+1] == '\\' {
-			return i + 2
+		if data[i] == st {
+			return i + 1
 		}
-		if data[i] == c1UTF8Lead && i+1 < len(data) && data[i+1] == 0x9C {
+		if data[i] == esc && i+1 < len(data) && data[i+1] == '\\' {
 			return i + 2
 		}
 	}

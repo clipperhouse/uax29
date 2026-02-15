@@ -38,12 +38,12 @@ var (
 )
 
 const (
-	esc        = 0x1B
-	cr         = 0x0D
-	bel        = 0x07
-	can        = 0x18
-	sub        = 0x1A
-	c1UTF8Lead = 0xC2
+	esc = 0x1B
+	cr  = 0x0D
+	bel = 0x07
+	can = 0x18
+	sub = 0x1A
+	st  = 0x9C // C1 String Terminator
 )
 
 // Next advances the iterator to the next grapheme cluster.
@@ -54,7 +54,8 @@ func (iter *Iterator[T]) Next() bool {
 	}
 	iter.start = iter.pos
 
-	if iter.AnsiEscapeSequences && (iter.data[iter.pos] == esc || iter.data[iter.pos] == c1UTF8Lead) {
+	b := iter.data[iter.pos]
+	if iter.AnsiEscapeSequences && (b == esc || (b >= 0x80 && b <= 0x9F)) {
 		if a := ansiEscapeLength(iter.data[iter.pos:]); a > 0 {
 			iter.pos += a
 			return true
@@ -62,8 +63,6 @@ func (iter *Iterator[T]) Next() bool {
 	}
 
 	// ASCII hot path: any ASCII is one grapheme when next byte is ASCII or end.
-	// Fall through on CR so splitfunc can handle CR+LF as a single cluster.
-	b := iter.data[iter.pos]
 	if b < utf8.RuneSelf && b != cr {
 		if iter.pos+1 >= len(iter.data) || iter.data[iter.pos+1] < utf8.RuneSelf {
 			iter.pos++
