@@ -86,7 +86,7 @@ for g.Next() {
 }
 ```
 
-We implement [ECMA-48](https://ecma-international.org/publications-and-standards/standards/ecma-48/) C0 and C1 control codes, 7-bit and 8-bit, in UTF-8 encoding.
+We implement [ECMA-48](https://ecma-international.org/publications-and-standards/standards/ecma-48/) C0 and C1 control codes, 7-bit and 8-bit. Note that 8-bit control codes are not UTF-8 encoded, and in fact are not valid UTF-8. Caveat emptor.
 
 ### Benchmarks
 

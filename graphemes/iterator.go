@@ -27,8 +27,13 @@ type Iterator[T ~string | ~[]byte] struct {
 	data  T
 	pos   int
 	start int
-	// AnsiEscapeSequences treats ANSI escape sequences (ECMA-48) as single grapheme
-	// clusters when true. Default is false.
+	// AnsiEscapeSequences treats ANSI escape sequences (ECMA-48) as single
+	// grapheme clusters when true. The default is false.
+	//
+	// This option recognizes 7-bit and 8-bit control codes from ECMA-48. 8-bit
+	// control codes are not UTF-8 encoded, i.e. not valid UTF-8. If you
+	// choose this option, you are choosing to interpret non-UTF-8 data,
+	// caveat emptor.
 	AnsiEscapeSequences bool
 }
 
