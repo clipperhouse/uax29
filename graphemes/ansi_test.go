@@ -258,6 +258,26 @@ func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
 			expected: []string{"\x84"},
 		},
 		{
+			name:     "UTF-8 cafe",
+			input:    "café",
+			expected: []string{"c", "a", "f", "é"},
+		},
+		{
+			name:     "UTF-8 Japanese text",
+			input:    "日本語",
+			expected: []string{"日", "本", "語"},
+		},
+		{
+			name:     "UTF-8 runes with continuation bytes in C1 range",
+			input:    "Āğל",
+			expected: []string{"Ā", "ğ", "ל"},
+		},
+		{
+			name:     "mixed ANSI and UTF-8 adversarial payload",
+			input:    "\x1b[31mĀğ日本語café\x1b[0m",
+			expected: []string{"\x1b[31m", "Ā", "ğ", "日", "本", "語", "c", "a", "f", "é", "\x1b[0m"},
+		},
+		{
 			name:     "SOS canceled by CAN",
 			input:    "\x1bXhello\x18z",
 			expected: []string{"\x1bXhello", "\x18", "z"},
@@ -300,6 +320,58 @@ func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
 				gotBytes = append(gotBytes, string(iterBytes.Value()))
 			}
 			assertEqual("bytes", gotBytes)
+		})
+	}
+}
+
+func TestAnsiEscapeSequencesPureUTF8Parity(t *testing.T) {
+	t.Parallel()
+
+	samples := []string{
+		"café",
+		"日本語",
+		"Āğל",
+		"A\u0301",
+		"👩🏽‍💻",
+		"Résumé — 東京 — 👍",
+	}
+
+	collectString := func(input string, ansi bool) []string {
+		iter := graphemes.FromString(input)
+		iter.AnsiEscapeSequences = ansi
+		var out []string
+		for iter.Next() {
+			out = append(out, iter.Value())
+		}
+		return out
+	}
+
+	collectBytes := func(input string, ansi bool) []string {
+		iter := graphemes.FromBytes([]byte(input))
+		iter.AnsiEscapeSequences = ansi
+		var out []string
+		for iter.Next() {
+			out = append(out, string(iter.Value()))
+		}
+		return out
+	}
+
+	for i, sample := range samples {
+		sample := sample
+		t.Run("sample-"+string(rune('A'+i)), func(t *testing.T) {
+			t.Parallel()
+
+			stringNoANSI := collectString(sample, false)
+			stringANSI := collectString(sample, true)
+			if !reflect.DeepEqual(stringNoANSI, stringANSI) {
+				t.Fatalf("string parity mismatch for %q\noff=%q\non=%q", sample, stringNoANSI, stringANSI)
+			}
+
+			bytesNoANSI := collectBytes(sample, false)
+			bytesANSI := collectBytes(sample, true)
+			if !reflect.DeepEqual(bytesNoANSI, bytesANSI) {
+				t.Fatalf("bytes parity mismatch for %q\noff=%q\non=%q", sample, bytesNoANSI, bytesANSI)
+			}
 		})
 	}
 }
