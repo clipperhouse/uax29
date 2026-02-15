@@ -11,7 +11,7 @@ jobs:
     strategy:
         matrix:
           package: [words, sentences, graphemes, phrases]
-          fuzzer: [FuzzValidShort, FuzzValidLong, FuzzInvalid]
+          fuzzer: [FuzzValidShort, FuzzValidLong, FuzzInvalid, FuzzANSIOptions]
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go
