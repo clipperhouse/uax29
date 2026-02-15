@@ -176,6 +176,77 @@ func TestAnsiBoundaryAgreement(t *testing.T) {
 	}
 }
 
+// ansiSample builds a realistic ANSI-heavy string simulating colored terminal output.
+func ansiSample() string {
+	var b strings.Builder
+	colors := []string{
+		"\x1b[1;34m", // bold blue
+		"\x1b[0;32m", // green
+		"\x1b[0;36m", // cyan
+		"\x1b[1;31m", // bold red
+		"\x1b[33m",   // yellow
+	}
+	reset := "\x1b[0m"
+	lines := []string{
+		"drwxr-xr-x  5 user staff  160 Jan  1 12:00 Documents",
+		"drwxr-xr-x  3 user staff   96 Feb  2 09:30 Downloads",
+		"-rwxr-xr-x  1 user staff 8432 Mar 15 14:22 build.sh",
+		"lrwxr-xr-x  1 user staff   11 Apr 20 08:00 config",
+		"-rw-r--r--  1 user staff 1024 May  5 16:45 README.md",
+	}
+	for round := 0; round < 40; round++ {
+		for i, line := range lines {
+			color := colors[i%len(colors)]
+			if i%5 == 0 {
+				b.WriteString("\x1b]0;terminal - round ")
+				b.WriteString(string(rune('0' + round%10)))
+				b.WriteString("\x07")
+			}
+			b.WriteString(color)
+			b.WriteString(line)
+			b.WriteString(reset)
+			b.WriteString("\n")
+		}
+	}
+	return b.String()
+}
+
+func BenchmarkAnsiIteration(b *testing.B) {
+	input := ansiSample()
+	n := int64(len(input))
+
+	b.Run("clipperhouse/uax29", func(b *testing.B) {
+		b.SetBytes(n)
+		b.ReportAllocs()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			count := 0
+			g := graphemes.FromString(input)
+			g.AnsiEscapeSequences = true
+			for g.Next() {
+				count++
+			}
+		}
+	})
+
+	b.Run("charmbracelet/x/ansi", func(b *testing.B) {
+		b.SetBytes(n)
+		b.ReportAllocs()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			count := 0
+			var state byte
+			remaining := input
+			for len(remaining) > 0 {
+				_, _, advance, newState := ansi.DecodeSequence(remaining, state, nil)
+				state = newState
+				remaining = remaining[advance:]
+				count++
+			}
+		}
+	})
+}
+
 // uax29Tokens segments the input using our graphemes iterator with ANSI support.
 func uax29Tokens(input string) []string {
 	iter := graphemes.FromString(input)
