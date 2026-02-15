@@ -508,20 +508,73 @@ func ansiSample() string {
 	return b.String()
 }
 
+// ansiSample8Bit builds a string that uses 8-bit C1 initiators.
+func ansiSample8Bit() string {
+	var b strings.Builder
+
+	lines := []string{
+		"drwxr-xr-x  5 user staff  160 Jan  1 12:00 Documents",
+		"drwxr-xr-x  3 user staff   96 Feb  2 09:30 Downloads",
+		"-rwxr-xr-x  1 user staff 8432 Mar 15 14:22 build.sh",
+		"lrwxr-xr-x  1 user staff   11 Apr 20 08:00 config -> /etc/config",
+		"-rw-r--r--  1 user staff 1024 May  5 16:45 README.md",
+		"total 42",
+		"drwxr-xr-x  2 user staff   64 Jun 10 11:11 src",
+		"-rw-r--r--  1 user staff  512 Jul  7 07:07 main.go",
+		"error: file not found: missing.txt",
+		"warning: deprecated function used in line 42",
+	}
+
+	for round := 0; round < 20; round++ {
+		for i, line := range lines {
+			// C1 OSC: 0x9D ... BEL
+			if i%5 == 0 {
+				b.WriteByte(0x9D)
+				b.WriteString("0;terminal - round ")
+				b.WriteString(string(rune('0' + round%10)))
+				b.WriteByte(0x07)
+			}
+			// C1 CSI SGR: 0x9B ... m
+			b.WriteByte(0x9B)
+			b.WriteString("1;3")
+			b.WriteString(string(rune('0' + (i % 8))))
+			b.WriteByte('m')
+			b.WriteString(line)
+			// C1 CSI reset: 0x9B0m
+			b.WriteByte(0x9B)
+			b.WriteString("0m")
+			b.WriteByte('\n')
+		}
+	}
+	return b.String()
+}
+
+// ansiSampleMixed builds a string with both 7-bit and 8-bit ANSI forms.
+func ansiSampleMixed() string {
+	var b strings.Builder
+	a7 := ansiSample()
+	a8 := ansiSample8Bit()
+	b.WriteString(a7)
+	b.WriteString(a8)
+	return b.String()
+}
+
 // BenchmarkAnsiOption benchmarks the iterator on text that contains ANSI escapes,
 // and on plain text, with the AnsiEscapeSequences option on and off.
 func BenchmarkAnsiOption(b *testing.B) {
-	ansi := ansiSample()
+	ansi7 := ansiSample()
+	ansi8 := ansiSample8Bit()
+	ansiMixed := ansiSampleMixed()
 	plain, err := testdata.Sample()
 	if err != nil {
 		b.Fatal(err)
 	}
 	plainStr := string(plain)
 
-	b.Run("AnsiText/OptionOn", func(b *testing.B) {
-		b.SetBytes(int64(len(ansi)))
+	b.Run("AnsiText7Bit/Option7BitOn", func(b *testing.B) {
+		b.SetBytes(int64(len(ansi7)))
 		for i := 0; i < b.N; i++ {
-			iter := graphemes.FromString(ansi)
+			iter := graphemes.FromString(ansi7)
 			iter.AnsiEscapeSequences = true
 			c := 0
 			for iter.Next() {
@@ -532,10 +585,10 @@ func BenchmarkAnsiOption(b *testing.B) {
 		}
 	})
 
-	b.Run("AnsiText/OptionOff", func(b *testing.B) {
-		b.SetBytes(int64(len(ansi)))
+	b.Run("AnsiText7Bit/OptionOff", func(b *testing.B) {
+		b.SetBytes(int64(len(ansi7)))
 		for i := 0; i < b.N; i++ {
-			iter := graphemes.FromString(ansi)
+			iter := graphemes.FromString(ansi7)
 			c := 0
 			for iter.Next() {
 				_ = iter.Value()
@@ -545,11 +598,82 @@ func BenchmarkAnsiOption(b *testing.B) {
 		}
 	})
 
-	b.Run("PlainText/OptionOn", func(b *testing.B) {
+	b.Run("AnsiText8Bit/Option8BitOn", func(b *testing.B) {
+		b.SetBytes(int64(len(ansi8)))
+		for i := 0; i < b.N; i++ {
+			iter := graphemes.FromString(ansi8)
+			iter.AnsiEscapeSequences8Bit = true
+			c := 0
+			for iter.Next() {
+				_ = iter.Value()
+				c++
+			}
+			b.ReportMetric(float64(c), "tokens")
+		}
+	})
+
+	b.Run("AnsiText8Bit/OptionOff", func(b *testing.B) {
+		b.SetBytes(int64(len(ansi8)))
+		for i := 0; i < b.N; i++ {
+			iter := graphemes.FromString(ansi8)
+			c := 0
+			for iter.Next() {
+				_ = iter.Value()
+				c++
+			}
+			b.ReportMetric(float64(c), "tokens")
+		}
+	})
+
+	b.Run("AnsiTextMixed/BothOptionsOn", func(b *testing.B) {
+		b.SetBytes(int64(len(ansiMixed)))
+		for i := 0; i < b.N; i++ {
+			iter := graphemes.FromString(ansiMixed)
+			iter.AnsiEscapeSequences = true
+			iter.AnsiEscapeSequences8Bit = true
+			c := 0
+			for iter.Next() {
+				_ = iter.Value()
+				c++
+			}
+			b.ReportMetric(float64(c), "tokens")
+		}
+	})
+
+	b.Run("PlainText/Option7BitOn", func(b *testing.B) {
 		b.SetBytes(int64(len(plainStr)))
 		for i := 0; i < b.N; i++ {
 			iter := graphemes.FromString(plainStr)
 			iter.AnsiEscapeSequences = true
+			c := 0
+			for iter.Next() {
+				_ = iter.Value()
+				c++
+			}
+			b.ReportMetric(float64(c), "tokens")
+		}
+	})
+
+	b.Run("PlainText/Option8BitOn", func(b *testing.B) {
+		b.SetBytes(int64(len(plainStr)))
+		for i := 0; i < b.N; i++ {
+			iter := graphemes.FromString(plainStr)
+			iter.AnsiEscapeSequences8Bit = true
+			c := 0
+			for iter.Next() {
+				_ = iter.Value()
+				c++
+			}
+			b.ReportMetric(float64(c), "tokens")
+		}
+	})
+
+	b.Run("PlainText/BothOptionsOn", func(b *testing.B) {
+		b.SetBytes(int64(len(plainStr)))
+		for i := 0; i < b.N; i++ {
+			iter := graphemes.FromString(plainStr)
+			iter.AnsiEscapeSequences = true
+			iter.AnsiEscapeSequences8Bit = true
 			c := 0
 			for iter.Next() {
 				_ = iter.Value()

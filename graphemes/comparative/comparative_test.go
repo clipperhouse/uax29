@@ -210,17 +210,52 @@ func ansiSample() string {
 	return b.String()
 }
 
-func BenchmarkAnsiIteration(b *testing.B) {
-	input := ansiSample()
-	n := int64(len(input))
+func ansiSample8Bit() string {
+	var b strings.Builder
+	lines := []string{
+		"drwxr-xr-x  5 user staff  160 Jan  1 12:00 Documents",
+		"drwxr-xr-x  3 user staff   96 Feb  2 09:30 Downloads",
+		"-rwxr-xr-x  1 user staff 8432 Mar 15 14:22 build.sh",
+		"lrwxr-xr-x  1 user staff   11 Apr 20 08:00 config",
+		"-rw-r--r--  1 user staff 1024 May  5 16:45 README.md",
+	}
+	for round := 0; round < 40; round++ {
+		for i, line := range lines {
+			if i%5 == 0 {
+				b.WriteByte(0x9D)
+				b.WriteString("0;terminal - round ")
+				b.WriteString(string(rune('0' + round%10)))
+				b.WriteByte(0x07)
+			}
+			b.WriteByte(0x9B)
+			b.WriteString("1;3")
+			b.WriteString(string(rune('0' + (i % 8))))
+			b.WriteByte('m')
+			b.WriteString(line)
+			b.WriteByte(0x9B)
+			b.WriteString("0m")
+			b.WriteString("\n")
+		}
+	}
+	return b.String()
+}
 
-	b.Run("clipperhouse/uax29", func(b *testing.B) {
-		b.SetBytes(n)
+func ansiSampleMixed() string {
+	return ansiSample() + ansiSample8Bit()
+}
+
+func BenchmarkAnsiIteration(b *testing.B) {
+	input7 := ansiSample()
+	input8 := ansiSample8Bit()
+	inputMixed := ansiSampleMixed()
+
+	b.Run("clipperhouse/uax29/7bit", func(b *testing.B) {
+		b.SetBytes(int64(len(input7)))
 		b.ReportAllocs()
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			count := 0
-			g := graphemes.FromString(input)
+			g := graphemes.FromString(input7)
 			g.AnsiEscapeSequences = true
 			for g.Next() {
 				count++
@@ -228,14 +263,43 @@ func BenchmarkAnsiIteration(b *testing.B) {
 		}
 	})
 
-	b.Run("charmbracelet/x/ansi", func(b *testing.B) {
-		b.SetBytes(n)
+	b.Run("clipperhouse/uax29/8bit", func(b *testing.B) {
+		b.SetBytes(int64(len(input8)))
+		b.ReportAllocs()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			count := 0
+			g := graphemes.FromString(input8)
+			g.AnsiEscapeSequences8Bit = true
+			for g.Next() {
+				count++
+			}
+		}
+	})
+
+	b.Run("clipperhouse/uax29/both", func(b *testing.B) {
+		b.SetBytes(int64(len(inputMixed)))
+		b.ReportAllocs()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			count := 0
+			g := graphemes.FromString(inputMixed)
+			g.AnsiEscapeSequences = true
+			g.AnsiEscapeSequences8Bit = true
+			for g.Next() {
+				count++
+			}
+		}
+	})
+
+	b.Run("charmbracelet/x/ansi/mixed", func(b *testing.B) {
+		b.SetBytes(int64(len(inputMixed)))
 		b.ReportAllocs()
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			count := 0
 			var state byte
-			remaining := input
+			remaining := inputMixed
 			for len(remaining) > 0 {
 				_, _, advance, newState := ansi.DecodeSequence(remaining, state, nil)
 				state = newState

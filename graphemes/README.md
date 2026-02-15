@@ -95,7 +95,7 @@ g.AnsiEscapeSequences8Bit = true // 8-bit C1 forms (0x80-0x9F), not valid UTF-8
 
 For ESC-initiated (7-bit) control strings, only 7-bit terminators are recognized.
 
-We implement [ECMA-48](https://ecma-international.org/publications-and-standards/standards/ecma-48/) control codes in both 7-bit and 8-bit representations. 8-bit control codes are not UTF-8 encoded and are not valid UTF-8.
+We implement [ECMA-48](https://ecma-international.org/publications-and-standards/standards/ecma-48/) control codes in both 7-bit and 8-bit representations. 8-bit control codes are not UTF-8 encoded and are not valid UTF-8, caveat emptor.
 
 ### Benchmarks
 
