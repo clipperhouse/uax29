@@ -17,7 +17,7 @@ func ansiEscapeLength[T ~string | ~[]byte](data T) int {
 	b1 := data[1]
 	switch b1 {
 	case '[': // CSI
-		body := csiLength(data[2:])
+		body := csiBodyLength(data[2:])
 		if body == 0 {
 			return 0
 		}
@@ -59,14 +59,14 @@ func ansiEscapeLength[T ~string | ~[]byte](data T) int {
 	return 0
 }
 
-// csiLength returns the length of the CSI body (param/intermediate/final bytes).
+// csiBodyLength returns the length of the CSI body (param/intermediate/final bytes).
 // data is the slice after "ESC [".
 // Per ECMA-48, the CSI body has the form:
 //
 //	parameters (0x30–0x3F)*, intermediates (0x20–0x2F)*, final (0x40–0x7E)
 //
 // Once an intermediate byte is seen, subsequent parameter bytes are invalid.
-func csiLength[T ~string | ~[]byte](data T) int {
+func csiBodyLength[T ~string | ~[]byte](data T) int {
 	seenIntermediate := false
 	for i := 0; i < len(data); i++ {
 		b := data[i]

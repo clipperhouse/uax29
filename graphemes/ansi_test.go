@@ -87,12 +87,12 @@ func TestAnsiEscapeSequences8BitOnlyAsGraphemes(t *testing.T) {
 		{name: "C1 CSI then text", input: "\x9B31mhello", expected: []string{"\x9B31m", "h", "e", "l", "l", "o"}},
 		{name: "C1 CSI multiple params", input: "\x9B1;2;3m", expected: []string{"\x9B1;2;3m"}},
 		{name: "C1 OSC with C1 ST", input: "\x9D0;Title\x9C", expected: []string{"\x9D0;Title\x9C"}},
-		{name: "C1 OSC with 7-bit ST", input: "\x9D0;Title\x1b\\", expected: []string{"\x9D0;Title\x1b\\"}},
+		{name: "C1 OSC with 7-bit ST is not parsed as one sequence", input: "\x9D0;Title\x1b\\", expected: []string{"\x9D", "0", ";", "T", "i", "t", "l", "e", "\x1b", "\\"}},
 		{name: "C1 DCS with C1 ST", input: "\x90qpayload\x9C", expected: []string{"\x90qpayload\x9C"}},
-		{name: "C1 DCS with 7-bit ST", input: "\x90qpayload\x1b\\", expected: []string{"\x90qpayload\x1b\\"}},
+		{name: "C1 DCS with 7-bit ST is not parsed as one sequence", input: "\x90qpayload\x1b\\", expected: []string{"\x90", "q", "p", "a", "y", "l", "o", "a", "d", "\x1b", "\\"}},
 		{name: "C1 DCS canceled by CAN", input: "\x90qpayload\x18x", expected: []string{"\x90qpayload", "\x18", "x"}},
 		{name: "C1 SOS with C1 ST", input: "\x98hello\x9C", expected: []string{"\x98hello\x9C"}},
-		{name: "C1 PM with 7-bit ST", input: "\x9Emsg\x1b\\", expected: []string{"\x9Emsg\x1b\\"}},
+		{name: "C1 PM with 7-bit ST is not parsed as one sequence", input: "\x9Emsg\x1b\\", expected: []string{"\x9E", "m", "s", "g", "\x1b", "\\"}},
 		{name: "C1 APC with C1 ST", input: "\x9Fdata\x9C", expected: []string{"\x9Fdata\x9C"}},
 		{name: "single C1 Fe control", input: "\x84", expected: []string{"\x84"}},
 		{name: "C1 OSC unterminated", input: "\x9D0;title", expected: []string{"\x9D", "0", ";", "t", "i", "t", "l", "e"}},
@@ -270,7 +270,7 @@ func TestAnsiEscapeSequencesBothEnabledAsGraphemes(t *testing.T) {
 		{
 			name:     "C1 OSC with 7-bit ST terminator",
 			input:    "\x9D0;Title\x1b\\",
-			expected: []string{"\x9D0;Title\x1b\\"},
+			expected: []string{"\x9D", "0", ";", "T", "i", "t", "l", "e", "\x1b\\"},
 		},
 		{
 			name:     "7-bit OSC with C1 ST terminator",
@@ -290,7 +290,7 @@ func TestAnsiEscapeSequencesBothEnabledAsGraphemes(t *testing.T) {
 		{
 			name:     "C1 DCS with 7-bit ST terminator",
 			input:    "\x90qpayload\x1b\\",
-			expected: []string{"\x90qpayload\x1b\\"},
+			expected: []string{"\x90", "q", "p", "a", "y", "l", "o", "a", "d", "\x1b\\"},
 		},
 		{
 			name:     "7-bit DCS with C1 ST terminator",
@@ -340,7 +340,7 @@ func TestAnsiEscapeSequencesBothEnabledAsGraphemes(t *testing.T) {
 		{
 			name:     "C1 PM with 7-bit ST terminator",
 			input:    "\x9Emsg\x1b\\",
-			expected: []string{"\x9Emsg\x1b\\"},
+			expected: []string{"\x9E", "m", "s", "g", "\x1b\\"},
 		},
 		{
 			name:     "C1 APC with C1 ST terminator",

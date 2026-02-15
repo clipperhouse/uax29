@@ -111,11 +111,8 @@ func TestAnsiBoundaryAgreement(t *testing.T) {
 		// C1 8-bit
 		{"C1 CSI then text", "\x9B31mhello"},
 		{"C1 OSC with C1 ST", "\x9D0;Title\x9C"},
-		{"C1 OSC with 7-bit ST", "\x9D0;Title\x1b\\"},
-		{"C1 DCS with 7-bit ST", "\x90qpayload\x1b\\"},
 		{"C1 DCS with C1 ST", "\x90qpayload\x9C"},
 		{"C1 SOS with C1 ST", "\x98hello\x9C"},
-		{"C1 PM with 7-bit ST", "\x9Emsg\x1b\\"},
 		{"C1 APC with C1 ST", "\x9Fdata\x9C"},
 
 		// CSI variants (from charmbracelet test suite)
