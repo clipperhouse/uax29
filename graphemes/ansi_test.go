@@ -9,14 +9,104 @@ import (
 	"github.com/clipperhouse/uax29/v2/testdata"
 )
 
-func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
+type ansiCase struct {
+	name     string
+	input    string
+	expected []string
+}
+
+func assertANSITokens(t *testing.T, input string, expected []string, sevenBit, eightBit bool) {
+	t.Helper()
+
+	assertEqual := func(kind string, got []string) {
+		t.Helper()
+		if !reflect.DeepEqual(got, expected) {
+			t.Errorf("%s mismatch\ngot %q\nexpected %q", kind, got, expected)
+		}
+	}
+
+	iterString := graphemes.FromString(input)
+	iterString.AnsiEscapeSequences = sevenBit
+	iterString.AnsiEscapeSequences8Bit = eightBit
+	var gotString []string
+	for iterString.Next() {
+		gotString = append(gotString, iterString.Value())
+	}
+	assertEqual("string", gotString)
+
+	iterBytes := graphemes.FromBytes([]byte(input))
+	iterBytes.AnsiEscapeSequences = sevenBit
+	iterBytes.AnsiEscapeSequences8Bit = eightBit
+	var gotBytes []string
+	for iterBytes.Next() {
+		gotBytes = append(gotBytes, string(iterBytes.Value()))
+	}
+	assertEqual("bytes", gotBytes)
+}
+
+func runANSICases(t *testing.T, tests []ansiCase, sevenBit, eightBit bool) {
+	t.Helper()
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			assertANSITokens(t, tt.input, tt.expected, sevenBit, eightBit)
+		})
+	}
+}
+
+func TestAnsiEscapeSequences7BitOnlyAsGraphemes(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
-		name     string
-		input    string
-		expected []string
-	}{
+	tests := []ansiCase{
+		{name: "SGR reset", input: "\x1b[0m", expected: []string{"\x1b[0m"}},
+		{name: "SGR red then text", input: "\x1b[31mhello", expected: []string{"\x1b[31m", "h", "e", "l", "l", "o"}},
+		{name: "CSI with valid intermediate", input: "\x1b[0 q", expected: []string{"\x1b[0 q"}},
+		{name: "OSC window title then BEL", input: "\x1b]0;My Title\x07", expected: []string{"\x1b]0;My Title\x07"}},
+		{name: "OSC window title then ST", input: "\x1b]0;Title\x1b\\", expected: []string{"\x1b]0;Title\x1b\\"}},
+		{name: "DCS with ST terminator", input: "\x1bPq#0;2;0;0;0\x1b\\", expected: []string{"\x1bPq#0;2;0;0;0\x1b\\"}},
+		{name: "DCS canceled by CAN", input: "\x1bPqdata\x18z", expected: []string{"\x1bPqdata", "\x18", "z"}},
+		{name: "SOS with ST terminator", input: "\x1bXhello\x1b\\", expected: []string{"\x1bXhello\x1b\\"}},
+		{name: "PM with ST terminator", input: "\x1b^msg\x1b\\", expected: []string{"\x1b^msg\x1b\\"}},
+		{name: "APC with ST terminator", input: "\x1b_data\x1b\\", expected: []string{"\x1b_data\x1b\\"}},
+		{name: "two-byte Fe", input: "\x1bD", expected: []string{"\x1bD"}},
+		{name: "two-byte Fp", input: "\x1b7", expected: []string{"\x1b7"}},
+		{name: "nF with multiple intermediates", input: "\x1b !Fx", expected: []string{"\x1b !F", "x"}},
+		{name: "malformed CSI remains split", input: "\x1b[ 1mok", expected: []string{"\x1b", "[", " ", "1", "m", "o", "k"}},
+		{name: "C1 CSI is not parsed", input: "\x9B31mhello", expected: []string{"\x9B", "3", "1", "m", "h", "e", "l", "l", "o"}},
+		{name: "7-bit OSC does not accept C1 ST", input: "\x1b]0;Title\x9Cz", expected: []string{"\x1b", "]", "0", ";", "T", "i", "t", "l", "e", "\x9C", "z"}},
+	}
+
+	runANSICases(t, tests, true, false)
+}
+
+func TestAnsiEscapeSequences8BitOnlyAsGraphemes(t *testing.T) {
+	t.Parallel()
+
+	tests := []ansiCase{
+		{name: "C1 CSI then text", input: "\x9B31mhello", expected: []string{"\x9B31m", "h", "e", "l", "l", "o"}},
+		{name: "C1 CSI multiple params", input: "\x9B1;2;3m", expected: []string{"\x9B1;2;3m"}},
+		{name: "C1 OSC with C1 ST", input: "\x9D0;Title\x9C", expected: []string{"\x9D0;Title\x9C"}},
+		{name: "C1 OSC with 7-bit ST", input: "\x9D0;Title\x1b\\", expected: []string{"\x9D0;Title\x1b\\"}},
+		{name: "C1 DCS with C1 ST", input: "\x90qpayload\x9C", expected: []string{"\x90qpayload\x9C"}},
+		{name: "C1 DCS with 7-bit ST", input: "\x90qpayload\x1b\\", expected: []string{"\x90qpayload\x1b\\"}},
+		{name: "C1 DCS canceled by CAN", input: "\x90qpayload\x18x", expected: []string{"\x90qpayload", "\x18", "x"}},
+		{name: "C1 SOS with C1 ST", input: "\x98hello\x9C", expected: []string{"\x98hello\x9C"}},
+		{name: "C1 PM with 7-bit ST", input: "\x9Emsg\x1b\\", expected: []string{"\x9Emsg\x1b\\"}},
+		{name: "C1 APC with C1 ST", input: "\x9Fdata\x9C", expected: []string{"\x9Fdata\x9C"}},
+		{name: "single C1 Fe control", input: "\x84", expected: []string{"\x84"}},
+		{name: "C1 OSC unterminated", input: "\x9D0;title", expected: []string{"\x9D", "0", ";", "t", "i", "t", "l", "e"}},
+		{name: "C1 DCS unterminated", input: "\x90data", expected: []string{"\x90", "d", "a", "t", "a"}},
+		{name: "7-bit ESC sequence is not parsed", input: "\x1b[31mhello", expected: []string{"\x1b", "[", "3", "1", "m", "h", "e", "l", "l", "o"}},
+	}
+
+	runANSICases(t, tests, false, true)
+}
+
+func TestAnsiEscapeSequencesBothEnabledAsGraphemes(t *testing.T) {
+	t.Parallel()
+
+	tests := []ansiCase{
 		{
 			name:     "SGR reset",
 			input:    "\x1b[0m",
@@ -38,6 +128,11 @@ func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
 			expected: []string{"\x1b]0;My Title\x07"},
 		},
 		{
+			name:     "OSC UTF-8 payload does not terminate at continuation byte",
+			input:    "\x1b]0;本\x07",
+			expected: []string{"\x1b]0;本\x07"},
+		},
+		{
 			name:     "OSC window title then ST",
 			input:    "\x1b]0;Title\x1b\\",
 			expected: []string{"\x1b]0;Title\x1b\\"},
@@ -46,6 +141,11 @@ func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
 			name:     "DCS with ST terminator",
 			input:    "\x1bPq#0;2;0;0;0\x1b\\",
 			expected: []string{"\x1bPq#0;2;0;0;0\x1b\\"},
+		},
+		{
+			name:     "DCS UTF-8 payload does not terminate at continuation byte",
+			input:    "\x1bPq本\x1b\\",
+			expected: []string{"\x1bPq本\x1b\\"},
 		},
 		{
 			name:     "DCS with BEL in payload is not a single sequence",
@@ -175,7 +275,7 @@ func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
 		{
 			name:     "7-bit OSC with C1 ST terminator",
 			input:    "\x1b]0;Title\x9C",
-			expected: []string{"\x1b]0;Title\x9C"},
+			expected: []string{"\x1b", "]", "0", ";", "T", "i", "t", "l", "e", "\x9C"},
 		},
 		{
 			name:     "C1 DCS with C1 ST terminator",
@@ -195,7 +295,7 @@ func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
 		{
 			name:     "7-bit DCS with C1 ST terminator",
 			input:    "\x1bPqpayload\x9C",
-			expected: []string{"\x1bPqpayload\x9C"},
+			expected: []string{"\x1b", "P", "q", "p", "a", "y", "l", "o", "a", "d", "\x9C"},
 		},
 		{
 			name:     "C1 Fe IND control",
@@ -294,34 +394,7 @@ func TestAnsiEscapeSequencesAsGraphemes(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			assertEqual := func(kind string, got []string) {
-				t.Helper()
-				if !reflect.DeepEqual(got, tt.expected) {
-					t.Errorf("%s mismatch\ngot %q\nexpected %q", kind, got, tt.expected)
-				}
-			}
-
-			iterString := graphemes.FromString(tt.input)
-			iterString.AnsiEscapeSequences = true
-			var gotString []string
-			for iterString.Next() {
-				gotString = append(gotString, iterString.Value())
-			}
-			assertEqual("string", gotString)
-
-			iterBytes := graphemes.FromBytes([]byte(tt.input))
-			iterBytes.AnsiEscapeSequences = true
-			var gotBytes []string
-			for iterBytes.Next() {
-				gotBytes = append(gotBytes, string(iterBytes.Value()))
-			}
-			assertEqual("bytes", gotBytes)
-		})
-	}
+	runANSICases(t, tests, true, true)
 }
 
 func TestAnsiEscapeSequencesPureUTF8Parity(t *testing.T) {
@@ -336,9 +409,10 @@ func TestAnsiEscapeSequencesPureUTF8Parity(t *testing.T) {
 		"Résumé — 東京 — 👍",
 	}
 
-	collectString := func(input string, ansi bool) []string {
+	collectString := func(input string, ansi7, ansi8 bool) []string {
 		iter := graphemes.FromString(input)
-		iter.AnsiEscapeSequences = ansi
+		iter.AnsiEscapeSequences = ansi7
+		iter.AnsiEscapeSequences8Bit = ansi8
 		var out []string
 		for iter.Next() {
 			out = append(out, iter.Value())
@@ -346,9 +420,10 @@ func TestAnsiEscapeSequencesPureUTF8Parity(t *testing.T) {
 		return out
 	}
 
-	collectBytes := func(input string, ansi bool) []string {
+	collectBytes := func(input string, ansi7, ansi8 bool) []string {
 		iter := graphemes.FromBytes([]byte(input))
-		iter.AnsiEscapeSequences = ansi
+		iter.AnsiEscapeSequences = ansi7
+		iter.AnsiEscapeSequences8Bit = ansi8
 		var out []string
 		for iter.Next() {
 			out = append(out, string(iter.Value()))
@@ -361,16 +436,26 @@ func TestAnsiEscapeSequencesPureUTF8Parity(t *testing.T) {
 		t.Run("sample-"+string(rune('A'+i)), func(t *testing.T) {
 			t.Parallel()
 
-			stringNoANSI := collectString(sample, false)
-			stringANSI := collectString(sample, true)
-			if !reflect.DeepEqual(stringNoANSI, stringANSI) {
-				t.Fatalf("string parity mismatch for %q\noff=%q\non=%q", sample, stringNoANSI, stringANSI)
-			}
+			stringBase := collectString(sample, false, false)
+			for _, flags := range []struct {
+				name  string
+				ansi7 bool
+				ansi8 bool
+			}{
+				{name: "7-bit only", ansi7: true, ansi8: false},
+				{name: "8-bit only", ansi7: false, ansi8: true},
+				{name: "both", ansi7: true, ansi8: true},
+			} {
+				gotString := collectString(sample, flags.ansi7, flags.ansi8)
+				if !reflect.DeepEqual(stringBase, gotString) {
+					t.Fatalf("string parity mismatch for %q (%s)\noff=%q\non=%q", sample, flags.name, stringBase, gotString)
+				}
 
-			bytesNoANSI := collectBytes(sample, false)
-			bytesANSI := collectBytes(sample, true)
-			if !reflect.DeepEqual(bytesNoANSI, bytesANSI) {
-				t.Fatalf("bytes parity mismatch for %q\noff=%q\non=%q", sample, bytesNoANSI, bytesANSI)
+				bytesBase := collectBytes(sample, false, false)
+				gotBytes := collectBytes(sample, flags.ansi7, flags.ansi8)
+				if !reflect.DeepEqual(bytesBase, gotBytes) {
+					t.Fatalf("bytes parity mismatch for %q (%s)\noff=%q\non=%q", sample, flags.name, bytesBase, gotBytes)
+				}
 			}
 		})
 	}

@@ -139,7 +139,6 @@ func TestAnsiBoundaryAgreement(t *testing.T) {
 		{"nF charset G0 then text", "\x1b(Btext"},
 
 		// DCS with params
-		{"DCS with params and C1 ST", "\x1bP0;1|17/ab\x9c"},
 		{"C1 DCS with params and C1 ST", "\x90?123;456+q\x9c"},
 
 		// APC payload (Kitty graphics protocol)
@@ -251,6 +250,7 @@ func BenchmarkAnsiIteration(b *testing.B) {
 func uax29Tokens(input string) []string {
 	iter := graphemes.FromString(input)
 	iter.AnsiEscapeSequences = true
+	iter.AnsiEscapeSequences8Bit = true
 	var tokens []string
 	for iter.Next() {
 		tokens = append(tokens, iter.Value())

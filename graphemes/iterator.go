@@ -27,14 +27,17 @@ type Iterator[T ~string | ~[]byte] struct {
 	data  T
 	pos   int
 	start int
-	// AnsiEscapeSequences treats ANSI escape sequences (ECMA-48) as single
+	// AnsiEscapeSequences treats 7-bit ANSI escape sequences (ECMA-48) as
+	// single grapheme clusters when true. The default is false.
+	//
+	// 8-bit controls are not enabled by this option. See AnsiEscapeSequences8Bit.
+	AnsiEscapeSequences bool
+	// AnsiEscapeSequences8Bit treats 8-bit C1 control codes (ECMA-48) as single
 	// grapheme clusters when true. The default is false.
 	//
-	// This option recognizes 7-bit and 8-bit control codes from ECMA-48. 8-bit
-	// control codes are not UTF-8 encoded, i.e. not valid UTF-8. If you
-	// choose this option, you are choosing to interpret non-UTF-8 data,
-	// caveat emptor.
-	AnsiEscapeSequences bool
+	// 8-bit control bytes are not UTF-8 encoded, i.e. not valid UTF-8. If you
+	// choose this option, you are choosing to interpret non-UTF-8 data.
+	AnsiEscapeSequences8Bit bool
 }
 
 var (
@@ -60,8 +63,14 @@ func (iter *Iterator[T]) Next() bool {
 	iter.start = iter.pos
 
 	b := iter.data[iter.pos]
-	if iter.AnsiEscapeSequences && (b == esc || (b >= 0x80 && b <= 0x9F)) {
+	if iter.AnsiEscapeSequences && b == esc {
 		if a := ansiEscapeLength(iter.data[iter.pos:]); a > 0 {
+			iter.pos += a
+			return true
+		}
+	}
+	if iter.AnsiEscapeSequences8Bit && b >= 0x80 && b <= 0x9F {
+		if a := ansiEscapeLength8Bit(iter.data[iter.pos:]); a > 0 {
 			iter.pos += a
 			return true
 		}
