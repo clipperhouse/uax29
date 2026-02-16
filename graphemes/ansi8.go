@@ -41,6 +41,15 @@ func ansiEscapeLength8Bit[T ~string | ~[]byte](data T) int {
 	return 0
 }
 
+// oscLengthC1 returns the length of a C1 OSC body.
+// data is the slice after the C1 OSC initiator (0x9D).
+//
+// Returns:
+//   - n >= 0: consumed body length (includes BEL/ST terminator when present)
+//   - -1: not terminated in the provided data
+//
+// Terminators: BEL (0x07) or C1 ST (0x9C).
+// CAN (0x18) and SUB (0x1A) cancel the control string.
 func oscLengthC1[T ~string | ~[]byte](data T) int {
 	for i := 0; i < len(data); i++ {
 		b := data[i]
