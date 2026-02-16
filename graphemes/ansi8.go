@@ -58,10 +58,11 @@ func oscLengthC1[T ~string | ~[]byte](data T) int {
 // (0x9C), or are canceled by CAN/SUB.
 func stSequenceLengthC1[T ~string | ~[]byte](data T) int {
 	for i := 0; i < len(data); i++ {
-		if data[i] == can || data[i] == sub {
+		b := data[i]
+		if b == can || b == sub {
 			return i
 		}
-		if data[i] == st {
+		if b == st {
 			return i + 1
 		}
 	}
