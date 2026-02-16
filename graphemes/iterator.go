@@ -27,7 +27,7 @@ type Iterator[T ~string | ~[]byte] struct {
 	data  T
 	pos   int
 	start int
-	// AnsiEscapeSequences treats 7-bit C0 ANSI escape sequences (ECMA-48) as
+	// AnsiEscapeSequences treats 7-bit ANSI escape sequences (ECMA-48) as
 	// single grapheme clusters when true. The default is false.
 	//
 	// 8-bit controls are not enabled by this option. See [AnsiEscapeSequences8Bit].
