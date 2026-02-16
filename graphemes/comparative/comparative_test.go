@@ -159,6 +159,19 @@ func TestAnsiBoundaryAgreement(t *testing.T) {
 
 		// Plain text (no ANSI)
 		{"plain ASCII", "hello world"},
+
+		// DecodeSequence parser parity edge cases
+		{"single ESC byte", "\x1b"},
+		{"single NUL byte", "\x00"},
+		{"ASCII DEL byte", "\x7f"},
+		{"DEL between ASCII runes", "a\x7fb"},
+		{"double ESC", "\x1b\x1b"},
+		{"double ST 7-bit", "\x1b\\\x1b\\"},
+		{"double ST 8-bit", "\x9c\x9c"},
+		{"single-param OSC", "\x1b]112\x07"},
+		{"ESC with intermediate", "\x1b Q"},
+		{"DCS containing DEL payload", "\x1bP1;2+xa\x7fb\x1b\\"},
+		{"OSC with C1 bytes in payload", "\x1b]11;\x90?\x1b\\"},
 	}
 
 	for _, tt := range tests {
@@ -168,6 +181,60 @@ func TestAnsiBoundaryAgreement(t *testing.T) {
 			if !reflect.DeepEqual(ours, theirs) {
 				t.Errorf("boundary mismatch\nours:   %q\ntheirs: %q", ours, theirs)
 			}
+		})
+	}
+}
+
+// TestAnsiBoundaryKnownDivergences documents cases where our grapheme-oriented
+// tokenizer intentionally differs from charmbracelet/x/ansi DecodeSequence.
+func TestAnsiBoundaryKnownDivergences(t *testing.T) {
+	tests := []struct {
+		name   string
+		input  string
+		reason string
+	}{
+		{
+			name:   "unterminated CSI",
+			input:  "\x1b[1;2;3",
+			reason: "DecodeSequence returns one unterminated CSI token; we split when no final byte is present",
+		},
+		{
+			name:   "unterminated OSC",
+			input:  "\x1b]11;ff/00/ff",
+			reason: "DecodeSequence returns one unterminated OSC token; we split when OSC has no BEL/ST/CAN/SUB terminator",
+		},
+		{
+			name:   "unterminated OSC followed by CSI",
+			input:  "\x1b]11;ff/00/ff\x1b[1;2;3m",
+			reason: "DecodeSequence ends OSC at ESC and parses following CSI; we require explicit OSC terminator",
+		},
+		{
+			name:   "unterminated OSC followed by bare ESC",
+			input:  "\x1b]11;ff/00/ff\x1b",
+			reason: "DecodeSequence emits unterminated OSC then ESC; we split because OSC is invalid without terminator",
+		},
+		{
+			name:   "unterminated DCS",
+			input:  "\x1bP1;2+xa",
+			reason: "DecodeSequence returns one unterminated DCS token; we split when DCS has no ST/CAN/SUB terminator",
+		},
+		{
+			name:   "invalid DCS immediately terminated",
+			input:  "\x1bP\x1b\\ab",
+			reason: "DecodeSequence emits ESC P token before ST; we do not treat invalid DCS start as a sequence",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ours := uax29Tokens(tt.input)
+			theirs := charmTokens(tt.input)
+			if reflect.DeepEqual(ours, theirs) {
+				t.Fatalf("expected divergence, but boundaries matched\nreason: %s\ntokens: %q", tt.reason, ours)
+			}
+			t.Logf("reason: %s", tt.reason)
+			t.Logf("ours:   %q", ours)
+			t.Logf("theirs: %q", theirs)
 		})
 	}
 }
