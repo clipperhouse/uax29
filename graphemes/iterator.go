@@ -27,12 +27,12 @@ type Iterator[T ~string | ~[]byte] struct {
 	data  T
 	pos   int
 	start int
-	// AnsiEscapeSequences treats 7-bit ANSI escape sequences (ECMA-48) as
+	// AnsiEscapeSequences treats 7-bit C0 ANSI escape sequences (ECMA-48) as
 	// single grapheme clusters when true. The default is false.
 	//
 	// 8-bit controls are not enabled by this option. See [AnsiEscapeSequences8Bit].
 	AnsiEscapeSequences bool
-	// AnsiEscapeSequences8Bit treats 8-bit C1 control codes (ECMA-48) as single
+	// AnsiEscapeSequences8Bit treats 8-bit C1 ANSI escape sequences (ECMA-48) as single
 	// grapheme clusters when true. The default is false.
 	//
 	// 8-bit control bytes are not UTF-8 encoded, i.e. not valid UTF-8. If you
@@ -52,7 +52,7 @@ const (
 	bel = 0x07
 	can = 0x18
 	sub = 0x1A
-	st  = 0x9C // C1 String Terminator
+	st  = 0x9C
 )
 
 // Next advances the iterator to the next grapheme cluster.
