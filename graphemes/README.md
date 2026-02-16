@@ -74,7 +74,7 @@ for g.Next() {                     // Next() returns true until end of data
 
 ### ANSI escape sequences
 
-By the UAX 29 specification, ANSI escape sequences are not grapheme clusters. To treat these sequences as a single cluster, set the `AnsiEscapeSequences` option to true.
+By the UAX 29 specification, ANSI escape sequences are not grapheme clusters. To treat 7-bit ANSI escape sequences as a single cluster, set `AnsiEscapeSequences` to true.
 
 ```go
 text := "Hello, \x1b[31mworld\x1b[0m!"
@@ -86,7 +86,17 @@ for g.Next() {
 }
 ```
 
-We implement [ECMA-48](https://ecma-international.org/publications-and-standards/standards/ecma-48/) C0 and C1 control codes, 7-bit and 8-bit, in UTF-8 encoding.
+To also parse 8-bit C1 controls (non-UTF-8 bytes), set `AnsiEscapeSequences8Bit` to true.
+
+```go
+g.AnsiEscapeSequences = true     // 7-bit forms (ESC ...)
+g.AnsiEscapeSequences8Bit = true // 8-bit C1 forms (0x80-0x9F), not valid UTF-8
+```
+
+For ESC-initiated (7-bit) control strings, only 7-bit terminators are recognized.
+For C1-initiated (8-bit) control strings, only C1 ST (`0x9C`) is recognized as ST.
+
+We implement [ECMA-48](https://ecma-international.org/publications-and-standards/standards/ecma-48/) control codes in both 7-bit and 8-bit representations. 8-bit control codes are not UTF-8 encoded and are not valid UTF-8, caveat emptor.
 
 ### Benchmarks
 
