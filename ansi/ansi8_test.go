@@ -2,7 +2,7 @@ package ansi
 
 import "testing"
 
-// // Tests for [EscapeLength8Bit] function.
+// Tests for [EscapeLength8Bit] function.
 func TestEscapeLength8Bit(t *testing.T) {
 	t.Parallel()
 
@@ -38,7 +38,7 @@ func TestEscapeLength8Bit(t *testing.T) {
 	}
 }
 
-// Testss for [oscLengthC1] function.
+// Tests for [oscLengthC1] function.
 func TestOscLengthC1(t *testing.T) {
 	t.Parallel()
 
