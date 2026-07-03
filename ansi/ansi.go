@@ -1,6 +1,15 @@
-package graphemes
+package ansi
 
-// ansiEscapeLength returns the byte length of a valid 7-bit ANSI escape
+const (
+	esc = 0x1B
+	cr  = 0x0D
+	bel = 0x07
+	can = 0x18
+	sub = 0x1A
+	st  = 0x9C
+)
+
+// EscapeLength returns the byte length of a valid 7-bit ANSI escape
 // sequence at the start of data, or 0 if none.
 //
 // Recognized forms (ECMA-48 / ISO 6429):
@@ -8,7 +17,7 @@ package graphemes
 //   - OSC: ESC ] then payload until BEL (0x07), 7-bit ST (ESC \), CAN (0x18), or SUB (0x1A)
 //   - DCS, SOS, PM, APC: ESC P/X/^/_ then payload until 7-bit ST (ESC \), CAN, or SUB
 //   - Two-byte: ESC + Fe/Fs (0x40-0x7E excluding above), or Fp (0x30-0x3F), or nF (0x20-0x2F then final)
-func ansiEscapeLength[T ~string | ~[]byte](data T) int {
+func EscapeLength[T ~string | ~[]byte](data T) int {
 	n := len(data)
 	if n < 2 || data[0] != esc {
 		return 0

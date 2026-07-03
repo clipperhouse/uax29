@@ -1,6 +1,10 @@
 package graphemes
 
-import "unicode/utf8"
+import (
+	"unicode/utf8"
+
+	"github.com/clipperhouse/uax29/v2/ansi"
+)
 
 // FromString returns an iterator for the grapheme clusters in the input string.
 // Iterate while Next() is true, and access the grapheme via Value().
@@ -65,13 +69,13 @@ func (iter *Iterator[T]) Next() bool {
 
 	b := iter.data[iter.pos]
 	if iter.AnsiEscapeSequences && b == esc {
-		if a := ansiEscapeLength(iter.data[iter.pos:]); a > 0 {
+		if a := ansi.EscapeLength(iter.data[iter.pos:]); a > 0 {
 			iter.pos += a
 			return true
 		}
 	}
 	if iter.AnsiEscapeSequences8Bit && b >= 0x80 && b <= 0x9F {
-		if a := ansiEscapeLength8Bit(iter.data[iter.pos:]); a > 0 {
+		if a := ansi.EscapeLength8Bit(iter.data[iter.pos:]); a > 0 {
 			iter.pos += a
 			return true
 		}

@@ -1,6 +1,6 @@
-package graphemes
+package ansi
 
-// ansiEscapeLength8Bit returns the byte length of a valid 8-bit C1 ANSI
+// EscapeLength8Bit returns the byte length of a valid 8-bit C1 ANSI
 // sequence at the start of data, or 0 if none.
 //
 // Recognized forms (ECMA-48 / ISO 6429):
@@ -8,7 +8,7 @@ package graphemes
 //   - C1 OSC (0x9D) body terminated by BEL, C1 ST, CAN, or SUB
 //   - C1 DCS/SOS/PM/APC (0x90/0x98/0x9E/0x9F) body terminated by C1 ST, CAN, or SUB
 //   - Standalone C1 controls (0x80..0x9F not listed above): single byte
-func ansiEscapeLength8Bit[T ~string | ~[]byte](data T) int {
+func EscapeLength8Bit[T ~string | ~[]byte](data T) int {
 	if len(data) == 0 {
 		return 0
 	}
