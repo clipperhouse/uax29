@@ -3,7 +3,7 @@ package graphemes
 import (
 	"unicode/utf8"
 
-	"github.com/clipperhouse/uax29/v2/ansi"
+	"github.com/clipperhouse/uax29/v2/graphemes/ansi"
 )
 
 // FromString returns an iterator for the grapheme clusters in the input string.
