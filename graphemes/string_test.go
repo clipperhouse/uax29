@@ -301,3 +301,43 @@ func BenchmarkStringUnicodeTests(b *testing.B) {
 		b.ReportMetric(float64(c), "tokens")
 	}
 }
+
+func TestStringTruncatedAtEOF(t *testing.T) {
+	t.Parallel()
+
+	// An incomplete rune at the end of input should not absorb its neighbors
+	tests := []struct {
+		input    string
+		expected []string
+	}{
+		{"abc\xc3", []string{"a", "b", "c", "\xc3"}},
+		{"abc\xe2\x82", []string{"a", "b", "c", "\xe2\x82"}},
+		{"a\xf0bc", []string{"a", "\xf0", "b", "c"}},
+		{"\xf0 b", []string{"\xf0", " ", "b"}},
+		{"ab\xe2\n", []string{"a", "b", "\xe2", "\n"}},
+		{"\xf0\x9f\x98", []string{"\xf0\x9f\x98"}},
+		{"\xf0\u0301", []string{"\xf0\u0301"}},       // GB9
+		{"\u0601\xf0b", []string{"\u0601\xf0", "b"}}, // GB9b
+	}
+
+	for _, test := range tests {
+		var got []string
+		tokens := graphemes.FromString(test.input)
+		for tokens.Next() {
+			got = append(got, tokens.Value())
+		}
+		if !reflect.DeepEqual(got, test.expected) {
+			t.Errorf("%q: got %q, expected %q", test.input, got, test.expected)
+		}
+
+		// Same boundaries as when more input follows
+		var padded []string
+		tokens = graphemes.FromString(test.input + "\r\r\r")
+		for tokens.Next() && len(padded) < len(got) {
+			padded = append(padded, tokens.Value())
+		}
+		if !reflect.DeepEqual(got, padded) {
+			t.Errorf("%q: got %q, but %q when followed by more input", test.input, got, padded)
+		}
+	}
+}
