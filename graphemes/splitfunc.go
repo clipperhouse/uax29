@@ -21,6 +21,16 @@ const (
 	incbLinker                     // seen Consonant and Linker (conjunct ready)
 )
 
+// truncated returns the width of an incomplete encoding at the end of data:
+// the lead byte and any continuation bytes.
+func truncated[T ~string | ~[]byte](data T) int {
+	w := 1
+	for w < len(data) && data[w]&0xC0 == 0x80 {
+		w++
+	}
+	return w
+}
+
 // SplitFunc is a bufio.SplitFunc implementation of Unicode grapheme cluster segmentation, for use with bufio.Scanner.
 //
 // See https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries.
@@ -50,8 +60,8 @@ func splitFunc[T ~string | ~[]byte](data T, atEOF bool) (advance int, token T, e
 			// Rune extends past current data, request more
 			return 0, empty, nil
 		}
-		pos = len(data)
-		return pos, data[:pos], nil
+		// Incomplete rune, treat as invalid UTF-8
+		w = truncated(data[pos:])
 	}
 
 	// https://unicode.org/reports/tr29/#GB1
@@ -106,13 +116,12 @@ func splitFunc[T ~string | ~[]byte](data T, atEOF bool) (advance int, token T, e
 
 		current, w = lookup(data[pos:])
 		if w == 0 {
-			if atEOF {
-				// Just return the bytes, we can't do anything with them
-				pos = len(data)
-				break
+			if !atEOF {
+				// Rune extends past current data, request more
+				return 0, empty, nil
 			}
-			// Rune extends past current data, request more
-			return 0, empty, nil
+			// Incomplete rune, treat as invalid UTF-8
+			w = truncated(data[pos:])
 		}
 
 		// Optimization: no rule can possibly apply
